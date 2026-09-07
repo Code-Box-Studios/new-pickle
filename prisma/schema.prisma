@@ -63,6 +63,11 @@ enum BookingSource {
   WALK_IN
 }
 
+enum BackendType {
+  LOCAL
+  SENTRY
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -162,6 +167,7 @@ model Court {
   priceCents  Int
   active      Boolean  @default(true)
   sortOrder   Int      @default(0)
+  externalRef String? // Sentry resource id (SENTRY venues only)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -223,6 +229,8 @@ model Booking {
   customerEmail  String?
   note           String?
   source         BookingSource @default(ONLINE)
+  backendType    BackendType   @default(LOCAL)
+  externalRef    String? // Sentry booking id (SENTRY bookings only)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -239,6 +247,7 @@ model Booking {
   @@index([venueId, status])
   @@index([courtId, startsAt])
   @@index([userId])
+  @@index([backendType])
   @@map("bookings")
 }
 
