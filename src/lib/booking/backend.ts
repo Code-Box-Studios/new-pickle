@@ -82,4 +82,6 @@ export interface BookingBackend {
   expireStale(now?: Date): Promise<number>;
   /** Currently-occupying ranges on a court within [from, to). */
   getOccupied(courtId: string, from: Date, to: Date): Promise<OccupiedRange[]>;
+  /** Current normalized status. LOCAL reads its own row; SENTRY refreshes from Sentry. */
+  getStatus(bookingId: string): Promise<{ status: BookingStatus; externalRef: string | null }>;
 }

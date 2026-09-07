@@ -338,4 +338,13 @@ export class LocalBookingBackend implements BookingBackend {
     });
     return rows;
   }
+
+  async getStatus(bookingId: string): Promise<{ status: BookingStatus; externalRef: string | null }> {
+    const b = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      select: { status: true, externalRef: true },
+    });
+    if (!b) throw new NotFoundError("Booking not found");
+    return { status: b.status, externalRef: b.externalRef };
+  }
 }
