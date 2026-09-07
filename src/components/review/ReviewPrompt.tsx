@@ -1,0 +1,100 @@
+"use client";
+
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import { StarRating } from "./StarRating";
+import { Stars } from "./Stars";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
+
+export function ReviewPrompt({
+  bookingId,
+  venueName,
+  existing,
+}: {
+  bookingId: string;
+  venueName: string;
+  existing: { rating: number; body: string | null } | null;
+}) {
+  const router = useRouter();
+  const toast = useToast();
+  const [editing, setEditing] = React.useState(existing === null);
+  const [rating, setRating] = React.useState(existing?.rating ?? 0);
+  const [body, setBody] = React.useState(existing?.body ?? "");
+  const [busy, setBusy] = React.useState(false);
+
+  async function submit() {
+    if (rating < 1) {
+      toast({ title: "Pick a rating first", tone: "error" });
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/bookings/${bookingId}/review`, {
+        method: existing ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating, body: body.trim() || null }),
+      });
+      if (!res.ok) {
+        const j = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(j.error ?? "Something went wrong");
+      }
+      toast({ title: existing ? "Review updated" : "Thanks for your review!", tone: "success" });
+      setEditing(false);
+      router.refresh();
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : "Failed to submit", tone: "error" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (existing && !editing) {
+    return (
+      <section className="mt-4 rounded-2xl border border-black/5 p-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-ink">Your review</h2>
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="text-sm font-medium text-brand-700 hover:underline"
+          >
+            Edit
+          </button>
+        </div>
+        <div className="mt-2">
+          <Stars value={existing.rating} />
+        </div>
+        {existing.body && <p className="mt-1.5 text-sm text-ink-soft">{existing.body}</p>}
+      </section>
+    );
+  }
+
+  return (
+    <section className="mt-4 rounded-2xl border border-black/5 p-4">
+      <h2 className="text-base font-bold text-ink">How was your experience?</h2>
+      <p className="mt-0.5 text-sm text-muted">Rate your visit to {venueName}.</p>
+      <div className="mt-3">
+        <StarRating value={rating} onChange={setRating} />
+      </div>
+      <textarea
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        rows={3}
+        maxLength={1000}
+        placeholder="Share a little about your visit (optional)"
+        className="mt-3 w-full rounded-xl border border-black/10 p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+      />
+      <div className="mt-3 flex gap-2">
+        <Button onClick={submit} loading={busy} size="lg">
+          {existing ? "Save changes" : "Submit review"}
+        </Button>
+        {existing && (
+          <Button variant="ghost" onClick={() => setEditing(false)} disabled={busy}>
+            Cancel
+          </Button>
+        )}
+      </div>
+    </section>
+  );
+}
