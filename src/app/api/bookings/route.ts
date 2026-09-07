@@ -17,6 +17,20 @@ export async function POST(req: NextRequest) {
     const session = await getSession();
     if (!session) throw new UnauthorizedError("Please sign in to reserve a court");
 
+    // Idempotency short-circuit: a replay must return the same booking, even
+    // though the slot now reads as occupied by that first hold.
+    const idempotencyKey = req.headers.get("Idempotency-Key") ?? undefined;
+    if (idempotencyKey) {
+      const existing = await prisma.booking.findUnique({ where: { idempotencyKey } });
+      if (existing && existing.userId === session.id) {
+        return NextResponse.json({
+          id: existing.id,
+          reference: existing.reference,
+          holdExpiresAt: existing.holdExpiresAt,
+        });
+      }
+    }
+
     const body = (await req.json()) as {
       courtId?: string;
       startsAt?: string;
@@ -63,7 +77,7 @@ export async function POST(req: NextRequest) {
       endsAt,
       priceCents: match.priceCents,
       userId: session.id,
-      idempotencyKey: req.headers.get("Idempotency-Key") ?? undefined,
+      idempotencyKey,
       customer: { email: session.email },
     });
 
