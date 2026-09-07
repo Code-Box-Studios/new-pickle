@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { SessionUser } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 const NAV = [
   { href: "/", label: "Home" },
@@ -35,6 +36,7 @@ export function SiteHeader({ session }: { session: SessionUser | null }) {
           </Link>
           {session ? (
             <>
+              <NotificationBell />
               <span className="hidden text-sm text-muted sm:inline">{session.email}</span>
               <form action="/api/auth/logout" method="post">
                 <button className="text-sm font-medium text-muted hover:text-ink">

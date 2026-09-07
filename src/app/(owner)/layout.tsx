@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 export default async function OwnerLayout({
   children,
@@ -37,6 +38,7 @@ export default async function OwnerLayout({
             </Link>
           </nav>
           <div className="ml-auto flex items-center gap-3">
+            <NotificationBell />
             <span className="hidden text-sm text-muted sm:inline">{session.email}</span>
             <form action="/api/auth/logout" method="post">
               <button className="text-sm font-medium text-muted hover:text-ink">
