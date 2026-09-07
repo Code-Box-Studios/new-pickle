@@ -12,6 +12,7 @@ import {
 } from "./errors";
 import { assertTransition, HOLD_PHASE, isOccupying, OCCUPYING } from "./status";
 import { newReference } from "./reference";
+import { notificationService } from "@/lib/notifications/service";
 import type {
   Actor,
   BookingBackend,
@@ -52,13 +53,22 @@ async function expireStaleForCourt(tx: Tx, courtId: string, now: Date): Promise<
   }
 }
 
+/** Fire a notification best-effort: never let a delivery failure break a booking action. */
+async function safeNotify(fn: () => Promise<unknown>): Promise<void> {
+  try {
+    await fn();
+  } catch (e) {
+    console.error("[notify] failed", e);
+  }
+}
+
 export class LocalBookingBackend implements BookingBackend {
   async createHold(input: HoldInput): Promise<HeldBooking> {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + holdMinutes() * 60_000);
     const actorKind = input.source === "WALK_IN" ? "OWNER" : "CUSTOMER";
 
-    return withBookingRetry(async () => {
+    const result = await withBookingRetry(async () => {
       try {
         return await prisma.$transaction(async (tx) => {
           if (input.idempotencyKey) {
@@ -104,6 +114,10 @@ export class LocalBookingBackend implements BookingBackend {
         throw e;
       }
     });
+    if ((input.source ?? "ONLINE") !== "WALK_IN") {
+      await safeNotify(() => notificationService.onBookingCreated(result.id));
+    }
+    return result;
   }
 
   async createWalkIn(input: WalkInInput): Promise<HeldBooking> {
@@ -253,6 +267,7 @@ export class LocalBookingBackend implements BookingBackend {
         data: { bookingId, fromStatus: "PAYMENT_SUBMITTED", toStatus: "PENDING_CONFIRMATION", actor: "SYSTEM", note: "Awaiting venue confirmation" },
       });
     });
+    await safeNotify(() => notificationService.onPaymentSubmitted(bookingId));
   }
 
   confirm(bookingId: string, actor: Actor): Promise<void> {
@@ -284,6 +299,9 @@ export class LocalBookingBackend implements BookingBackend {
         data: { bookingId, fromStatus: b.status, toStatus: to, actor: actor.type, actorId: actor.id ?? null, note },
       });
     });
+    if (to === "CONFIRMED") await safeNotify(() => notificationService.onConfirmed(bookingId));
+    else if (to === "REJECTED") await safeNotify(() => notificationService.onRejected(bookingId));
+    else if (to === "CANCELLED") await safeNotify(() => notificationService.onCancelled(bookingId, actor.type));
   }
 
   async expireStale(now = new Date()): Promise<number> {
@@ -298,6 +316,7 @@ export class LocalBookingBackend implements BookingBackend {
           data: { bookingId: b.id, fromStatus: b.status, toStatus: "EXPIRED", actor: "SYSTEM", note: "Hold expired" },
         });
       });
+      await safeNotify(() => notificationService.onExpired(b.id));
     }
     return stale.length;
   }

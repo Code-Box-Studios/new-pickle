@@ -322,6 +322,7 @@ model Notification {
   type      String
   title     String
   body      String?
+  link      String? // role-appropriate click target
   bookingId String?
   readAt    DateTime?
   createdAt DateTime  @default(now())
