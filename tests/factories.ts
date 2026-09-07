@@ -45,3 +45,37 @@ export async function seedOneCourtSlot(opts?: { priceCents?: number }) {
   const base = await seedOwnerVenueCourt(opts);
   return { ...base, ...slot(), priceCents: opts?.priceCents ?? 40000 };
 }
+
+export async function seedCustomer() {
+  return prisma.user.create({
+    data: { email: `c-${rid()}@t.test`, name: "Casey Customer", role: "CUSTOMER" },
+  });
+}
+
+/** Owner+venue+court+customer + a booking row created directly at a given status. */
+async function seedBookingAt(status: "CONFIRMED" | "COMPLETED", opts?: { priceCents?: number }) {
+  const base = await seedOwnerVenueCourt(opts);
+  const customer = await seedCustomer();
+  const s = slot();
+  const booking = await prisma.booking.create({
+    data: {
+      reference: `RP-${rid().toUpperCase()}`,
+      venueId: base.venueId,
+      courtId: base.courtId,
+      userId: customer.id,
+      startsAt: s.startsAt,
+      endsAt: s.endsAt,
+      status,
+      priceCents: opts?.priceCents ?? 40000,
+    },
+  });
+  return { ...base, customerId: customer.id, bookingId: booking.id, reference: booking.reference };
+}
+
+export function seedCompletedBooking(opts?: { priceCents?: number }) {
+  return seedBookingAt("COMPLETED", opts);
+}
+
+export function seedConfirmedBooking(opts?: { priceCents?: number }) {
+  return seedBookingAt("CONFIRMED", opts);
+}
