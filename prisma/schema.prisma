@@ -326,14 +326,15 @@ model Notification {
 }
 
 model VenueVerification {
-  id         String      @id @default(cuid())
-  venueId    String      @unique
-  venue      Venue       @relation(fields: [venueId], references: [id], onDelete: Cascade)
-  status     VenueStatus @default(PENDING_REVIEW)
-  notes      String?
-  reviewedBy String?
-  reviewedAt DateTime?
-  createdAt  DateTime    @default(now())
+  id            String      @id @default(cuid())
+  venueId       String      @unique
+  venue         Venue       @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  status        VenueStatus @default(PENDING_REVIEW)
+  submittedNote String? // owner's business/contact note captured at submit
+  notes         String? // admin's rejection/suspension reason
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  createdAt     DateTime    @default(now())
 
   @@map("venue_verifications")
 }

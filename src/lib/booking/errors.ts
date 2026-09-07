@@ -47,6 +47,13 @@ export class InvalidTransitionError extends AppError {
   }
 }
 
+/** Generic 409 for venue-side state conflicts (bad transition, edit-locked). */
+export class ConflictError extends AppError {
+  constructor(message = "That action conflicts with the current state") {
+    super(message, 409, "conflict");
+  }
+}
+
 export class HoldExpiredError extends AppError {
   constructor(message = "Your hold expired. Please start again.") {
     super(message, 410, "hold_expired");
