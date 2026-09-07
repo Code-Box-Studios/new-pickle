@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { bookingBackend } from "@/lib/booking";
+import { resolveBackend } from "@/lib/booking/resolve";
 
 /**
  * Availability derives from three sources, unified:
@@ -92,7 +92,7 @@ export async function courtSlotsForDate(
         OR: [{ courtId }, { courtId: null, venueId: court.venueId }],
       },
     }),
-    bookingBackend.getOccupied(courtId, day, dayEnd),
+    resolveBackend(court.venueId).then((backend) => backend.getOccupied(courtId, day, dayEnd)),
   ]);
 
   const now = new Date();

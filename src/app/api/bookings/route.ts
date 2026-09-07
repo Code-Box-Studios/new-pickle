@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
-import { bookingBackend } from "@/lib/booking";
+import { resolveBackend } from "@/lib/booking/resolve";
 import { courtSlotsForDate } from "@/lib/availability/engine";
 import {
   NotFoundError,
@@ -70,7 +70,8 @@ export async function POST(req: NextRequest) {
     if (!match.available) throw new SlotTakenError();
 
     const endsAt = new Date(startsAt.getTime() + durationMinutes * 60_000);
-    const held = await bookingBackend.createHold({
+    const backend = await resolveBackend(court.venueId);
+    const held = await backend.createHold({
       venueId: court.venueId,
       courtId: court.id,
       startsAt,
