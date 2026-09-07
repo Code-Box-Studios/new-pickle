@@ -77,6 +77,7 @@ export interface BookingBackend {
   confirm(bookingId: string, actor: Actor): Promise<void>;
   reject(bookingId: string, actor: Actor, note?: string): Promise<void>;
   cancel(bookingId: string, actor: Actor): Promise<void>;
+  complete(bookingId: string, actor: Actor): Promise<void>;
   /** Flip HELD/PENDING_PAYMENT rows past their holdExpiresAt to EXPIRED. */
   expireStale(now?: Date): Promise<number>;
   /** Currently-occupying ranges on a court within [from, to). */

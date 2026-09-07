@@ -267,6 +267,10 @@ export class LocalBookingBackend implements BookingBackend {
     return this.transition(bookingId, "CANCELLED", actor, "Cancelled");
   }
 
+  complete(bookingId: string, actor: Actor): Promise<void> {
+    return this.transition(bookingId, "COMPLETED", actor, "Marked completed");
+  }
+
   private async transition(bookingId: string, to: BookingStatus, actor: Actor, note: string): Promise<void> {
     await prisma.$transaction(async (tx) => {
       const b = await tx.booking.findUnique({ where: { id: bookingId } });
