@@ -322,7 +322,7 @@ import { externalStateToStatus, busyRangesToOccupied, holdInputToCreateBooking }
 
 describe("sentry mapping", () => {
   it("maps every external state to a RallyPoint status", () => {
-    expect(externalStateToStatus("held")).toBe("PENDING_CONFIRMATION");
+    expect(externalStateToStatus("held")).toBe("HELD");
     expect(externalStateToStatus("confirmed")).toBe("CONFIRMED");
     expect(externalStateToStatus("cancelled")).toBe("CANCELLED");
     expect(externalStateToStatus("completed")).toBe("COMPLETED");
@@ -371,7 +371,7 @@ import type { ExternalBookingState, SentryBusyRange, SentryCreateBookingInput } 
 // Documented mapping over the NORMALIZED port vocabulary only (not Sentry's real
 // state strings, which are unavailable here).
 const STATE_TO_STATUS: Record<ExternalBookingState, BookingStatus> = {
-  held: "PENDING_CONFIRMATION",
+  held: "HELD",
   confirmed: "CONFIRMED",
   cancelled: "CANCELLED",
   completed: "COMPLETED",

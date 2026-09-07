@@ -107,11 +107,16 @@ Used to write/read `SentryConnection.encryptedApiKey`. Server-only; never serial
 
   | ExternalBookingState | BookingStatus |
   |---|---|
-  | `held` | `PENDING_CONFIRMATION` |
+  | `held` | `HELD` |
   | `confirmed` | `CONFIRMED` |
   | `cancelled` | `CANCELLED` |
   | `completed` | `COMPLETED` |
   | `rejected` | `REJECTED` |
+
+  Note: `held → HELD` (never `PENDING_CONFIRMATION`, which is RallyPoint's
+  payment-submitted/venue-confirmation semantic that the Sentry connector does
+  not drive). A Sentry `HELD` index row is stored with `holdExpiresAt = null`, so
+  the local `expireStale` sweep (`holdExpiresAt < now`) never touches it.
 
 - `holdInputToCreateBooking(input, resourceRef)` — RallyPoint `HoldInput` → `SentryCreateBookingInput`.
 
