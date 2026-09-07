@@ -196,6 +196,19 @@ async function onExpired(bookingId: string) {
   });
 }
 
+async function onCompleted(bookingId: string) {
+  const b = await loadBooking(bookingId);
+  if (!b || !b.userId) return;
+  await createOnce({
+    userId: b.userId,
+    type: NotificationType.REVIEW_INVITE,
+    title: "How was your experience?",
+    body: `Rate your visit to ${b.venue.name} on ${dateLabel(b.startsAt)}.`,
+    link: playerLink(b.reference),
+    bookingId,
+  });
+}
+
 /** Create deduped reminders for CONFIRMED bookings starting within the window. */
 async function sweepUpcomingReminders(now = new Date(), withinMinutes = 120): Promise<number> {
   const to = new Date(now.getTime() + withinMinutes * 60_000);
@@ -244,5 +257,6 @@ export const notificationService = {
   onRejected,
   onCancelled,
   onExpired,
+  onCompleted,
   sweepUpcomingReminders,
 };

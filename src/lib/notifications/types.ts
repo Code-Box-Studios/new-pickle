@@ -8,6 +8,7 @@ export const NotificationType = {
   CUSTOMER_CANCELLED: "CUSTOMER_CANCELLED",
   BOOKING_EXPIRED: "BOOKING_EXPIRED",
   BOOKING_REMINDER: "BOOKING_REMINDER",
+  REVIEW_INVITE: "REVIEW_INVITE",
 } as const;
 
 export type NotificationTypeValue =

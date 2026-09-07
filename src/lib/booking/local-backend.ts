@@ -302,6 +302,7 @@ export class LocalBookingBackend implements BookingBackend {
     if (to === "CONFIRMED") await safeNotify(() => notificationService.onConfirmed(bookingId));
     else if (to === "REJECTED") await safeNotify(() => notificationService.onRejected(bookingId));
     else if (to === "CANCELLED") await safeNotify(() => notificationService.onCancelled(bookingId, actor.type));
+    else if (to === "COMPLETED") await safeNotify(() => notificationService.onCompleted(bookingId));
   }
 
   async expireStale(now = new Date()): Promise<number> {
