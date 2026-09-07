@@ -30,7 +30,7 @@ export function StarRating({
           onFocus={() => setHover(n)}
           onBlur={() => setHover(0)}
           onClick={() => onChange(n)}
-          className="rounded p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          className="rounded p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
         >
           <Star className={cn(px, n <= shown ? "fill-amber-400 text-amber-400" : "text-slate-300")} aria-hidden />
         </button>
