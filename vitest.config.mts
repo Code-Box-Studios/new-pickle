@@ -10,11 +10,12 @@ export default defineConfig({
   test: {
     environment: "node",
     setupFiles: ["./tests/setup.ts"],
+    globalSetup: ["./tests/global-setup.ts"],
     // DB-backed tests share one Postgres schema; run files serially.
     fileParallelism: false,
     globals: true,
   },
   resolve: {
-    alias: { "@": path.resolve(__dirname, "src") },
+    alias: { "@": path.resolve(import.meta.dirname, "src") },
   },
 });
