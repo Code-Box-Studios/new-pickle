@@ -22,9 +22,11 @@ const TYPE_BY_EXT: Record<string, string> = {
 };
 
 const ROOT = path.join(process.cwd(), "uploads");
-const SUBDIR = "payment-proofs";
 
+/** Local-disk implementation, scoped to a subdirectory under `uploads/`. */
 export class LocalFsStorage implements PaymentProofStorage {
+  constructor(private readonly subdir: string = "payment-proofs") {}
+
   async save({
     bytes,
     contentType,
@@ -39,19 +41,19 @@ export class LocalFsStorage implements PaymentProofStorage {
       throw new ValidationError("Image is too large (max 5 MB).");
     }
     const name = `${randomUUID()}.${EXT_BY_TYPE[contentType]}`;
-    const key = `${SUBDIR}/${name}`;
-    const abs = path.join(ROOT, SUBDIR, name);
+    const key = `${this.subdir}/${name}`;
+    const abs = path.join(ROOT, this.subdir, name);
     await mkdir(path.dirname(abs), { recursive: true });
     await writeFile(abs, bytes);
     return { key };
   }
 
   async getBytes(key: string): Promise<{ bytes: Buffer; contentType: string }> {
-    // Guard against path traversal: the resolved path must stay under ROOT/SUBDIR.
-    const base = path.join(ROOT, SUBDIR);
+    // Guard against path traversal: the resolved path must stay under ROOT/subdir.
+    const base = path.join(ROOT, this.subdir);
     const abs = path.resolve(base, path.basename(key));
     if (!abs.startsWith(path.resolve(base))) {
-      throw new ValidationError("Invalid proof key");
+      throw new ValidationError("Invalid file key");
     }
     const bytes = await readFile(abs);
     const ext = path.extname(abs).slice(1).toLowerCase();

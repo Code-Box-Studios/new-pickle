@@ -2,9 +2,10 @@ import { LocalFsStorage } from "./local-fs-storage";
 import type { PaymentProofStorage } from "./proof-storage";
 
 /**
- * Single place that picks the storage implementation. Swap to an object-storage
- * implementation here for production; callers import `paymentProofStorage`.
+ * Single place that picks storage implementations. Swap to object storage here
+ * for production; callers import these instances.
  */
-export const paymentProofStorage: PaymentProofStorage = new LocalFsStorage();
+export const paymentProofStorage: PaymentProofStorage = new LocalFsStorage("payment-proofs");
+export const venueMediaStorage: PaymentProofStorage = new LocalFsStorage("venue-media");
 
 export * from "./proof-storage";
