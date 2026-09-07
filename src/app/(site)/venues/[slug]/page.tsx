@@ -59,8 +59,8 @@ export async function generateMetadata({
   const desc =
     venue.description ??
     `Book a pickleball court at ${venue.name} in ${venue.city}.`;
-  // Don't let unpublished venues get indexed.
-  if (!isLive(venue)) return { title: venue.name, robots: { index: false, follow: false } };
+  // Don't leak an unpublished venue's name or let it get indexed.
+  if (!isLive(venue)) return { title: "Venue preview", robots: { index: false, follow: false } };
   return {
     title: venue.name,
     description: desc,
