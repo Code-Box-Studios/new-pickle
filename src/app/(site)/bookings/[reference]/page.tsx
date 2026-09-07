@@ -11,6 +11,8 @@ import { channelLabel } from "@/lib/payment";
 import { pesos } from "@/lib/format";
 import { nowMs } from "@/lib/now";
 import { cn } from "@/lib/cn";
+import { reviewEligibility } from "@/lib/review";
+import { ReviewPrompt } from "@/components/review/ReviewPrompt";
 
 export const metadata = { title: "Booking status" };
 
@@ -52,6 +54,9 @@ export default async function BookingStatusPage({
     !!b.holdExpiresAt &&
     b.holdExpiresAt.getTime() > nowMs();
 
+  const showReview = b.status === "COMPLETED" && b.userId === session.id;
+  const eligibility = showReview ? await reviewEligibility(b.id, session.id) : null;
+
   return (
     <div className="mx-auto max-w-lg px-4 py-6">
       <div className="flex items-start justify-between">
@@ -78,6 +83,14 @@ export default async function BookingStatusPage({
             Resume booking
           </Button>
         </Link>
+      )}
+
+      {showReview && (
+        <ReviewPrompt
+          bookingId={b.id}
+          venueName={b.venue.name}
+          existing={eligibility?.existingReview ?? null}
+        />
       )}
 
       {/* Progress */}
