@@ -5,6 +5,7 @@ import {
   withBookingRetry,
 } from "@/lib/db/pg-errors";
 import {
+  ConflictError,
   HoldExpiredError,
   NotFoundError,
   SlotTakenError,
@@ -19,6 +20,7 @@ import type {
   HoldInput,
   OccupiedRange,
   PaymentInput,
+  WalkInInput,
 } from "./backend";
 
 type Tx = Prisma.TransactionClient;
@@ -96,6 +98,86 @@ export class LocalBookingBackend implements BookingBackend {
             },
           });
           return toHeld(booking);
+        });
+      } catch (e) {
+        if (isExclusionViolation(e)) throw new SlotTakenError();
+        throw e;
+      }
+    });
+  }
+
+  async createWalkIn(input: WalkInInput): Promise<HeldBooking> {
+    const now = new Date();
+    return withBookingRetry(async () => {
+      try {
+        return await prisma.$transaction(async (tx) => {
+          if (input.idempotencyKey) {
+            const existing = await tx.booking.findUnique({
+              where: { idempotencyKey: input.idempotencyKey },
+            });
+            if (existing) return toHeld(existing);
+          }
+
+          await expireStaleForCourt(tx, input.courtId, now);
+
+          // Owner-created booking: confirmed on creation, no payment workflow.
+          const booking = await tx.booking.create({
+            data: {
+              reference: newReference(),
+              venueId: input.venueId,
+              courtId: input.courtId,
+              userId: input.userId ?? null,
+              startsAt: input.startsAt,
+              endsAt: input.endsAt,
+              status: "CONFIRMED",
+              holdExpiresAt: null,
+              priceCents: input.priceCents,
+              source: "WALK_IN",
+              idempotencyKey: input.idempotencyKey ?? null,
+              customerName: input.customer.name ?? null,
+              customerMobile: input.customer.mobile ?? null,
+              customerEmail: input.customer.email ?? null,
+              note: input.note ?? null,
+            },
+          });
+          await tx.bookingStatusHistory.create({
+            data: {
+              bookingId: booking.id,
+              toStatus: "CONFIRMED",
+              actor: "OWNER",
+              actorId: input.userId ?? null,
+              note: "Walk-in booking created",
+            },
+          });
+          return toHeld(booking);
+        });
+      } catch (e) {
+        if (isExclusionViolation(e)) throw new SlotTakenError();
+        throw e;
+      }
+    });
+  }
+
+  async reschedule(bookingId: string, startsAt: Date, endsAt: Date, act: Actor): Promise<void> {
+    await withBookingRetry(async () => {
+      try {
+        await prisma.$transaction(async (tx) => {
+          const b = await tx.booking.findUnique({ where: { id: bookingId } });
+          if (!b) throw new NotFoundError("Booking not found");
+          if (!isOccupying(b.status)) {
+            throw new ConflictError("This booking can no longer be rescheduled");
+          }
+          await tx.booking.update({ where: { id: bookingId }, data: { startsAt, endsAt } });
+          await tx.bookingStatusHistory.create({
+            data: {
+              bookingId,
+              fromStatus: b.status,
+              toStatus: b.status,
+              actor: act.type,
+              actorId: act.id ?? null,
+              note: "Rescheduled",
+            },
+          });
         });
       } catch (e) {
         if (isExclusionViolation(e)) throw new SlotTakenError();

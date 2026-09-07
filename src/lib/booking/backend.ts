@@ -54,8 +54,16 @@ export interface OccupiedRange {
   status: BookingStatus;
 }
 
+export interface WalkInInput extends HoldInput {
+  note?: string | null;
+}
+
 export interface BookingBackend {
   createHold(input: HoldInput): Promise<HeldBooking>;
+  /** Owner-created booking, confirmed on creation (no payment workflow). */
+  createWalkIn(input: WalkInInput): Promise<HeldBooking>;
+  /** Move a non-terminal booking to a new time; EXCLUDE guards overlap. */
+  reschedule(bookingId: string, startsAt: Date, endsAt: Date, actor: Actor): Promise<void>;
   submitDetails(
     bookingId: string,
     customer: CustomerDetails,

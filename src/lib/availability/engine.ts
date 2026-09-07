@@ -85,7 +85,12 @@ export async function courtSlotsForDate(
   const dayEnd = addMinutes(day, 24 * 60);
   const [exceptions, occupied] = await Promise.all([
     prisma.scheduleException.findMany({
-      where: { courtId, startsAt: { lt: dayEnd }, endsAt: { gt: day } },
+      where: {
+        startsAt: { lt: dayEnd },
+        endsAt: { gt: day },
+        // court-scoped OR venue-wide (courtId null) block
+        OR: [{ courtId }, { courtId: null, venueId: court.venueId }],
+      },
     }),
     bookingBackend.getOccupied(courtId, day, dayEnd),
   ]);

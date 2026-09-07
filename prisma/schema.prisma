@@ -127,6 +127,7 @@ model Venue {
   reviews        Review[]
   favorites      Favorite[]
   paymentMethods PaymentMethod[]
+  exceptions     ScheduleException[]
   verification   VenueVerification?
   sentry         SentryConnection?
 
@@ -186,14 +187,17 @@ model CourtSchedule {
 
 model ScheduleException {
   id        String        @id @default(cuid())
-  courtId   String
-  court     Court         @relation(fields: [courtId], references: [id], onDelete: Cascade)
+  venueId   String
+  venue     Venue         @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  courtId   String? // null = venue-wide block (all courts)
+  court     Court?        @relation(fields: [courtId], references: [id], onDelete: Cascade)
   startsAt  DateTime
   endsAt    DateTime
   type      ExceptionType @default(MAINTENANCE)
   reason    String?
   createdAt DateTime      @default(now())
 
+  @@index([venueId, startsAt])
   @@index([courtId, startsAt])
   @@map("schedule_exceptions")
 }
@@ -217,6 +221,7 @@ model Booking {
   customerName   String?
   customerMobile String?
   customerEmail  String?
+  note           String?
   source         BookingSource @default(ONLINE)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt

@@ -63,9 +63,9 @@ describe("availability engine", () => {
   });
 
   it("marks maintenance-exception slots unavailable", async () => {
-    const { courtId, day } = await setup();
+    const { venueId, courtId, day } = await setup();
     await prisma.scheduleException.create({
-      data: { courtId, startsAt: at(day, 12), endsAt: at(day, 14), type: "MAINTENANCE" },
+      data: { venueId, courtId, startsAt: at(day, 12), endsAt: at(day, 14), type: "MAINTENANCE" },
     });
     const slots = await courtSlotsForDate(courtId, day);
     expect(slotAtHour(slots, 12)!.available).toBe(false);
