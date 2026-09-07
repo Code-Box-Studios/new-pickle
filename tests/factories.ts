@@ -79,3 +79,17 @@ export function seedCompletedBooking(opts?: { priceCents?: number }) {
 export function seedConfirmedBooking(opts?: { priceCents?: number }) {
   return seedBookingAt("CONFIRMED", opts);
 }
+
+/** A CONNECTED Sentry venue: court carries an externalRef, connection is CONNECTED. */
+export async function seedSentryVenue(opts?: { resourceRef?: string; priceCents?: number }) {
+  const resourceRef = opts?.resourceRef ?? "r1";
+  const base = await seedOwnerVenueCourt(opts);
+  await prisma.court.update({ where: { id: base.courtId }, data: { externalRef: resourceRef } });
+  await prisma.sentryConnection.create({
+    data: { venueId: base.venueId, sentryBusinessRef: "biz-1", connectionState: "CONNECTED" },
+  });
+  const customer = await prisma.user.create({
+    data: { email: `c-${rid()}@t.test`, role: "CUSTOMER" },
+  });
+  return { ...base, resourceRef, customerId: customer.id };
+}
