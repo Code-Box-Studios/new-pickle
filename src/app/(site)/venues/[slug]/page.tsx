@@ -12,6 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { DURATIONS } from "@/lib/search-params";
 import { dateLabel, isoDate, longDateLabel, parseIsoDate, weekdayLabel } from "@/lib/format";
 import { venueJsonLd } from "@/lib/seo";
+import { venueRatingSummary, listVenueReviews } from "@/lib/review";
+import { Stars } from "@/components/review/Stars";
 import { cn } from "@/lib/cn";
 
 const WEEKDAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
@@ -34,11 +36,6 @@ async function loadVenue(slug: string) {
         where: { active: true },
         orderBy: { sortOrder: "asc" },
         include: { schedules: true },
-      },
-      reviews: {
-        orderBy: { createdAt: "desc" },
-        take: 6,
-        include: { user: { select: { name: true, email: true } } },
       },
     },
   });
@@ -87,6 +84,11 @@ export default async function VenuePage({
     const canPreview = !!session && (session.id === venue.ownerId || session.role === "ADMIN");
     if (!canPreview) notFound();
   }
+
+  const [ratingSummary, recentReviews] = await Promise.all([
+    venueRatingSummary(venue.id),
+    listVenueReviews(venue.id, 6),
+  ]);
 
   const tomorrow = new Date();
   tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
@@ -157,8 +159,8 @@ export default async function VenuePage({
       <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
         <span className="flex items-center gap-1 text-ink-soft">
           <Star className="size-4 fill-amber-400 text-amber-400" aria-hidden />
-          <span className="font-semibold text-ink">{venue.ratingAvg.toFixed(1)}</span>
-          <span>({venue.ratingCount} reviews)</span>
+          <span className="font-semibold text-ink">{ratingSummary.avg.toFixed(1)}</span>
+          <span>({ratingSummary.count} reviews)</span>
         </span>
         <span className="flex items-center gap-1">
           <MapPin className="size-4" aria-hidden />
@@ -287,23 +289,47 @@ export default async function VenuePage({
       {/* Reviews */}
       <section className="mt-8 mb-8">
         <h2 className="text-lg font-bold text-ink">Reviews</h2>
-        {venue.reviews.length === 0 ? (
+        {ratingSummary.count === 0 ? (
           <p className="mt-2 text-muted">No reviews yet.</p>
         ) : (
-          <ul className="mt-3 space-y-4">
-            {venue.reviews.map((r) => (
-              <li key={r.id} className="rounded-2xl border border-black/5 p-4">
-                <div className="flex items-center gap-1 text-sm">
-                  <Star className="size-4 fill-amber-400 text-amber-400" aria-hidden />
-                  <span className="font-semibold text-ink">{r.rating}.0</span>
-                  <span className="ml-2 text-muted">
-                    {r.user.name ?? r.user.email.split("@")[0]}
-                  </span>
-                </div>
-                {r.body && <p className="mt-1.5 text-ink-soft">{r.body}</p>}
-              </li>
-            ))}
-          </ul>
+          <>
+            <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-extrabold text-ink">{ratingSummary.avg.toFixed(1)}</span>
+                <Stars value={ratingSummary.avg} />
+                <span className="text-sm text-muted">{ratingSummary.count} reviews</span>
+              </div>
+              <ul className="min-w-[12rem] flex-1 space-y-1">
+                {[5, 4, 3, 2, 1].map((n) => {
+                  const c = ratingSummary.distribution[n as 1 | 2 | 3 | 4 | 5];
+                  const pct = ratingSummary.count ? Math.round((c / ratingSummary.count) * 100) : 0;
+                  return (
+                    <li key={n} className="flex items-center gap-2 text-xs text-muted">
+                      <span className="w-3 text-right">{n}</span>
+                      <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-black/5">
+                        <span className="block h-full rounded-full bg-amber-400" style={{ width: `${pct}%` }} />
+                      </span>
+                      <span className="w-6 text-right">{c}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <ul className="mt-5 space-y-4">
+              {recentReviews.map((r) => (
+                <li key={r.id} className="rounded-2xl border border-black/5 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Stars value={r.rating} />
+                      <span className="font-medium text-ink">{r.authorName}</span>
+                    </div>
+                    <span className="text-xs text-muted">{dateLabel(r.createdAt)}</span>
+                  </div>
+                  {r.body && <p className="mt-1.5 text-ink-soft">{r.body}</p>}
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </section>
     </div>
