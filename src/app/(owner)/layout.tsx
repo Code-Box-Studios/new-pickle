@@ -33,6 +33,9 @@ export default async function OwnerLayout({
             <Link href="/owner/reservations" className="rounded-lg px-3 py-2 text-sm font-medium text-ink-soft hover:bg-black/5">
               Reservations
             </Link>
+            <Link href="/owner/reviews" className="rounded-lg px-3 py-2 text-sm font-medium text-ink-soft hover:bg-black/5">
+              Reviews
+            </Link>
             <Link href="/owner/venues" className="rounded-lg px-3 py-2 text-sm font-medium text-ink-soft hover:bg-black/5">
               Venues
             </Link>
