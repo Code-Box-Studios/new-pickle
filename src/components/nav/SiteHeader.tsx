@@ -27,6 +27,12 @@ export function SiteHeader({ session }: { session: SessionUser | null }) {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-3">
+          <Link
+            href="/list-your-venue"
+            className="hidden text-sm font-medium text-ink-soft hover:text-ink sm:inline"
+          >
+            List your venue
+          </Link>
           {session ? (
             <>
               <span className="hidden text-sm text-muted sm:inline">{session.email}</span>

@@ -29,6 +29,12 @@ export default async function OwnerLayout({
             >
               Reservations
             </Link>
+            <Link
+              href="/owner/venues"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-ink-soft hover:bg-black/5"
+            >
+              Venues
+            </Link>
           </nav>
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden text-sm text-muted sm:inline">{session.email}</span>

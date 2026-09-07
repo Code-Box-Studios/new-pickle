@@ -29,6 +29,9 @@ export default async function SiteLayout({
             <Link href="/bookings" className="hover:text-ink">
               My bookings
             </Link>
+            <Link href="/list-your-venue" className="hover:text-ink">
+              List your venue
+            </Link>
           </p>
         </div>
       </footer>

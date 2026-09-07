@@ -25,8 +25,10 @@ function minuteLabel(min: number): string {
 }
 
 async function loadVenue(slug: string) {
+  // Load regardless of publish state; the caller gates who may view a
+  // non-live venue (owner/admin preview only).
   return prisma.venue.findFirst({
-    where: { slug, isPublished: true, status: "APPROVED" },
+    where: { slug },
     include: {
       courts: {
         where: { active: true },
@@ -42,6 +44,10 @@ async function loadVenue(slug: string) {
   });
 }
 
+function isLive(v: { isPublished: boolean; status: string }): boolean {
+  return v.isPublished && v.status === "APPROVED";
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -53,6 +59,8 @@ export async function generateMetadata({
   const desc =
     venue.description ??
     `Book a pickleball court at ${venue.name} in ${venue.city}.`;
+  // Don't let unpublished venues get indexed.
+  if (!isLive(venue)) return { title: venue.name, robots: { index: false, follow: false } };
   return {
     title: venue.name,
     description: desc,
@@ -74,6 +82,11 @@ export default async function VenuePage({
   if (!venue) notFound();
 
   const session = await getSession();
+  const live = isLive(venue);
+  if (!live) {
+    const canPreview = !!session && (session.id === venue.ownerId || session.role === "ADMIN");
+    if (!canPreview) notFound();
+  }
 
   const tomorrow = new Date();
   tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
@@ -121,10 +134,17 @@ export default async function VenuePage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(venueJsonLd(venue)) }}
-      />
+      {!live && (
+        <div className="mb-4 rounded-xl bg-amber-100 px-4 py-3 text-sm font-medium text-amber-900">
+          Preview — this venue isn&apos;t live yet. Only you and admins can see this page.
+        </div>
+      )}
+      {live && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(venueJsonLd(venue)) }}
+        />
+      )}
 
       <Gallery photos={venue.photos} name={venue.name} />
 
