@@ -23,16 +23,16 @@ export default async function OwnerLayout({
             </span>
           </Link>
           <nav className="ml-4 hidden items-center gap-1 sm:flex">
-            <Link
-              href="/owner/reservations"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-ink-soft hover:bg-black/5"
-            >
+            <Link href="/owner" className="rounded-lg px-3 py-2 text-sm font-medium text-ink-soft hover:bg-black/5">
+              Dashboard
+            </Link>
+            <Link href="/owner/calendar" className="rounded-lg px-3 py-2 text-sm font-medium text-ink-soft hover:bg-black/5">
+              Calendar
+            </Link>
+            <Link href="/owner/reservations" className="rounded-lg px-3 py-2 text-sm font-medium text-ink-soft hover:bg-black/5">
               Reservations
             </Link>
-            <Link
-              href="/owner/venues"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-ink-soft hover:bg-black/5"
-            >
+            <Link href="/owner/venues" className="rounded-lg px-3 py-2 text-sm font-medium text-ink-soft hover:bg-black/5">
               Venues
             </Link>
           </nav>

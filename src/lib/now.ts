@@ -6,3 +6,7 @@
 export function nowMs(): number {
   return Date.now();
 }
+
+export function nowDate(): Date {
+  return new Date();
+}

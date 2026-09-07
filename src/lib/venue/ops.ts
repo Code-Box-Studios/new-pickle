@@ -17,6 +17,7 @@ export interface DayCell {
   state: CellState;
   bookingId?: string;
   reference?: string;
+  blockId?: string;
   label?: string;
 }
 export interface DayCourt {
@@ -77,7 +78,7 @@ export async function ownerDaySchedule(venueId: string, date: Date): Promise<Own
     }),
     prisma.scheduleException.findMany({
       where: { venueId, startsAt: { lt: dayEnd }, endsAt: { gt: day } },
-      select: { courtId: true, startsAt: true, endsAt: true, type: true, reason: true },
+      select: { id: true, courtId: true, startsAt: true, endsAt: true, type: true, reason: true },
     }),
   ]);
 
@@ -99,6 +100,7 @@ export async function ownerDaySchedule(venueId: string, date: Date): Promise<Own
       let state: CellState;
       let bookingId: string | undefined;
       let reference: string | undefined;
+      let blockId: string | undefined;
       let label: string | undefined;
       if (booking) {
         state = pendingGroup(booking.status);
@@ -107,6 +109,7 @@ export async function ownerDaySchedule(venueId: string, date: Date): Promise<Own
         label = booking.customerName ?? booking.reference;
       } else if (block) {
         state = "BLOCKED";
+        blockId = block.id;
         label = block.reason ?? block.type.toLowerCase();
       } else {
         state = inWindow ? "AVAILABLE" : "CLOSED";
@@ -119,6 +122,7 @@ export async function ownerDaySchedule(venueId: string, date: Date): Promise<Own
         state,
         bookingId,
         reference,
+        blockId,
         label,
       });
     }

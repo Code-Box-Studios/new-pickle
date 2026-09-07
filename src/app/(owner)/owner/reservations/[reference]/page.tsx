@@ -8,6 +8,7 @@ import { BookingSummary } from "@/components/booking/BookingSummary";
 import { StatusTimeline } from "@/components/booking/StatusTimeline";
 import { BookingStatusBadge } from "@/components/ui/badge";
 import { ConfirmRejectActions } from "@/components/owner/ConfirmRejectActions";
+import { ManageActions } from "@/components/owner/ManageActions";
 import { channelLabel } from "@/lib/payment";
 import { pesos } from "@/lib/format";
 
@@ -84,6 +85,13 @@ export default async function OwnerReservationDetail({
         />
       </div>
 
+      {(b.source === "WALK_IN" || b.note) && (
+        <p className="mt-2 text-sm text-muted">
+          {b.source === "WALK_IN" ? "Walk-in" : "Note"}
+          {b.note ? ` · ${b.note}` : ""}
+        </p>
+      )}
+
       {/* Payment proof */}
       <section className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
         <h2 className="text-sm font-semibold text-ink">Payment proof</h2>
@@ -120,6 +128,16 @@ export default async function OwnerReservationDetail({
           <ConfirmRejectActions bookingId={b.id} />
         </section>
       )}
+
+      <section className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
+        <h2 className="mb-3 text-sm font-semibold text-ink">Manage</h2>
+        <ManageActions
+          bookingId={b.id}
+          status={b.status}
+          startsAtIso={b.startsAt.toISOString()}
+          durationMinutes={Math.round((b.endsAt.getTime() - b.startsAt.getTime()) / 60000)}
+        />
+      </section>
 
       <section className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
         <h2 className="mb-3 text-sm font-semibold text-ink">Activity</h2>
