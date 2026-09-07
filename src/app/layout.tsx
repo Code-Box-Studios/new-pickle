@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ToastProvider } from "@/components/ui/toast";
+import { MagicLinkBanner } from "@/components/dev/MagicLinkBanner";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
@@ -8,7 +10,14 @@ export const metadata: Metadata = {
     template: "%s · RallyPoint",
   },
   description:
-    "Discover and reserve pickleball courts across independent venues. Search, compare, book, and play.",
+    "Discover and reserve pickleball courts across independent venues in Davao. Search, compare, book, and play.",
+  openGraph: {
+    type: "website",
+    siteName: "RallyPoint",
+    title: "RallyPoint — Find your next game",
+    description:
+      "Discover and reserve pickleball courts across independent venues in Davao.",
+  },
 };
 
 export default function RootLayout({
@@ -16,7 +25,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="bg-white text-ink antialiased">
+        <ToastProvider>{children}</ToastProvider>
+        <MagicLinkBanner />
+      </body>
     </html>
   );
 }
