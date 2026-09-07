@@ -4,3 +4,14 @@ node_modules/
 .env*.local
 uploads/
 *.log
+
+# Prisma generated client
+/src/generated/
+
+# build output
+/out/
+next-env.d.ts
+
+# test / tooling
+/coverage/
+.vitest/

@@ -1,0 +1,353 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  OWNER
+  STAFF
+  ADMIN
+}
+
+enum VenueStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum BookingStatus {
+  HELD
+  PENDING_PAYMENT
+  PAYMENT_SUBMITTED
+  PENDING_CONFIRMATION
+  CONFIRMED
+  EXPIRED
+  CANCELLED
+  REJECTED
+  COMPLETED
+}
+
+enum PaymentChannel {
+  GCASH
+  MAYA
+  BANK_TRANSFER
+  CASH
+}
+
+enum ExceptionType {
+  MAINTENANCE
+  HOLIDAY
+  PRIVATE_EVENT
+  CLOSURE
+  TOURNAMENT
+}
+
+enum ActorType {
+  SYSTEM
+  CUSTOMER
+  OWNER
+  STAFF
+  ADMIN
+}
+
+enum BookingSource {
+  ONLINE
+  WALK_IN
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  mobile    String?
+  role      Role     @default(CUSTOMER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownedVenues   Venue[]          @relation("VenueOwner")
+  staffOf       VenueStaff[]
+  bookings      Booking[]
+  favorites     Favorite[]
+  reviews       Review[]
+  magicTokens   MagicLinkToken[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model MagicLinkToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@map("magic_link_tokens")
+}
+
+model Venue {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  name          String
+  description   String?
+  addressLine   String?
+  barangay      String?
+  city          String      @default("Davao City")
+  lat           Float?
+  lng           Float?
+  contactNumber String?
+  website       String?
+  photos        String[]
+  amenities     String[]
+  houseRules    String?
+  status        VenueStatus @default(DRAFT)
+  isPublished   Boolean     @default(false)
+  ratingAvg     Float       @default(0)
+  ratingCount   Int         @default(0)
+  ownerId       String
+  owner         User        @relation("VenueOwner", fields: [ownerId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  courts         Court[]
+  staff          VenueStaff[]
+  bookings       Booking[]
+  reviews        Review[]
+  favorites      Favorite[]
+  paymentMethods PaymentMethod[]
+  verification   VenueVerification?
+  sentry         SentryConnection?
+
+  @@index([city, isPublished])
+  @@map("venues")
+}
+
+model VenueStaff {
+  id          String   @id @default(cuid())
+  venueId     String
+  venue       Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        Role     @default(STAFF)
+  permissions String[]
+  createdAt   DateTime @default(now())
+
+  @@unique([venueId, userId])
+  @@map("venue_staff")
+}
+
+model Court {
+  id          String   @id @default(cuid())
+  venueId     String
+  venue       Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  name        String
+  indoor      Boolean  @default(true)
+  covered     Boolean  @default(false)
+  surface     String?
+  capacity    Int      @default(4)
+  slotMinutes Int      @default(60)
+  priceCents  Int
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  schedules  CourtSchedule[]
+  exceptions ScheduleException[]
+  bookings   Booking[]
+
+  @@index([venueId])
+  @@map("courts")
+}
+
+model CourtSchedule {
+  id          String @id @default(cuid())
+  courtId     String
+  court       Court  @relation(fields: [courtId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int // 0 = Sunday .. 6 = Saturday
+  openMinute  Int // minutes from midnight
+  closeMinute Int
+
+  @@unique([courtId, dayOfWeek])
+  @@map("court_schedules")
+}
+
+model ScheduleException {
+  id        String        @id @default(cuid())
+  courtId   String
+  court     Court         @relation(fields: [courtId], references: [id], onDelete: Cascade)
+  startsAt  DateTime
+  endsAt    DateTime
+  type      ExceptionType @default(MAINTENANCE)
+  reason    String?
+  createdAt DateTime      @default(now())
+
+  @@index([courtId, startsAt])
+  @@map("schedule_exceptions")
+}
+
+model Booking {
+  id             String        @id @default(cuid())
+  reference      String        @unique
+  userId         String?
+  user           User?         @relation(fields: [userId], references: [id])
+  venueId        String
+  venue          Venue         @relation(fields: [venueId], references: [id])
+  courtId        String
+  court          Court         @relation(fields: [courtId], references: [id])
+  startsAt       DateTime
+  endsAt         DateTime
+  status         BookingStatus @default(HELD)
+  holdExpiresAt  DateTime?
+  priceCents     Int
+  currency       String        @default("PHP")
+  idempotencyKey String?       @unique
+  customerName   String?
+  customerMobile String?
+  customerEmail  String?
+  source         BookingSource @default(ONLINE)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  payment PaymentSubmission?
+  history BookingStatusHistory[]
+
+  // NOTE: a DB-generated `period` (tsrange) column and the
+  // `bookings_no_overlap` EXCLUDE constraint are added by the raw-SQL migration
+  // `booking_exclusion` and are intentionally not modeled here (Prisma 5 cannot
+  // represent generated columns). Apply migrations with `prisma migrate deploy`
+  // — `migrate dev` will report benign drift on this column. See
+  // prisma/migrations/README.md.
+
+  @@index([venueId, status])
+  @@index([courtId, startsAt])
+  @@index([userId])
+  @@map("bookings")
+}
+
+model PaymentSubmission {
+  id              String         @id @default(cuid())
+  bookingId       String         @unique
+  booking         Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  paymentMethodId String?
+  paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+  channel         PaymentChannel
+  reference       String
+  proofKey        String
+  amountCents     Int
+  submittedAt     DateTime       @default(now())
+
+  @@map("payment_submissions")
+}
+
+model PaymentMethod {
+  id            String         @id @default(cuid())
+  venueId       String
+  venue         Venue          @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  channel       PaymentChannel
+  accountName   String
+  accountNumber String
+  instructions  String?
+  active        Boolean        @default(true)
+  sortOrder     Int            @default(0)
+  submissions   PaymentSubmission[]
+
+  @@map("payment_methods")
+}
+
+model BookingStatusHistory {
+  id         String         @id @default(cuid())
+  bookingId  String
+  booking    Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  fromStatus BookingStatus?
+  toStatus   BookingStatus
+  actor      ActorType      @default(SYSTEM)
+  actorId    String?
+  note       String?
+  at         DateTime       @default(now())
+
+  @@index([bookingId, at])
+  @@map("booking_status_history")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  venueId    String
+  venue      Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  bookingId  String?  @unique
+  rating     Int
+  body       String?
+  ownerReply String?
+  createdAt  DateTime @default(now())
+
+  @@index([venueId])
+  @@map("reviews")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  venueId   String
+  venue     Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, venueId])
+  @@map("favorites")
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String?
+  bookingId String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+model VenueVerification {
+  id         String      @id @default(cuid())
+  venueId    String      @unique
+  venue      Venue       @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  status     VenueStatus @default(PENDING_REVIEW)
+  notes      String?
+  reviewedBy String?
+  reviewedAt DateTime?
+  createdAt  DateTime    @default(now())
+
+  @@map("venue_verifications")
+}
+
+model SentryConnection {
+  id                String   @id @default(cuid())
+  venueId           String   @unique
+  venue             Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  sentryBusinessRef String?
+  encryptedApiKey   String?
+  entitlement       String?
+  connectionState   String   @default("DISCONNECTED")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("sentry_connections")
+}

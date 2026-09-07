@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16
+    container_name: rallypoint-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rallypoint
+      POSTGRES_PASSWORD: rallypoint
+      POSTGRES_DB: rallypoint
+    ports:
+      - "55432:5432"
+    volumes:
+      - rallypoint_pg:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rallypoint -d rallypoint"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  rallypoint_pg:
