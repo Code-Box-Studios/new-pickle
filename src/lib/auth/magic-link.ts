@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import prisma from "@/lib/prisma";
 import { emailSender } from "@/lib/email";
+import { forgetMagicLink } from "@/lib/email/dev-sender";
 import { ValidationError } from "@/lib/booking/errors";
 import type { SessionUser } from "./session";
 
@@ -50,6 +51,9 @@ export async function consumeMagicToken(raw: string): Promise<SessionUser | null
     data: { usedAt: new Date() },
   });
   if (burned.count === 0) return null;
+
+  // Dev-only: the link has now been used, so remove it from the login banner.
+  forgetMagicLink(rec.user.email);
 
   return { id: rec.user.id, email: rec.user.email, role: rec.user.role };
 }

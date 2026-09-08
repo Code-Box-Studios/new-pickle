@@ -34,6 +34,19 @@ describe("magic-link auth", () => {
     expect(await consumeMagicToken(raw)).toBeNull(); // already used
   });
 
+  it("clears the dev banner entry once its token is consumed", async () => {
+    await requestMagicLink("banner@e.com");
+    expect(lastMagicLinks.has("banner@e.com")).toBe(true);
+    await consumeMagicToken(tokenFromLink("banner@e.com"));
+    expect(lastMagicLinks.has("banner@e.com")).toBe(false); // banner should disappear after login
+  });
+
+  it("leaves the dev banner entry when the token is invalid", async () => {
+    await requestMagicLink("keep@e.com");
+    await consumeMagicToken("not-a-real-token");
+    expect(lastMagicLinks.has("keep@e.com")).toBe(true); // never opened → stays until dismissed
+  });
+
   it("rejects unknown tokens", async () => {
     expect(await consumeMagicToken("not-a-real-token")).toBeNull();
   });

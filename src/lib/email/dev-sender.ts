@@ -13,3 +13,8 @@ export class DevConsoleSender implements EmailSender {
     console.log(`\n🔗 [DEV magic link] ${to}\n   ${url}\n`);
   }
 }
+
+/** Dev-only: drop a surfaced link (e.g. once its token is consumed) so the banner clears. */
+export function forgetMagicLink(email: string): void {
+  lastMagicLinks.delete(email.toLowerCase());
+}
