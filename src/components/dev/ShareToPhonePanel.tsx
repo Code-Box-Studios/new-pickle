@@ -22,8 +22,9 @@ export function ShareToPhonePanel() {
   const [open, setOpen] = useState(false);
   const [info, setInfo] = useState<ShareInfo | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [dismissed, setDismissed] = useState(false);
 
-  if (process.env.NODE_ENV === "production") return null;
+  if (process.env.NODE_ENV === "production" || dismissed) return null;
 
   function fail() {
     setInfo({
@@ -54,14 +55,25 @@ export function ShareToPhonePanel() {
 
   if (!open) {
     return (
-      <button
-        type="button"
-        onClick={share}
-        className="fixed bottom-3 right-3 z-[95] flex items-center gap-1.5 rounded-full bg-ink px-3 py-2 text-xs font-semibold text-white shadow-lg hover:bg-ink/90"
-      >
-        <Smartphone className="size-4" aria-hidden />
-        Share to phone
-      </button>
+      <div className="fixed bottom-3 right-3 z-[95] flex items-center gap-1">
+        <button
+          type="button"
+          onClick={share}
+          className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-2 text-xs font-semibold text-white shadow-lg hover:bg-ink/90"
+        >
+          <Smartphone className="size-4" aria-hidden />
+          Share to phone
+        </button>
+        <button
+          type="button"
+          onClick={() => setDismissed(true)}
+          aria-label="Hide"
+          title="Hide until reload"
+          className="rounded-full bg-ink/80 p-1.5 text-white shadow-lg hover:bg-ink"
+        >
+          <X className="size-3.5" aria-hidden />
+        </button>
+      </div>
     );
   }
 

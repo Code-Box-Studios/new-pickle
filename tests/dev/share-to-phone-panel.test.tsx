@@ -119,4 +119,22 @@ describe("ShareToPhonePanel", () => {
     // No second fetch — the switch re-renders from cached candidates
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it("hides the button for the session when dismissed", () => {
+    render(<ShareToPhonePanel />);
+
+    // Trigger is present initially
+    expect(
+      screen.getByRole("button", { name: /share to phone/i }),
+    ).toBeTruthy();
+
+    // Dismiss it (the small "Hide" control next to the trigger)
+    fireEvent.click(screen.getByRole("button", { name: /^hide$/i }));
+
+    // Component now renders nothing — both controls are gone until reload
+    expect(
+      screen.queryByRole("button", { name: /share to phone/i }),
+    ).toBeNull();
+    expect(screen.queryByRole("button", { name: /^hide$/i })).toBeNull();
+  });
 });
