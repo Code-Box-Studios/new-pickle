@@ -12,8 +12,23 @@ function hashToken(raw: string): string {
   return createHash("sha256").update(raw).digest("hex");
 }
 
+/**
+ * Base URL for magic links. Prod always uses APP_URL (an attacker-supplied Host
+ * can never redirect a prod link). In dev/test we honor the request origin so a
+ * link requested from a phone on the LAN opens on that phone.
+ */
+export function resolveMagicLinkBase(origin?: string): string {
+  if (process.env.NODE_ENV === "production") {
+    return process.env.APP_URL ?? "http://localhost:3000";
+  }
+  return origin ?? process.env.APP_URL ?? "http://localhost:3000";
+}
+
 /** Create a single-use, short-TTL token (stored hashed) and email the link. */
-export async function requestMagicLink(emailRaw: string): Promise<void> {
+export async function requestMagicLink(
+  emailRaw: string,
+  opts?: { origin?: string },
+): Promise<void> {
   const email = emailRaw.trim().toLowerCase();
   if (!EMAIL_RE.test(email)) throw new ValidationError("Enter a valid email address");
 
@@ -32,7 +47,7 @@ export async function requestMagicLink(emailRaw: string): Promise<void> {
     },
   });
 
-  const base = process.env.APP_URL ?? "http://localhost:3000";
+  const base = resolveMagicLinkBase(opts?.origin);
   await emailSender.sendMagicLink(email, `${base}/auth/verify?token=${raw}`);
 }
 

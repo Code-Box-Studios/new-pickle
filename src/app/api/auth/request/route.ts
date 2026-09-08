@@ -5,7 +5,7 @@ import { errorResponse } from "@/lib/http";
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as { email?: unknown };
-    await requestMagicLink(String(body.email ?? ""));
+    await requestMagicLink(String(body.email ?? ""), { origin: req.nextUrl.origin });
     return NextResponse.json({ ok: true });
   } catch (e) {
     return errorResponse(e);

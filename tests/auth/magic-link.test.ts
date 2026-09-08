@@ -1,6 +1,6 @@
-import { beforeEach, describe, it, expect } from "vitest";
+import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { prisma, resetDb } from "../db";
-import { requestMagicLink, consumeMagicToken } from "@/lib/auth/magic-link";
+import { requestMagicLink, consumeMagicToken, resolveMagicLinkBase } from "@/lib/auth/magic-link";
 import { lastMagicLinks } from "@/lib/email/dev-sender";
 import { ValidationError } from "@/lib/booking/errors";
 
@@ -61,5 +61,27 @@ describe("magic-link auth", () => {
 
   it("rejects an invalid email", async () => {
     await expect(requestMagicLink("nope")).rejects.toBeInstanceOf(ValidationError);
+  });
+});
+
+describe("resolveMagicLinkBase", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("uses the request origin in dev when provided", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("APP_URL", "http://localhost:3000");
+    expect(resolveMagicLinkBase("http://172.16.14.20:3000")).toBe("http://172.16.14.20:3000");
+  });
+
+  it("falls back to APP_URL in dev when no origin", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("APP_URL", "http://localhost:3000");
+    expect(resolveMagicLinkBase(undefined)).toBe("http://localhost:3000");
+  });
+
+  it("ignores the origin in production (never redirected by host)", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("APP_URL", "https://rallypoint.example");
+    expect(resolveMagicLinkBase("http://attacker.test")).toBe("https://rallypoint.example");
   });
 });
