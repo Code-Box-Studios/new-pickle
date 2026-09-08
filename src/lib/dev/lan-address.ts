@@ -7,6 +7,8 @@ export interface LanCandidate {
 }
 
 // Interface-name fragments we never advertise (virtual adapters / loopback).
+// `/loopback/i` intentionally duplicates the per-address `internal` guard below:
+// it drops the whole adapter by name, independent of any per-entry `internal` flag.
 const VIRTUAL = [/vethernet/i, /\bwsl\b/i, /hyper-?v/i, /virtualbox/i, /vmware/i, /loopback/i, /docker/i];
 
 // Higher = preferred. Physical wireless first, then wired, then anything else.
