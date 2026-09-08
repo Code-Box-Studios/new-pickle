@@ -14,6 +14,7 @@ describe("ph-locations", () => {
 
   it("lists Davao barangays including the real seed names", () => {
     const brgys = barangaysForCity("Davao City");
+    expect(brgys).toHaveLength(28);
     expect(brgys).toEqual(expect.arrayContaining(["Agdao", "Buhangin", "Toril"]));
     expect(brgys).not.toContain("Lanang"); // not an official barangay
     expect(brgys).not.toContain("Matina"); // split into Aplaya/Crossing/Pangi
