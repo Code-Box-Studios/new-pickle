@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input, Field } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { AMENITY_LABELS } from "@/lib/amenities";
 import { cn } from "@/lib/cn";
+import { cityNames, barangaysForCity, OTHER } from "@/lib/location/ph-locations";
 import { sendJson } from "./api";
 
 interface Initial {
@@ -17,6 +19,7 @@ interface Initial {
   city: string;
   contactNumber: string | null;
   website: string | null;
+  mapUrl: string | null;
   houseRules: string | null;
   amenities: string[];
 }
@@ -39,6 +42,28 @@ export function DetailsForm({
   function set<K extends keyof Initial>(k: K, v: Initial[K]) {
     setF((prev) => ({ ...prev, [k]: v }));
   }
+
+  const [cityChoice, setCityChoice] = useState(
+    cityNames().includes(initial.city) ? initial.city : OTHER,
+  );
+  const [brgyChoice, setBrgyChoice] = useState<string>(() => {
+    if (!initial.barangay) return "";
+    return barangaysForCity(initial.city).includes(initial.barangay) ? initial.barangay : OTHER;
+  });
+
+  function onCityChange(value: string) {
+    setCityChoice(value);
+    set("city", value === OTHER ? "" : value); // never store the "Other" sentinel
+    setBrgyChoice("");                          // city changed → reset barangay
+    set("barangay", null);
+  }
+
+  function onBarangayChange(value: string) {
+    setBrgyChoice(value);
+    if (value === OTHER) set("barangay", "");   // reveal text box for free entry
+    else set("barangay", value || null);        // "" placeholder → null
+  }
+
   function toggle(a: string) {
     setAmenities((prev) => {
       const next = new Set(prev);
@@ -60,6 +85,7 @@ export function DetailsForm({
         city: f.city,
         contactNumber: f.contactNumber,
         website: f.website,
+        mapUrl: f.mapUrl,
         houseRules: f.houseRules,
         amenities: [...amenities],
       });
@@ -91,11 +117,41 @@ export function DetailsForm({
           <Field label="Address" htmlFor="addr">
             <Input id="addr" value={f.addressLine ?? ""} onChange={(e) => set("addressLine", e.target.value)} />
           </Field>
-          <Field label="Barangay" htmlFor="brgy">
-            <Input id="brgy" value={f.barangay ?? ""} onChange={(e) => set("barangay", e.target.value)} />
-          </Field>
           <Field label="City" htmlFor="city">
-            <Input id="city" required value={f.city} onChange={(e) => set("city", e.target.value)} />
+            <Select id="city" value={cityChoice} onChange={(e) => onCityChange(e.target.value)}>
+              {cityNames().map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+              <option value={OTHER}>Other…</option>
+            </Select>
+            {cityChoice === OTHER && (
+              <Input
+                className="mt-2"
+                aria-label="City name"
+                required
+                placeholder="City"
+                value={f.city}
+                onChange={(e) => set("city", e.target.value)}
+              />
+            )}
+          </Field>
+          <Field label="Barangay" htmlFor="brgy">
+            <Select id="brgy" value={brgyChoice} onChange={(e) => onBarangayChange(e.target.value)}>
+              <option value="">Select barangay…</option>
+              {barangaysForCity(f.city).map((b) => (
+                <option key={b} value={b}>{b}</option>
+              ))}
+              <option value={OTHER}>Other…</option>
+            </Select>
+            {brgyChoice === OTHER && (
+              <Input
+                className="mt-2"
+                aria-label="Barangay name"
+                placeholder="Barangay"
+                value={f.barangay ?? ""}
+                onChange={(e) => set("barangay", e.target.value)}
+              />
+            )}
           </Field>
           <Field label="Contact number" htmlFor="tel">
             <Input id="tel" inputMode="tel" value={f.contactNumber ?? ""} onChange={(e) => set("contactNumber", e.target.value)} />
@@ -103,6 +159,15 @@ export function DetailsForm({
         </div>
         <Field label="Website (optional)" htmlFor="web">
           <Input id="web" value={f.website ?? ""} onChange={(e) => set("website", e.target.value)} />
+        </Field>
+        <Field label="Google Maps link (optional)" htmlFor="mapUrl" hint="Paste your venue's Google Maps share link.">
+          <Input
+            id="mapUrl"
+            inputMode="url"
+            placeholder="https://maps.app.goo.gl/…"
+            value={f.mapUrl ?? ""}
+            onChange={(e) => set("mapUrl", e.target.value)}
+          />
         </Field>
 
         <div>

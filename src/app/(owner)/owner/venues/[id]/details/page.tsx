@@ -22,6 +22,7 @@ export default async function DetailsStep({ params }: { params: Promise<{ id: st
         city: v.city,
         contactNumber: v.contactNumber,
         website: v.website,
+        mapUrl: v.mapUrl,
         houseRules: v.houseRules,
         amenities: v.amenities,
       }}
