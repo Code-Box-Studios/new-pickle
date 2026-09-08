@@ -25,16 +25,30 @@ export function ShareToPhonePanel() {
 
   if (process.env.NODE_ENV === "production") return null;
 
+  function fail() {
+    setInfo({
+      url: null,
+      qrDataUrl: null,
+      candidates: [],
+      error: "Couldn't reach the dev share endpoint — is the server running?",
+    });
+    setSelected(null);
+    setOpen(true);
+  }
+
   async function share() {
     try {
       const res = await fetch("/api/dev/share-url");
-      if (!res.ok) return;
+      if (!res.ok) {
+        fail();
+        return;
+      }
       const data = (await res.json()) as ShareInfo;
       setInfo(data);
       setSelected(data.candidates[0]?.address ?? null);
       setOpen(true);
     } catch {
-      /* ignore */
+      fail();
     }
   }
 
@@ -71,10 +85,19 @@ export function ShareToPhonePanel() {
       </div>
 
       {info?.error || !current ? (
-        <p className="py-6 text-xs text-ink/60">
-          {info?.error ??
-            "You don't appear to be on a Wi-Fi/LAN network."}
-        </p>
+        <div className="py-6">
+          <p className="text-xs text-ink/60">
+            {info?.error ??
+              "You don't appear to be on a Wi-Fi/LAN network."}
+          </p>
+          <button
+            type="button"
+            onClick={share}
+            className="mt-3 rounded-full bg-ink px-3 py-1.5 text-xs font-semibold text-white hover:bg-ink/90"
+          >
+            Try again
+          </button>
+        </div>
       ) : (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element -- data-URL QR, not an optimizable remote image */}

@@ -45,4 +45,78 @@ describe("ShareToPhonePanel", () => {
       expect(screen.queryByText("http://172.16.14.20:3000")).not.toBeNull();
     });
   });
+
+  it("shows an error message and a Try again button when the fetch fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({ ok: false, json: async () => ({}) })),
+    );
+
+    render(<ShareToPhonePanel />);
+
+    fireEvent.click(screen.getByRole("button", { name: /share to phone/i }));
+
+    // Error message surfaces (panel opens instead of staying silently closed)
+    await waitFor(() => {
+      expect(
+        screen.queryByText(/couldn't reach the dev share endpoint/i),
+      ).not.toBeNull();
+    });
+
+    // The spec-promised retry
+    expect(
+      screen.getByRole("button", { name: /try again/i }),
+    ).toBeTruthy();
+  });
+
+  it("switches candidates from cache without a second fetch", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        url: "http://172.16.14.20:3000",
+        qrDataUrl: "data:image/png;base64,AAAA",
+        candidates: [
+          {
+            iface: "Wi-Fi",
+            address: "172.16.14.20",
+            url: "http://172.16.14.20:3000",
+            qrDataUrl: "data:image/png;base64,AAAA",
+          },
+          {
+            iface: "Ethernet",
+            address: "10.0.0.5",
+            url: "http://10.0.0.5:3000",
+            qrDataUrl: "data:image/png;base64,BBBB",
+          },
+        ],
+      }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<ShareToPhonePanel />);
+
+    fireEvent.click(screen.getByRole("button", { name: /share to phone/i }));
+
+    // First candidate is shown initially
+    const img = await screen.findByRole("img", { name: /qr/i });
+    expect(img.getAttribute("src")).toBe("data:image/png;base64,AAAA");
+
+    // A picker (combobox) renders because there are 2 candidates
+    const select = screen.getByRole("combobox");
+    expect(select).toBeTruthy();
+
+    // Switch to the second candidate
+    fireEvent.change(select, { target: { value: "10.0.0.5" } });
+
+    // QR image src and URL text update to the second candidate from cache
+    await waitFor(() => {
+      expect(
+        screen.getByRole("img", { name: /qr/i }).getAttribute("src"),
+      ).toBe("data:image/png;base64,BBBB");
+      expect(screen.queryByText("http://10.0.0.5:3000")).not.toBeNull();
+    });
+
+    // No second fetch — the switch re-renders from cached candidates
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 });
