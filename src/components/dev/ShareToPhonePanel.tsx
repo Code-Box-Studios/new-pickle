@@ -77,6 +77,7 @@ export function ShareToPhonePanel() {
         </p>
       ) : (
         <>
+          {/* eslint-disable-next-line @next/next/no-img-element -- data-URL QR, not an optimizable remote image */}
           <img
             src={current.qrDataUrl}
             alt="QR code for the LAN URL"
