@@ -114,6 +114,7 @@ model Venue {
   lng           Float?
   contactNumber String?
   website       String?
+  mapUrl        String?
   photos        String[]
   amenities     String[]
   houseRules    String?
