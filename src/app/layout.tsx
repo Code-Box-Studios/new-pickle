@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 import { MagicLinkBanner } from "@/components/dev/MagicLinkBanner";
+import { ShareToPhonePanel } from "@/components/dev/ShareToPhonePanel";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body className="bg-white text-ink antialiased">
         <ToastProvider>{children}</ToastProvider>
         <MagicLinkBanner />
+        <ShareToPhonePanel />
       </body>
     </html>
   );
