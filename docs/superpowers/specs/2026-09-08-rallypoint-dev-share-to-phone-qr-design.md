@@ -54,7 +54,13 @@ export function pickLanAddresses(
   ifaces: Record<string, os.NetworkInterfaceInfo[] | undefined>,
   port: string,
 ): { chosen: LanCandidate | null; candidates: LanCandidate[] }
+
+// Also here (same module — both parse network/host input for the share route):
+export function portFromHost(host: string | null, fallback?: string): string
 ```
+
+`portFromHost` extracts the port from a `Host` header value (e.g.
+`"172.16.14.20:3000"` → `"3000"`, `"localhost"` → fallback `"3000"`).
 
 Selection rules:
 - Keep only `family === "IPv4"` && `internal === false`.
@@ -105,14 +111,14 @@ at `http://localhost:3000` — the phone itself — and fail.
 
 Change (dev-only, prod unchanged):
 - `requestMagicLink(emailRaw: string, opts?: { origin?: string })`.
-- Base resolution:
-  - Production (`NODE_ENV === "production"`): `process.env.APP_URL` (unchanged).
-  - Dev: `opts.origin ?? process.env.APP_URL ?? "http://localhost:3000"`.
-- Caller `src/app/api/auth/request/route.ts` passes the request origin
-  (`req.nextUrl.origin`) so the link points back to whatever host the phone used.
-- `src/lib/dev/request-origin.ts`: tiny helper `devOrigin(req)` returning
-  `req.nextUrl.origin` in dev and `undefined` in production, keeping the
-  environment branch in one testable place.
+- Exported pure helper `resolveMagicLinkBase(origin?: string): string` is the
+  single source of truth for the environment branch:
+  - Production (`NODE_ENV === "production"`): `process.env.APP_URL ?? "http://localhost:3000"` (identical to today — origin ignored).
+  - Otherwise (dev/test): `origin ?? process.env.APP_URL ?? "http://localhost:3000"`.
+- Caller `src/app/api/auth/request/route.ts` **always** passes the request origin
+  (`req.nextUrl.origin`); `resolveMagicLinkBase` decides whether to honor it, so
+  production can never be redirected by an attacker-supplied host. No separate
+  request-origin helper is needed.
 
 ### 5. Dependency
 
@@ -155,9 +161,10 @@ Unit tests (Vitest), matching the existing `tests/` layout:
   `vEthernet` entry, a `169.254.*` link-local, `127.0.0.1`, and a `Wi-Fi`
   interface → asserts it picks the Wi-Fi one, ranks it first, and omits the
   virtual/link-local/internal entries; empty/none-found → `chosen: null`.
-- `devOrigin` / magic-link base: dev + provided origin → link uses the origin;
-  dev + no origin → falls back to `APP_URL`; production → ignores origin and uses
-  `APP_URL`. Extends `tests/auth/magic-link.test.ts`.
+- `resolveMagicLinkBase`: dev + provided origin → uses the origin; dev + no
+  origin → falls back to `APP_URL`; production → ignores origin and uses
+  `APP_URL`. Also `portFromHost`: `"ip:3000"` → `"3000"`, `"localhost"` →
+  fallback. Extends `tests/auth/magic-link.test.ts`, adds `tests/dev/`.
 
 The route and panel are thin dev-only glue over the tested helpers and are not
 unit-tested; verified manually (open panel → scan on phone → log in).
