@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { DURATIONS } from "@/lib/search-params";
 import { dateLabel, isoDate, longDateLabel, parseIsoDate, weekdayLabel } from "@/lib/format";
 import { venueJsonLd } from "@/lib/seo";
+import { venueMapUrl } from "@/lib/location/maps";
 import { venueRatingSummary, listVenueReviews } from "@/lib/review";
 import { Stars } from "@/components/review/Stars";
 import { cn } from "@/lib/cn";
@@ -284,6 +285,14 @@ export default async function VenuePage({
           {venue.barangay ? `${venue.barangay}, ` : ""}
           {venue.city}
         </p>
+        <a
+          href={venueMapUrl(venue)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:underline"
+        >
+          <MapPin className="size-4" aria-hidden /> View on Google Maps
+        </a>
       </section>
 
       {/* Reviews */}
