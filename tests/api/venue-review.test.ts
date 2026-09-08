@@ -134,4 +134,18 @@ describe("venue submit / review / publish", () => {
     await unpublishVenue(venue.id);
     expect(await inSearch(venue.slug)).toBe(false);
   });
+
+  it("a Google Maps link and a null barangay never block publish (gating unchanged)", async () => {
+    const a = await admin();
+    const { venue } = await completeDraftVenue();
+    // set a maps link and clear barangay — neither is part of the completeness gate
+    await prisma.venue.update({
+      where: { id: venue.id },
+      data: { mapUrl: "https://maps.app.goo.gl/abc123", barangay: null },
+    });
+    await submitVenueForReview(venue.id, "note");
+    await reviewVenue(venue.id, "APPROVED", a.id, null, new Date());
+    await expect(publishVenue(venue.id)).resolves.toBeUndefined(); // publishes fine
+    expect((await prisma.venue.findUniqueOrThrow({ where: { id: venue.id } })).isPublished).toBe(true);
+  });
 });

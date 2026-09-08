@@ -5,6 +5,7 @@ import { ValidationError } from "@/lib/booking/errors";
 import { requireEditableOwnVenue } from "@/lib/api/owner-venue-access";
 import { uniqueVenueSlug } from "@/lib/venue/slug";
 import { errorResponse } from "@/lib/http";
+import { normalizeMapUrlInput } from "@/lib/location/maps";
 
 export async function PATCH(
   req: NextRequest,
@@ -25,6 +26,7 @@ export async function PATCH(
     if (b.city !== undefined) {
       const city = String(b.city).trim();
       if (!city) throw new ValidationError("City can't be empty");
+      if (city === "Other") throw new ValidationError("Please choose or type a real city");
       data.city = city;
     }
     for (const k of ["description", "addressLine", "barangay", "contactNumber", "website", "houseRules"] as const) {
@@ -32,6 +34,9 @@ export async function PATCH(
     }
     if (b.amenities !== undefined) {
       data.amenities = Array.isArray(b.amenities) ? b.amenities.map(String) : [];
+    }
+    if (b.mapUrl !== undefined) {
+      data.mapUrl = normalizeMapUrlInput(b.mapUrl);
     }
 
     const updated = await prisma.venue.update({ where: { id }, data, select: { slug: true } });
