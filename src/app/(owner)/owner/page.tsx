@@ -11,23 +11,13 @@ import { VenueStatusBadge } from "@/components/venue-admin/VenueStatusBadge";
 import { BookingStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { StatCard } from "@/components/ui/stat-card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { EmptyState } from "@/components/ui/states";
 import { pesos, dateLabel, timeLabel } from "@/lib/format";
 import { nowDate } from "@/lib/now";
 
 export const metadata = { title: "Dashboard" };
-
-function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <Card className="p-4">
-      <div className="flex items-center gap-2 text-muted">
-        {icon}
-        <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
-      </div>
-      <p className="mt-1.5 text-2xl font-extrabold text-ink">{value}</p>
-    </Card>
-  );
-}
 
 export default async function OwnerDashboard({
   searchParams,
@@ -117,11 +107,16 @@ export default async function OwnerDashboard({
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            <Stat icon={<CalendarDays className="size-4" />} label="Today" value={`${todayCount}`} />
-            <Stat icon={<Clock className="size-4" />} label="Pending" value={`${pendingCount}`} />
-            <Stat icon={<LayoutGrid className="size-4" />} label="Courts" value={`${activeCourts}`} />
-            <Stat icon={<CircleDollarSign className="size-4" />} label="Revenue" value={pesos(revenue._sum.priceCents ?? 0)} />
-            <Stat icon={<LayoutGrid className="size-4" />} label="Occupancy" value={occupancy} />
+            <StatCard icon={<CalendarDays className="size-4" />} label="Today" value={`${todayCount}`} />
+            <StatCard
+              icon={<Clock className="size-4" />}
+              label="Pending"
+              value={`${pendingCount}`}
+              urgent={pendingCount > 0}
+            />
+            <StatCard icon={<LayoutGrid className="size-4" />} label="Courts" value={`${activeCourts}`} />
+            <StatCard icon={<CircleDollarSign className="size-4" />} label="Revenue" value={pesos(revenue._sum.priceCents ?? 0)} />
+            <StatCard icon={<LayoutGrid className="size-4" />} label="Occupancy" value={occupancy} />
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -137,9 +132,7 @@ export default async function OwnerDashboard({
           </div>
 
           <section>
-            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">
-              Needs confirmation ({pendingCount})
-            </h2>
+            <SectionHeader className="mb-2">Needs confirmation ({pendingCount})</SectionHeader>
             {pendingList.length === 0 ? (
               <p className="text-sm text-muted">Nothing waiting on you. 🎉</p>
             ) : (
@@ -164,7 +157,7 @@ export default async function OwnerDashboard({
           </section>
 
           <section>
-            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">Upcoming</h2>
+            <SectionHeader className="mb-2">Upcoming</SectionHeader>
             {upcoming.length === 0 ? (
               <p className="text-sm text-muted">No upcoming bookings.</p>
             ) : (
