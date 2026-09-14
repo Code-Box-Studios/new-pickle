@@ -1,3 +1,4 @@
+import "@testing-library/jest-dom";
 import { config } from "dotenv";
 
 // Load env and route Prisma at the dedicated test database. This runs before
