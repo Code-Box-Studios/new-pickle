@@ -5,6 +5,8 @@ import { accessibleVenueIds } from "@/lib/api/owner-access";
 import { listReviewsForVenues } from "@/lib/review";
 import { Stars } from "@/components/review/Stars";
 import { EmptyState } from "@/components/ui/states";
+import { Card } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { dateLabel } from "@/lib/format";
 
 export const metadata = { title: "Reviews" };
@@ -30,21 +32,26 @@ export default async function OwnerReviewsPage() {
           />
         </div>
       ) : (
-        <ul className="mt-5 space-y-3">
-          {reviews.map((r) => (
-            <li key={r.id} className="rounded-2xl border border-black/5 bg-white p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm">
-                  <Stars value={r.rating} />
-                  <span className="font-medium text-ink">{r.authorName}</span>
-                </div>
-                <span className="text-xs text-muted">{dateLabel(r.createdAt)}</span>
-              </div>
-              <p className="mt-0.5 text-xs font-medium text-brand-700">{r.venueName}</p>
-              {r.body && <p className="mt-1.5 text-sm text-ink-soft">{r.body}</p>}
-            </li>
-          ))}
-        </ul>
+        <>
+          <SectionHeader className="mt-5 mb-2">Player reviews</SectionHeader>
+          <ul className="space-y-3">
+            {reviews.map((r) => (
+              <li key={r.id}>
+                <Card className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Stars value={r.rating} />
+                      <span className="font-medium text-ink">{r.authorName}</span>
+                    </div>
+                    <span className="text-xs text-muted">{dateLabel(r.createdAt)}</span>
+                  </div>
+                  <p className="mt-0.5 text-xs font-medium text-brand-700">{r.venueName}</p>
+                  {r.body && <p className="mt-1.5 text-sm text-ink-soft">{r.body}</p>}
+                </Card>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );

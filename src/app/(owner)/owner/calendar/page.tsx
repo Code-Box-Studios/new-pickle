@@ -8,6 +8,7 @@ import { VenueSwitcher } from "@/components/owner/VenueSwitcher";
 import { CalendarBoard } from "@/components/owner/CalendarBoard";
 import { WeekAgenda } from "@/components/owner/WeekAgenda";
 import { EmptyState } from "@/components/ui/states";
+import { Legend } from "@/components/ui/legend";
 import { cn } from "@/lib/cn";
 import { isoDate, longDateLabel, parseIsoDate } from "@/lib/format";
 import { nowDate } from "@/lib/now";
@@ -87,6 +88,17 @@ export default async function CalendarPage({
           </Link>
         </div>
       </div>
+
+      <Legend
+        items={[
+          { dotClass: "bg-white border border-dashed border-brand-500", label: "Available" },
+          { dotClass: "bg-amber-100", label: "Held" },
+          { dotClass: "bg-sky-100", label: "Pending" },
+          { dotClass: "bg-brand-100", label: "Confirmed" },
+          { dotClass: "bg-slate-200", label: "Blocked" },
+          { dotClass: "bg-slate-50 border border-black/5", label: "Closed" },
+        ]}
+      />
 
       {daySched ? (
         <>

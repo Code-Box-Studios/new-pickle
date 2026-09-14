@@ -9,6 +9,8 @@ import { StatusTimeline } from "@/components/booking/StatusTimeline";
 import { BookingStatusBadge } from "@/components/ui/badge";
 import { ConfirmRejectActions } from "@/components/owner/ConfirmRejectActions";
 import { ManageActions } from "@/components/owner/ManageActions";
+import { Card } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { channelLabel } from "@/lib/payment";
 import { pesos } from "@/lib/format";
 
@@ -58,8 +60,8 @@ export default async function OwnerReservationDetail({
       </div>
 
       {/* Customer */}
-      <section className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
-        <h2 className="text-sm font-semibold text-ink">Customer</h2>
+      <Card className="mt-4 p-5">
+        <SectionHeader>Customer</SectionHeader>
         <p className="mt-1 font-medium text-ink">{b.customerName ?? b.user?.name ?? "Guest"}</p>
         <div className="mt-1 space-y-0.5 text-sm text-ink-soft">
           {b.customerMobile && (
@@ -73,9 +75,10 @@ export default async function OwnerReservationDetail({
             </p>
           )}
         </div>
-      </section>
+      </Card>
 
-      <div className="mt-4">
+      <Card className="mt-4 p-5">
+        <SectionHeader className="mb-3">Booking</SectionHeader>
         <BookingSummary
           venueName={b.venue.name}
           courtName={b.court.name}
@@ -83,7 +86,7 @@ export default async function OwnerReservationDetail({
           endsAt={b.endsAt}
           priceCents={b.priceCents}
         />
-      </div>
+      </Card>
 
       {(b.source === "WALK_IN" || b.note) && (
         <p className="mt-2 text-sm text-muted">
@@ -93,8 +96,8 @@ export default async function OwnerReservationDetail({
       )}
 
       {/* Payment proof */}
-      <section className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
-        <h2 className="text-sm font-semibold text-ink">Payment proof</h2>
+      <Card className="mt-4 p-5">
+        <SectionHeader>Payment proof</SectionHeader>
         {b.payment ? (
           <div className="mt-2">
             <p className="text-sm text-ink-soft">
@@ -118,33 +121,34 @@ export default async function OwnerReservationDetail({
         ) : (
           <p className="mt-1 text-sm text-muted">No payment submitted yet.</p>
         )}
-      </section>
+      </Card>
 
       {actionable && (
-        <section className="mt-4 rounded-2xl border border-brand-200 bg-brand-50/50 p-4">
+        <Card className="mt-4 border-brand-200 bg-brand-50/50 p-5">
+          <SectionHeader className="mb-3">Action required</SectionHeader>
           <p className="mb-3 text-sm text-ink-soft">
             Review the payment above, then confirm or reject this reservation.
           </p>
           <ConfirmRejectActions bookingId={b.id} />
-        </section>
+        </Card>
       )}
 
-      <section className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-ink">Manage</h2>
+      <Card className="mt-4 p-5">
+        <SectionHeader className="mb-3">Manage</SectionHeader>
         <ManageActions
           bookingId={b.id}
           status={b.status}
           startsAtIso={b.startsAt.toISOString()}
           durationMinutes={Math.round((b.endsAt.getTime() - b.startsAt.getTime()) / 60000)}
         />
-      </section>
+      </Card>
 
-      <section className="mt-4 rounded-2xl border border-black/5 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-ink">Activity</h2>
+      <Card className="mt-4 p-5">
+        <SectionHeader className="mb-3">Activity</SectionHeader>
         <StatusTimeline
           history={b.history.map((h) => ({ toStatus: h.toStatus, at: h.at, note: h.note }))}
         />
-      </section>
+      </Card>
     </div>
   );
 }

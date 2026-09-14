@@ -11,12 +11,6 @@ import type { BookingStatus } from "@/generated/prisma";
 
 export const metadata = { title: "Reservations" };
 
-const FILTERS = [
-  { value: "action", label: "Needs action" },
-  { value: "confirmed", label: "Confirmed" },
-  { value: "all", label: "All" },
-] as const;
-
 const STATUSES: Record<string, BookingStatus[] | null> = {
   action: ["PENDING_CONFIRMATION", "PAYMENT_SUBMITTED"],
   confirmed: ["CONFIRMED"],
@@ -46,21 +40,21 @@ export default async function OwnerReservationsPage({
     <div>
       <h1 className="text-2xl font-extrabold tracking-tight text-ink">Reservations</h1>
 
-      <div className="mt-4 flex gap-2">
-        {FILTERS.map((f) => (
-          <Link
-            key={f.value}
-            href={`/owner/reservations?status=${f.value}`}
-            className={cn(
-              "rounded-full px-3.5 py-1.5 text-sm font-medium",
-              filter === f.value
-                ? "bg-brand-600 text-white"
-                : "bg-white text-ink-soft ring-1 ring-black/10 hover:bg-black/5",
-            )}
-          >
-            {f.label}
-          </Link>
-        ))}
+      <div className="mt-4">
+        <div className="inline-flex overflow-hidden rounded-xl border border-black/10 bg-white text-sm font-medium">
+          {(["action", "confirmed", "all"] as const).map((f) => (
+            <Link
+              key={f}
+              href={`/owner/reservations?status=${f}`}
+              className={cn(
+                "px-4 py-2 transition",
+                filter === f ? "bg-brand-600 text-white" : "text-ink-soft hover:bg-black/5",
+              )}
+            >
+              {f === "action" ? "Needs action" : f === "confirmed" ? "Confirmed" : "All"}
+            </Link>
+          ))}
+        </div>
       </div>
 
       {bookings.length === 0 ? (
