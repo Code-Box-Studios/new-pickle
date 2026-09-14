@@ -21,11 +21,13 @@ export function DateRail({
   slug,
   dateStr,
   duration,
+  tab,
 }: {
   days: DayChip[];
   slug: string;
   dateStr: string;
   duration: string;
+  tab?: string;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLAnchorElement>(null);
@@ -52,7 +54,7 @@ export function DateRail({
           <Link
             key={d.iso}
             ref={active ? activeRef : undefined}
-            href={`/venues/${slug}?date=${d.iso}&duration=${duration}`}
+            href={`/venues/${slug}?date=${d.iso}&duration=${duration}${tab ? `&tab=${tab}` : ""}`}
             scroll={false}
             aria-current={active ? "date" : undefined}
             className={cn(
