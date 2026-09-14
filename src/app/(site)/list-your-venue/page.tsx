@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CalendarCheck, LineChart, ShieldCheck } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { CreateVenueButton } from "@/components/venue-admin/CreateVenueButton";
 
 export const metadata: Metadata = {
@@ -43,13 +44,13 @@ export default async function ListYourVenuePage() {
           { icon: ShieldCheck, title: "Get paid directly", body: "Payments go straight to your GCash or Maya — no middleman." },
           { icon: LineChart, title: "Stay in control", body: "You confirm every booking and set your own hours and pricing." },
         ].map((f) => (
-          <div key={f.title} className="text-center">
+          <Card key={f.title} className="p-5 text-center">
             <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-brand-100 text-brand-700">
               <f.icon className="size-6" aria-hidden />
             </div>
             <h2 className="mt-3 font-semibold text-ink">{f.title}</h2>
             <p className="mt-1 text-sm text-muted">{f.body}</p>
-          </div>
+          </Card>
         ))}
       </div>
     </div>

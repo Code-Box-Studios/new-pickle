@@ -15,7 +15,7 @@ export default async function SiteLayout({
       <main className="flex-1 pb-24 md:pb-0">{children}</main>
       <footer className="border-t border-black/5 bg-slate-50 py-8 text-sm text-muted">
         <div className="mx-auto max-w-6xl space-y-2 px-4">
-          <p className="font-semibold text-ink-soft">
+          <p className="text-base font-extrabold tracking-tight">
             Rally<span className="text-accent-dark">Point</span>
           </p>
           <p>
