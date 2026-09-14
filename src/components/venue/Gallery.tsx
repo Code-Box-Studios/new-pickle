@@ -1,7 +1,7 @@
 export function Gallery({ photos, name }: { photos: string[]; name: string }) {
   if (photos.length === 0) {
     return (
-      <div className="grid aspect-[16/9] w-full place-items-center rounded-2xl bg-slate-100 text-muted">
+      <div className="grid aspect-[16/9] w-full place-items-center rounded-b-3xl bg-slate-100 text-muted sm:rounded-2xl">
         No photos yet
       </div>
     );
@@ -13,7 +13,7 @@ export function Gallery({ photos, name }: { photos: string[]; name: string }) {
       <img
         src={hero}
         alt={name}
-        className="aspect-[16/10] w-full rounded-2xl object-cover sm:aspect-auto sm:h-full"
+        className="aspect-[16/10] w-full rounded-b-3xl object-cover sm:aspect-auto sm:h-full sm:rounded-2xl"
       />
       {rest.length > 0 && (
         <div className="hidden grid-rows-2 gap-2 sm:grid">

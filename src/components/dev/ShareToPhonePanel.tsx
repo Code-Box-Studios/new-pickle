@@ -54,15 +54,20 @@ export function ShareToPhonePanel() {
   }
 
   if (!open) {
+    // Mobile/tablet: icon-only FAB sitting just above the bottom tab bar on the
+    // left, with a low z-index so the full-width Continue summary (z-30) covers
+    // it while a slot is selected — it never hides the Continue button, the nav,
+    // or the summary text. md+ (no bottom nav): labeled pill, bottom-right.
     return (
-      <div className="fixed bottom-3 right-3 z-[95] flex items-center gap-1">
+      <div className="fixed bottom-16 left-3 z-20 flex items-center gap-1 md:bottom-3 md:left-auto md:right-3 md:z-[80]">
         <button
           type="button"
           onClick={share}
-          className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-2 text-xs font-semibold text-white shadow-lg hover:bg-ink/90"
+          aria-label="Share to phone"
+          className="flex items-center gap-1.5 rounded-full bg-ink p-2.5 text-xs font-semibold text-white shadow-lg hover:bg-ink/90 md:px-3 md:py-2"
         >
           <Smartphone className="size-4" aria-hidden />
-          Share to phone
+          <span className="hidden md:inline">Share to phone</span>
         </button>
         <button
           type="button"
@@ -81,7 +86,7 @@ export function ShareToPhonePanel() {
     info?.candidates.find((c) => c.address === selected) ?? null;
 
   return (
-    <div className="fixed bottom-3 right-3 z-[95] w-64 rounded-xl border border-black/10 bg-white p-3 text-center shadow-xl">
+    <div className="fixed bottom-16 right-3 z-[90] w-64 rounded-xl border border-black/10 bg-white p-3 text-center shadow-xl md:bottom-3">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-xs font-semibold text-ink">
           Scan to open on your phone

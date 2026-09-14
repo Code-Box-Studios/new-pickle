@@ -8,6 +8,7 @@ import { venueAvailability } from "@/lib/availability/engine";
 import { Gallery } from "@/components/venue/Gallery";
 import { Amenities } from "@/components/venue/Amenities";
 import { CourtBooking, type CourtDTO } from "@/components/court/CourtBooking";
+import { DateRail } from "@/components/court/DateRail";
 import { Badge } from "@/components/ui/badge";
 import { DURATIONS } from "@/lib/search-params";
 import { dateLabel, isoDate, longDateLabel, parseIsoDate, weekdayLabel } from "@/lib/format";
@@ -127,18 +128,19 @@ export default async function VenuePage({
     }
   }
 
-  // Next 7 days for the date chips.
-  const days = Array.from({ length: 7 }, (_, i) => {
+  // Next 7 days for the date chips (precomputed for the client rail).
+  const dayChips = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setUTCHours(0, 0, 0, 0);
     d.setUTCDate(d.getUTCDate() + i);
-    return d;
+    return { iso: isoDate(d), weekday: weekdayLabel(d).slice(0, 3), label: dateLabel(d) };
   });
+  const selectedDateLabel = `${weekdayLabel(date).slice(0, 3)}, ${dateLabel(date)}`;
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6">
+    <div className="mx-auto max-w-5xl px-5 pb-24 md:pb-12">
       {!live && (
-        <div className="mb-4 rounded-xl bg-amber-100 px-4 py-3 text-sm font-medium text-amber-900">
+        <div className="mt-4 mb-4 rounded-xl bg-amber-100 px-4 py-3 text-sm font-medium text-amber-900">
           Preview — this venue isn&apos;t live yet. Only you and admins can see this page.
         </div>
       )}
@@ -149,12 +151,14 @@ export default async function VenuePage({
         />
       )}
 
-      <Gallery photos={venue.photos} name={venue.name} />
+      <div className="-mx-5 sm:mx-0 sm:mt-6">
+        <Gallery photos={venue.photos} name={venue.name} />
+      </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1">
+      <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1">
         <h1 className="text-2xl font-extrabold tracking-tight text-ink">{venue.name}</h1>
-        <Badge tone="brand">
-          <ShieldCheck className="size-3.5" aria-hidden /> Verified
+        <Badge tone="brand" className="gap-1 px-2 py-0.5 text-[11px]">
+          <ShieldCheck className="size-3" aria-hidden /> Verified
         </Badge>
       </div>
       <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
@@ -188,31 +192,13 @@ export default async function VenuePage({
 
       {/* Booking */}
       <section className="mt-8">
-        <h2 className="text-lg font-bold text-ink">Book a court</h2>
+        <h2 className="text-xl font-bold tracking-tight text-ink">Book a court</h2>
+        <p className="mt-1 text-sm text-muted">
+          Pick a date and duration, then choose a time on any court.
+        </p>
 
-        <div className="mt-3 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-          {days.map((d) => {
-            const iso = isoDate(d);
-            const active = iso === dateStr;
-            return (
-              <Link
-                key={iso}
-                href={`/venues/${venue.slug}?date=${iso}&duration=${duration}`}
-                scroll={false}
-                className={cn(
-                  "flex min-w-[4.5rem] flex-col items-center rounded-xl border px-3 py-2 text-center",
-                  active
-                    ? "border-brand-600 bg-brand-600 text-white"
-                    : "border-black/10 text-ink-soft hover:bg-black/5",
-                )}
-              >
-                <span className="text-[11px] font-medium opacity-80">
-                  {weekdayLabel(d).slice(0, 3)}
-                </span>
-                <span className="text-sm font-semibold">{dateLabel(d)}</span>
-              </Link>
-            );
-          })}
+        <div className="mt-4">
+          <DateRail days={dayChips} slug={venue.slug} dateStr={dateStr} duration={duration} />
         </div>
 
         <div className="mt-3 flex gap-2">
@@ -224,10 +210,10 @@ export default async function VenuePage({
                 href={`/venues/${venue.slug}?date=${dateStr}&duration=${dur.value}`}
                 scroll={false}
                 className={cn(
-                  "rounded-lg border px-3 py-1.5 text-sm font-medium",
+                  "rounded-lg border px-3.5 py-1.5 text-sm font-medium transition",
                   active
                     ? "border-brand-600 bg-brand-50 text-brand-800"
-                    : "border-black/10 text-ink-soft hover:bg-black/5",
+                    : "border-black/10 bg-white text-ink-soft hover:bg-black/5",
                 )}
               >
                 {dur.label}
@@ -236,7 +222,7 @@ export default async function VenuePage({
           })}
         </div>
 
-        <p className="mt-3 text-sm text-muted">{longDateLabel(date)}</p>
+        <p className="mt-4 text-sm font-medium text-ink-soft">{longDateLabel(date)}</p>
 
         <div className="mt-3">
           <CourtBooking
@@ -244,6 +230,7 @@ export default async function VenuePage({
             durationMinutes={durationMinutes}
             isAuthed={!!session}
             returnTo={`/venues/${venue.slug}?date=${dateStr}&duration=${duration}`}
+            selectedDateLabel={selectedDateLabel}
           />
         </div>
       </section>
