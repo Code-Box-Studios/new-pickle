@@ -183,7 +183,7 @@ export default async function VenuePage({
       )}
 
       {/* Gallery — full-bleed mobile, contained sm+ (unchanged from committed pass) */}
-      <div className="-mx-0 sm:mx-0 sm:mt-6">
+      <div className="-mx-5 sm:mx-0 sm:mt-6">
         <Gallery photos={venue.photos} name={venue.name} />
       </div>
 
