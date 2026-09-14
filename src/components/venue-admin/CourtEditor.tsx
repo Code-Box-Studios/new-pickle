@@ -144,10 +144,10 @@ export function CourtEditor({
                 </div>
                 {!locked && (
                   <div className="flex gap-1">
-                    <button type="button" onClick={() => setEditing({ id: c.id, draft: toDraft(c) })} className="rounded-md p-2 text-muted hover:bg-black/5" aria-label="Edit court">
+                    <button type="button" onClick={() => setEditing({ id: c.id, draft: toDraft(c) })} className="rounded-xl p-2 text-muted hover:bg-black/5" aria-label="Edit court">
                       <Pencil className="size-4" />
                     </button>
-                    <button type="button" onClick={() => run(() => sendJson(`/api/owner/venues/${venueId}/courts/${c.id}`, "DELETE"))} className="rounded-md p-2 text-red-600 hover:bg-red-50" aria-label="Delete court">
+                    <button type="button" onClick={() => run(() => sendJson(`/api/owner/venues/${venueId}/courts/${c.id}`, "DELETE"))} className="rounded-xl p-2 text-red-600 hover:bg-red-50" aria-label="Delete court">
                       <Trash2 className="size-4" />
                     </button>
                   </div>

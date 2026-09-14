@@ -64,7 +64,7 @@ export function PaymentMethodEditor({
               <button
                 type="button"
                 onClick={() => run(() => sendJson(`/api/owner/venues/${venueId}/payment-methods/${m.id}`, "DELETE"))}
-                className="rounded-md p-2 text-red-600 hover:bg-red-50"
+                className="rounded-xl p-2 text-red-600 hover:bg-red-50"
                 aria-label="Remove method"
               >
                 <Trash2 className="size-4" />

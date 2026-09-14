@@ -40,7 +40,7 @@ export function MagicLinkBanner() {
       <a
         href={link.url}
         onClick={() => setDismissedUrl(link.url)}
-        className="rounded-md bg-amber-950/10 px-2 py-0.5 font-semibold underline underline-offset-2 hover:bg-amber-950/20"
+        className="rounded-xl bg-amber-950/10 px-2 py-0.5 font-semibold underline underline-offset-2 hover:bg-amber-950/20"
       >
         Open link →
       </a>
@@ -48,7 +48,7 @@ export function MagicLinkBanner() {
         type="button"
         onClick={() => setDismissedUrl(link.url)}
         aria-label="Dismiss magic link"
-        className="rounded-md p-0.5 hover:bg-amber-950/15"
+        className="rounded-xl p-0.5 hover:bg-amber-950/15"
       >
         <X className="size-3.5" aria-hidden />
       </button>

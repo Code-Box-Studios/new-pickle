@@ -74,7 +74,7 @@ export function PhotoManager({
                     type="button"
                     onClick={() => mutate("PATCH", p)}
                     disabled={busy || i === 0}
-                    className="rounded-md bg-white/90 p-1.5 text-ink disabled:opacity-40"
+                    className="rounded-xl bg-white/90 p-1.5 text-ink disabled:opacity-40"
                     aria-label="Set as cover"
                   >
                     <Star className="size-4" />
@@ -83,7 +83,7 @@ export function PhotoManager({
                     type="button"
                     onClick={() => mutate("DELETE", p)}
                     disabled={busy}
-                    className="rounded-md bg-white/90 p-1.5 text-red-600"
+                    className="rounded-xl bg-white/90 p-1.5 text-red-600"
                     aria-label="Remove photo"
                   >
                     <Trash2 className="size-4" />
