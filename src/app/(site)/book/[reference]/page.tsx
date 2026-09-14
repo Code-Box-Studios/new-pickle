@@ -64,28 +64,32 @@ export default async function BookPage({
             </Link>
           </Card>
         ) : b.status === "HELD" ? (
-          <DetailsForm
-            bookingId={b.id}
-            expiresAt={b.holdExpiresAt!.toISOString()}
-            defaultName={b.customerName ?? ""}
-            defaultMobile={b.customerMobile ?? ""}
-            defaultEmail={b.customerEmail ?? session.email}
-          />
+          <Card className="p-5">
+            <DetailsForm
+              bookingId={b.id}
+              expiresAt={b.holdExpiresAt!.toISOString()}
+              defaultName={b.customerName ?? ""}
+              defaultMobile={b.customerMobile ?? ""}
+              defaultEmail={b.customerEmail ?? session.email}
+            />
+          </Card>
         ) : (
-          <PaymentStep
-            bookingId={b.id}
-            reference={b.reference}
-            expiresAt={b.holdExpiresAt!.toISOString()}
-            amountCents={b.priceCents}
-            venueName={b.venue.name}
-            methods={b.venue.paymentMethods.map((m) => ({
-              id: m.id,
-              channel: m.channel,
-              accountName: m.accountName,
-              accountNumber: m.accountNumber,
-              instructions: m.instructions,
-            }))}
-          />
+          <Card className="p-5">
+            <PaymentStep
+              bookingId={b.id}
+              reference={b.reference}
+              expiresAt={b.holdExpiresAt!.toISOString()}
+              amountCents={b.priceCents}
+              venueName={b.venue.name}
+              methods={b.venue.paymentMethods.map((m) => ({
+                id: m.id,
+                channel: m.channel,
+                accountName: m.accountName,
+                accountNumber: m.accountNumber,
+                instructions: m.instructions,
+              }))}
+            />
+          </Card>
         )}
       </div>
     </div>

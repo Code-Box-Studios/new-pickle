@@ -7,6 +7,7 @@ import { BookingStatusBadge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { dateLabel, pesos, timeLabel } from "@/lib/format";
 import { nowMs } from "@/lib/now";
 
@@ -62,7 +63,7 @@ export default async function MyBookingsPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-6">
-      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">{title}</h2>
+      <SectionHeader className="mb-2">{title}</SectionHeader>
       <ul className="space-y-3">{children}</ul>
     </section>
   );

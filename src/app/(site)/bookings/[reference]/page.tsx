@@ -8,6 +8,7 @@ import { StatusTimeline } from "@/components/booking/StatusTimeline";
 import { BookingStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { channelLabel } from "@/lib/payment";
 import { pesos } from "@/lib/format";
 import { nowMs } from "@/lib/now";
@@ -120,7 +121,7 @@ export default async function BookingStatusPage({
 
       {/* Payment */}
       <Card className="mt-4 p-4">
-        <h2 className="text-sm font-semibold text-ink">Payment</h2>
+        <SectionHeader>Payment</SectionHeader>
         {b.payment ? (
           <p className="mt-1 text-sm text-ink-soft">
             {channelLabel(b.payment.channel)} · ref {b.payment.reference} ·{" "}
@@ -134,7 +135,7 @@ export default async function BookingStatusPage({
       {/* Venue contact */}
       {b.venue.contactNumber && (
         <Card className="mt-4 p-4">
-          <h2 className="text-sm font-semibold text-ink">Venue contact</h2>
+          <SectionHeader>Venue contact</SectionHeader>
           <p className="mt-1 flex items-center gap-2 text-sm text-ink-soft">
             <Phone className="size-4" aria-hidden />
             {b.venue.contactNumber}
@@ -144,7 +145,7 @@ export default async function BookingStatusPage({
 
       {/* History */}
       <Card className="mt-4 p-4">
-        <h2 className="mb-3 text-sm font-semibold text-ink">Activity</h2>
+        <SectionHeader className="mb-3">Activity</SectionHeader>
         <StatusTimeline
           history={b.history.map((h) => ({ toStatus: h.toStatus, at: h.at, note: h.note }))}
         />
