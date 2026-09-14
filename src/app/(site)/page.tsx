@@ -1,6 +1,8 @@
 import { CalendarCheck, MapPin, Trophy } from "lucide-react";
 import { SearchBar } from "@/components/search/SearchBar";
 import { VenueCard } from "@/components/venue/VenueCard";
+import { Card } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { featuredVenues, listCities } from "@/lib/venues";
 import { isoDate } from "@/lib/format";
 
@@ -40,7 +42,7 @@ export default async function HomePage() {
 
       {/* Featured venues */}
       <section className="mx-auto max-w-6xl px-4 py-10">
-        <h2 className="text-xl font-bold text-ink">Popular venues</h2>
+        <SectionHeader className="text-xl font-bold text-ink">Popular venues</SectionHeader>
         <p className="mt-1 text-muted">Highly rated courts near you.</p>
         {venues.length === 0 ? (
           <p className="mt-6 text-muted">No venues listed yet — check back soon.</p>
@@ -63,13 +65,13 @@ export default async function HomePage() {
               { icon: CalendarCheck, title: "Reserve & pay the venue", body: "Hold your slot, then pay the venue directly via GCash or Maya." },
               { icon: Trophy, title: "Play", body: "The venue confirms your booking. Show up and rally." },
             ].map((s) => (
-              <div key={s.title} className="text-center">
+              <Card key={s.title} className="p-6 text-center">
                 <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-brand-100 text-brand-700">
                   <s.icon className="size-6" aria-hidden />
                 </div>
                 <h3 className="mt-3 font-semibold text-ink">{s.title}</h3>
                 <p className="mt-1 text-sm text-muted">{s.body}</p>
-              </div>
+              </Card>
             ))}
           </div>
         </div>

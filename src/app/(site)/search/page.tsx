@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SearchBar } from "@/components/search/SearchBar";
 import { VenueCard } from "@/components/venue/VenueCard";
 import { EmptyState } from "@/components/ui/states";
+import { SectionHeader } from "@/components/ui/section-header";
 import { SearchX } from "lucide-react";
 import { listCities } from "@/lib/venues";
 import { searchAvailability } from "@/lib/availability/engine";
@@ -55,9 +56,9 @@ export default async function SearchPage({
       />
 
       <div className="mt-6 mb-4">
-        <h1 className="text-lg font-bold text-ink">
+        <SectionHeader className="text-lg font-bold text-ink">
           Courts in {city}
-        </h1>
+        </SectionHeader>
         <p className="text-sm text-muted">
           {longDateLabel(date)} · {withOpenings} of {results.length} venue
           {results.length === 1 ? "" : "s"} with openings

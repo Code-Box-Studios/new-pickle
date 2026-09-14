@@ -60,16 +60,15 @@ export function VenueCard({
           <span className="font-semibold text-ink">{venue.ratingAvg.toFixed(1)}</span>
           <span className="text-muted">({venue.ratingCount})</span>
         </div>
-        <h3 className="text-base font-semibold text-ink">{venue.name}</h3>
+        <h3 className="text-[15px] font-bold text-ink">{venue.name}</h3>
         <p className="flex items-center gap-1 text-sm text-muted">
           <MapPin className="size-3.5" aria-hidden />
           {venue.barangay ? `${venue.barangay}, ` : ""}
           {venue.city}
         </p>
         {venue.priceFromCents != null && (
-          <p className="pt-0.5 text-sm text-ink">
-            From <span className="font-bold">{pesos(venue.priceFromCents)}</span>
-            <span className="text-muted">/hour</span>
+          <p className="text-sm font-semibold text-ink">
+            From {pesos(venue.priceFromCents)}<span className="font-normal text-muted">/hr</span>
           </p>
         )}
 
