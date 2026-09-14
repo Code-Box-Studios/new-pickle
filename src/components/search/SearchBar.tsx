@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { DURATIONS, TIME_PRESETS } from "@/lib/search-params";
@@ -34,9 +35,10 @@ export function SearchBar({
   }
 
   return (
+    <Card className="p-4">
     <form
       onSubmit={submit}
-      className="grid gap-3 rounded-2xl border border-black/5 bg-white p-4 shadow-[var(--shadow-card)] sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto] lg:items-end"
+      className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto] lg:items-end"
     >
       <label className="block">
         <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-muted">
@@ -85,5 +87,6 @@ export function SearchBar({
         Find courts
       </Button>
     </form>
+    </Card>
   );
 }

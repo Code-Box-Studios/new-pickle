@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 import { longDateLabel, pesos, timeLabel } from "@/lib/format";
 
 export function BookingSummary({
@@ -14,7 +15,7 @@ export function BookingSummary({
   priceCents: number;
 }) {
   return (
-    <div className="rounded-2xl border border-black/5 bg-white p-4">
+    <Card className="p-4">
       <p className="font-semibold text-ink">{venueName}</p>
       <p className="text-sm text-muted">{courtName}</p>
       <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
@@ -30,6 +31,6 @@ export function BookingSummary({
         </div>
       </dl>
       <p className="mt-3 text-lg font-bold text-ink">{pesos(priceCents)}</p>
-    </div>
+    </Card>
   );
 }

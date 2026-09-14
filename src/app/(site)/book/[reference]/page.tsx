@@ -7,6 +7,7 @@ import { BookingSummary } from "@/components/booking/BookingSummary";
 import { DetailsForm } from "@/components/booking/DetailsForm";
 import { PaymentStep } from "@/components/booking/PaymentStep";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export const metadata = { title: "Complete your booking" };
 
@@ -53,7 +54,7 @@ export default async function BookPage({
 
       <div className="mt-6">
         {dead ? (
-          <div className="rounded-2xl border border-black/5 p-5 text-center">
+          <Card className="p-5 text-center">
             <h2 className="text-lg font-bold text-ink">Your hold expired</h2>
             <p className="mt-1 text-muted">
               This slot was released. Pick another time — it only takes a moment.
@@ -61,7 +62,7 @@ export default async function BookPage({
             <Link href={`/venues/${b.venue.slug}`} className="mt-4 inline-block">
               <Button size="lg">Find another court</Button>
             </Link>
-          </div>
+          </Card>
         ) : b.status === "HELD" ? (
           <DetailsForm
             bookingId={b.id}

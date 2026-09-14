@@ -10,6 +10,7 @@ import { VenueSwitcher } from "@/components/owner/VenueSwitcher";
 import { VenueStatusBadge } from "@/components/venue-admin/VenueStatusBadge";
 import { BookingStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/states";
 import { pesos, dateLabel, timeLabel } from "@/lib/format";
 import { nowDate } from "@/lib/now";
@@ -18,13 +19,13 @@ export const metadata = { title: "Dashboard" };
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-black/5 bg-white p-4">
+    <Card className="p-4">
       <div className="flex items-center gap-2 text-muted">
         {icon}
         <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
       </div>
       <p className="mt-1.5 text-2xl font-extrabold text-ink">{value}</p>
-    </div>
+    </Card>
   );
 }
 
@@ -144,16 +145,18 @@ export default async function OwnerDashboard({
             ) : (
               <ul className="space-y-2">
                 {pendingList.map((b) => (
-                  <li key={b.id} className="flex items-center justify-between gap-3 rounded-xl border border-black/5 bg-white p-3">
-                    <div className="min-w-0">
-                      <p className="truncate font-medium text-ink">{b.customerName ?? "Guest"}</p>
-                      <p className="text-sm text-muted">
-                        {b.court.name} · {dateLabel(b.startsAt)} {timeLabel(b.startsAt)}
-                      </p>
-                    </div>
-                    <Link href={`/owner/reservations/${b.reference}`}>
-                      <Button size="sm">Review</Button>
-                    </Link>
+                  <li key={b.id}>
+                    <Card className="flex items-center justify-between gap-3 p-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-ink">{b.customerName ?? "Guest"}</p>
+                        <p className="text-sm text-muted">
+                          {b.court.name} · {dateLabel(b.startsAt)} {timeLabel(b.startsAt)}
+                        </p>
+                      </div>
+                      <Link href={`/owner/reservations/${b.reference}`}>
+                        <Button size="sm">Review</Button>
+                      </Link>
+                    </Card>
                   </li>
                 ))}
               </ul>
@@ -167,19 +170,21 @@ export default async function OwnerDashboard({
             ) : (
               <ul className="space-y-2">
                 {upcoming.map((b) => (
-                  <li key={b.id} className="flex items-center justify-between gap-3 rounded-xl border border-black/5 bg-white p-3">
-                    <div className="min-w-0">
-                      <p className="truncate font-medium text-ink">{b.customerName ?? "Guest"}</p>
-                      <p className="text-sm text-muted">
-                        {b.court.name} · {dateLabel(b.startsAt)} {timeLabel(b.startsAt)}–{timeLabel(b.endsAt)}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <BookingStatusBadge status={b.status} />
-                      <Link href={`/owner/reservations/${b.reference}`}>
-                        <Button size="sm" variant="outline">View</Button>
-                      </Link>
-                    </div>
+                  <li key={b.id}>
+                    <Card className="flex items-center justify-between gap-3 p-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-ink">{b.customerName ?? "Guest"}</p>
+                        <p className="text-sm text-muted">
+                          {b.court.name} · {dateLabel(b.startsAt)} {timeLabel(b.startsAt)}–{timeLabel(b.endsAt)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <BookingStatusBadge status={b.status} />
+                        <Link href={`/owner/reservations/${b.reference}`}>
+                          <Button size="sm" variant="outline">View</Button>
+                        </Link>
+                      </div>
+                    </Card>
                   </li>
                 ))}
               </ul>

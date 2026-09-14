@@ -6,6 +6,7 @@ import { listUserBookings } from "@/lib/bookings-read";
 import { BookingStatusBadge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { dateLabel, pesos, timeLabel } from "@/lib/format";
 import { nowMs } from "@/lib/now";
 
@@ -87,7 +88,8 @@ function BookingRow({ b, resumable }: { b: Row; resumable?: boolean }) {
     b.holdExpiresAt.getTime() > nowMs();
 
   return (
-    <li className="rounded-2xl border border-black/5 bg-white p-4">
+    <li>
+      <Card className="p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate font-semibold text-ink">{b.venue.name}</p>
@@ -111,6 +113,7 @@ function BookingRow({ b, resumable }: { b: Row; resumable?: boolean }) {
           </Link>
         )}
       </div>
+      </Card>
     </li>
   );
 }

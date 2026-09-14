@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MapPin, Star } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { pesos, timeLabel } from "@/lib/format";
 import type { Slot } from "@/lib/availability/engine";
 import { cn } from "@/lib/cn";
@@ -30,9 +31,10 @@ export function VenueCard({
   const href = isoDate ? `/venues/${venue.slug}?date=${isoDate}` : `/venues/${venue.slug}`;
 
   return (
+    <Card className="overflow-hidden transition hover:shadow-lg">
     <Link
       href={href}
-      className="group block overflow-hidden rounded-2xl border border-black/5 bg-white shadow-[var(--shadow-card)] transition hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+      className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
         {photo ? (
@@ -90,5 +92,6 @@ export function VenueCard({
         )}
       </div>
     </Link>
+    </Card>
   );
 }

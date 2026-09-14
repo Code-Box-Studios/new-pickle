@@ -7,6 +7,7 @@ import { BookingSummary } from "@/components/booking/BookingSummary";
 import { StatusTimeline } from "@/components/booking/StatusTimeline";
 import { BookingStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { channelLabel } from "@/lib/payment";
 import { pesos } from "@/lib/format";
 import { nowMs } from "@/lib/now";
@@ -94,7 +95,7 @@ export default async function BookingStatusPage({
       )}
 
       {/* Progress */}
-      <section className="mt-6 rounded-2xl border border-black/5 p-4">
+      <Card className="mt-6 p-4">
         <ul className="space-y-2.5">
           {STEPS.map((s) => {
             const isDone = done[s.key];
@@ -115,10 +116,10 @@ export default async function BookingStatusPage({
             );
           })}
         </ul>
-      </section>
+      </Card>
 
       {/* Payment */}
-      <section className="mt-4 rounded-2xl border border-black/5 p-4">
+      <Card className="mt-4 p-4">
         <h2 className="text-sm font-semibold text-ink">Payment</h2>
         {b.payment ? (
           <p className="mt-1 text-sm text-ink-soft">
@@ -128,26 +129,26 @@ export default async function BookingStatusPage({
         ) : (
           <p className="mt-1 text-sm text-muted">Not submitted yet.</p>
         )}
-      </section>
+      </Card>
 
       {/* Venue contact */}
       {b.venue.contactNumber && (
-        <section className="mt-4 rounded-2xl border border-black/5 p-4">
+        <Card className="mt-4 p-4">
           <h2 className="text-sm font-semibold text-ink">Venue contact</h2>
           <p className="mt-1 flex items-center gap-2 text-sm text-ink-soft">
             <Phone className="size-4" aria-hidden />
             {b.venue.contactNumber}
           </p>
-        </section>
+        </Card>
       )}
 
       {/* History */}
-      <section className="mt-4 rounded-2xl border border-black/5 p-4">
+      <Card className="mt-4 p-4">
         <h2 className="mb-3 text-sm font-semibold text-ink">Activity</h2>
         <StatusTimeline
           history={b.history.map((h) => ({ toStatus: h.toStatus, at: h.at, note: h.note }))}
         />
-      </section>
+      </Card>
 
       <p className="mt-4 text-center text-xs text-muted">
         Confirmation comes from the venue. Payment goes to the venue. This page is

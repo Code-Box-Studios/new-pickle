@@ -10,6 +10,7 @@ import { Amenities } from "@/components/venue/Amenities";
 import { CourtBooking, type CourtDTO } from "@/components/court/CourtBooking";
 import { DateRail } from "@/components/court/DateRail";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { DURATIONS } from "@/lib/search-params";
 import { dateLabel, isoDate, longDateLabel, parseIsoDate, weekdayLabel } from "@/lib/format";
 import { venueJsonLd } from "@/lib/seo";
@@ -313,15 +314,17 @@ export default async function VenuePage({
             </div>
             <ul className="mt-5 space-y-4">
               {recentReviews.map((r) => (
-                <li key={r.id} className="rounded-2xl border border-black/5 p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Stars value={r.rating} />
-                      <span className="font-medium text-ink">{r.authorName}</span>
+                <li key={r.id}>
+                  <Card className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Stars value={r.rating} />
+                        <span className="font-medium text-ink">{r.authorName}</span>
+                      </div>
+                      <span className="text-xs text-muted">{dateLabel(r.createdAt)}</span>
                     </div>
-                    <span className="text-xs text-muted">{dateLabel(r.createdAt)}</span>
-                  </div>
-                  {r.body && <p className="mt-1.5 text-ink-soft">{r.body}</p>}
+                    {r.body && <p className="mt-1.5 text-ink-soft">{r.body}</p>}
+                  </Card>
                 </li>
               ))}
             </ul>

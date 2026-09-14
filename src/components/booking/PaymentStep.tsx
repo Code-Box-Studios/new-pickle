@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input, Field } from "@/components/ui/input";
 import { HoldCountdown, useCountdown } from "./HoldCountdown";
 import { pesos } from "@/lib/format";
@@ -96,31 +97,36 @@ export function PaymentStep({
           </p>
         )}
         {methods.map((m) => (
-          <label
-            key={m.id}
-            className={cn(
-              "flex cursor-pointer items-start gap-3 rounded-xl border p-3",
-              methodId === m.id ? "border-brand-600 bg-brand-50" : "border-black/10",
-            )}
-          >
-            <input
-              type="radio"
-              name="method"
-              className="mt-1 accent-brand-600"
-              checked={methodId === m.id}
-              onChange={() => setMethodId(m.id)}
-            />
-            <span className="min-w-0">
-              <span className="block text-sm font-semibold text-ink">
-                {channelLabel(m.channel)}
-              </span>
-              <span className="block text-sm text-ink-soft">
-                {m.accountName} · {m.accountNumber}
-              </span>
-              {m.instructions && (
-                <span className="mt-0.5 block text-xs text-muted">{m.instructions}</span>
+          <label key={m.id}>
+            <Card
+              className={cn(
+                "cursor-pointer p-3.5 transition",
+                methodId === m.id
+                  ? "border-brand-600 bg-brand-50"
+                  : "hover:border-black/10",
               )}
+            >
+            <span className="flex items-start gap-3">
+              <input
+                type="radio"
+                name="method"
+                className="mt-1 accent-brand-600"
+                checked={methodId === m.id}
+                onChange={() => setMethodId(m.id)}
+              />
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-ink">
+                  {channelLabel(m.channel)}
+                </span>
+                <span className="block text-sm text-ink-soft">
+                  {m.accountName} · {m.accountNumber}
+                </span>
+                {m.instructions && (
+                  <span className="mt-0.5 block text-xs text-muted">{m.instructions}</span>
+                )}
+              </span>
             </span>
+            </Card>
           </label>
         ))}
       </fieldset>
