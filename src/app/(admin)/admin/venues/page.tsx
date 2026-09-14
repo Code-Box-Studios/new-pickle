@@ -36,14 +36,20 @@ export default async function AdminVenuesPage({
     <div>
       <h1 className="text-2xl font-extrabold tracking-tight text-ink">Venues</h1>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {FILTERS.map((f) => (
+      {/* Segmented control */}
+      <div className="mt-4 inline-flex rounded-xl border border-black/10 bg-white">
+        {FILTERS.map((f, i) => (
           <Link
             key={f.value}
             href={`/admin/venues?status=${f.value}`}
             className={cn(
-              "rounded-full px-3.5 py-1.5 text-sm font-medium",
-              filter.value === f.value ? "bg-brand-600 text-white" : "bg-white text-ink-soft ring-1 ring-black/10 hover:bg-black/5",
+              "px-3.5 py-1.5 text-sm font-medium",
+              i === 0 && "rounded-l-xl",
+              i === FILTERS.length - 1 && "rounded-r-xl",
+              i > 0 && "border-l border-black/10",
+              filter.value === f.value
+                ? "bg-brand-600 text-white"
+                : "text-ink-soft hover:bg-black/5 hover:text-ink",
             )}
           >
             {f.label}

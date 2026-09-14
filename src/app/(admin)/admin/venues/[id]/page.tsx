@@ -7,6 +7,8 @@ import { VenueStatusBadge } from "@/components/venue-admin/VenueStatusBadge";
 import { ReviewActions } from "@/components/admin/ReviewActions";
 import { channelLabel } from "@/lib/payment";
 import { pesos } from "@/lib/format";
+import { Card } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
 
 export const metadata = { title: "Admin · Review venue" };
 
@@ -52,65 +54,78 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
         <VenueStatusBadge status={v.status} />
       </div>
 
-      {v.verification?.submittedNote && (
-        <div className="mt-4 rounded-xl bg-slate-100 px-4 py-3 text-sm text-ink-soft">
-          <strong>Owner&apos;s note:</strong> {v.verification.submittedNote}
-        </div>
-      )}
+      <div className="mt-5 space-y-4">
+        {v.verification?.submittedNote && (
+          <Card className="p-5">
+            <SectionHeader>Owner&apos;s note</SectionHeader>
+            <p className="mt-2 text-sm text-ink-soft">{v.verification.submittedNote}</p>
+          </Card>
+        )}
 
-      {v.photos.length > 0 && (
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          {v.photos.slice(0, 6).map((p, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={i} src={p} alt={`Photo ${i + 1}`} className="aspect-square w-full rounded-lg object-cover" />
-          ))}
-        </div>
-      )}
+        {v.photos.length > 0 && (
+          <Card className="p-5">
+            <SectionHeader>Photos</SectionHeader>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {v.photos.slice(0, 6).map((p, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={i} src={p} alt={`Photo ${i + 1}`} className="aspect-square w-full rounded-lg object-cover" />
+              ))}
+            </div>
+          </Card>
+        )}
 
-      {v.description && <p className="mt-4 text-ink-soft">{v.description}</p>}
+        {v.description && (
+          <Card className="p-5">
+            <SectionHeader>Description</SectionHeader>
+            <p className="mt-2 text-sm text-ink-soft">{v.description}</p>
+          </Card>
+        )}
 
-      {v.amenities.length > 0 && (
-        <div className="mt-4">
-          <h2 className="text-sm font-semibold text-ink">Amenities</h2>
-          <div className="mt-2"><Amenities amenities={v.amenities} /></div>
-        </div>
-      )}
+        {v.amenities.length > 0 && (
+          <Card className="p-5">
+            <SectionHeader>Amenities</SectionHeader>
+            <div className="mt-3"><Amenities amenities={v.amenities} /></div>
+          </Card>
+        )}
 
-      <div className="mt-4">
-        <h2 className="text-sm font-semibold text-ink">Courts</h2>
-        <ul className="mt-2 space-y-1 text-sm text-ink-soft">
-          {v.courts.map((c) => (
-            <li key={c.id}>
-              {c.name} — {c.indoor ? "Indoor" : "Outdoor"} · {pesos(c.priceCents)}/hr {!c.active && "(inactive)"}
-            </li>
-          ))}
-          {v.courts.length === 0 && <li className="text-muted">No courts.</li>}
-        </ul>
-      </div>
+        <Card className="p-5">
+          <SectionHeader>Courts</SectionHeader>
+          <ul className="mt-2 space-y-1 text-sm text-ink-soft">
+            {v.courts.map((c) => (
+              <li key={c.id}>
+                {c.name} — {c.indoor ? "Indoor" : "Outdoor"} · {pesos(c.priceCents)}/hr {!c.active && "(inactive)"}
+              </li>
+            ))}
+            {v.courts.length === 0 && <li className="text-muted">No courts.</li>}
+          </ul>
+        </Card>
 
-      <div className="mt-4">
-        <h2 className="text-sm font-semibold text-ink">Hours</h2>
-        <ul className="mt-2 text-sm text-ink-soft">
-          {hours.length === 0 && <li className="text-muted">No hours set.</li>}
-          {hours.map((s) => (
-            <li key={s.id}>{DAYS[s.dayOfWeek]} {minuteLabel(s.openMinute)} – {minuteLabel(s.closeMinute)}</li>
-          ))}
-        </ul>
-      </div>
+        <Card className="p-5">
+          <SectionHeader>Hours</SectionHeader>
+          <ul className="mt-2 text-sm text-ink-soft">
+            {hours.length === 0 && <li className="text-muted">No hours set.</li>}
+            {hours.map((s) => (
+              <li key={s.id}>{DAYS[s.dayOfWeek]} {minuteLabel(s.openMinute)} – {minuteLabel(s.closeMinute)}</li>
+            ))}
+          </ul>
+        </Card>
 
-      <div className="mt-4">
-        <h2 className="text-sm font-semibold text-ink">Payment methods</h2>
-        <ul className="mt-2 text-sm text-ink-soft">
-          {v.paymentMethods.map((m) => (
-            <li key={m.id}>{channelLabel(m.channel)} · {m.accountName} · {m.accountNumber}</li>
-          ))}
-          {v.paymentMethods.length === 0 && <li className="text-muted">None.</li>}
-        </ul>
-      </div>
+        <Card className="p-5">
+          <SectionHeader>Payment methods</SectionHeader>
+          <ul className="mt-2 text-sm text-ink-soft">
+            {v.paymentMethods.map((m) => (
+              <li key={m.id}>{channelLabel(m.channel)} · {m.accountName} · {m.accountNumber}</li>
+            ))}
+            {v.paymentMethods.length === 0 && <li className="text-muted">None.</li>}
+          </ul>
+        </Card>
 
-      <div className="mt-6 rounded-2xl border border-black/5 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-ink">Decision</h2>
-        <ReviewActions venueId={v.id} status={v.status} />
+        <Card className="p-5">
+          <SectionHeader>Decision</SectionHeader>
+          <div className="mt-3">
+            <ReviewActions venueId={v.id} status={v.status} />
+          </div>
+        </Card>
       </div>
     </div>
   );
