@@ -46,7 +46,9 @@ export function DateRail({
   return (
     <div
       ref={scrollRef}
-      className="-mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="flex w-full max-w-full snap-x gap-2 overflow-x-auto px-4 pb-2 pt-1 md:px-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      role="group"
+      aria-label="Choose a booking date"
     >
       {days.map((d) => {
         const active = d.iso === dateStr;
@@ -58,13 +60,13 @@ export function DateRail({
             scroll={false}
             aria-current={active ? "date" : undefined}
             className={cn(
-              "flex w-16 shrink-0 snap-start flex-col items-center rounded-2xl border py-2.5 text-center transition",
+              "flex min-h-18 w-18 shrink-0 snap-start flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
               active
-                ? "border-brand-600 bg-brand-600 text-white"
-                : "border-black/10 bg-white text-ink-soft hover:bg-black/5",
+                ? "border-brand-700 bg-brand-700 text-white shadow-sm"
+                : "border-line bg-surface text-ink-soft hover:border-brand-300 hover:bg-mist",
             )}
           >
-            <span className={cn("text-[11px] font-medium", active ? "text-white/80" : "text-muted")}>
+            <span className={cn("text-xs font-medium", active ? "text-white/80" : "text-muted")}>
               {d.weekday}
             </span>
             <span className="text-sm font-semibold">{d.label}</span>

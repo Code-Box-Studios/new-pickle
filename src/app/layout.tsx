@@ -33,9 +33,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="bg-white font-[var(--font-inter)] text-ink antialiased">
-        <ToastProvider>{children}</ToastProvider>
+      <body className="font-[var(--font-inter)] text-ink antialiased">
         <MagicLinkBanner />
+        <ToastProvider>{children}</ToastProvider>
         <ShareToPhonePanel />
       </body>
     </html>

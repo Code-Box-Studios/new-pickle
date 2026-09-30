@@ -22,12 +22,12 @@ const STATE_LABEL: Record<CellState, string> = {
 
 export function WeekAgenda({ days }: { days: AgendaDay[] }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-7">
       {days.map((d) => {
         const date = parseIsoDate(d.date);
         return (
           <section key={d.date}>
-            <h3 className="mb-2 text-sm font-semibold text-ink">
+            <h3 className="mb-3 flex flex-wrap items-center gap-1.5 text-base font-semibold tracking-tight text-ink">
               {weekdayLabel(date)} <span className="text-muted">· {dateLabel(date)}</span>
             </h3>
             {d.items.length === 0 ? (
@@ -36,13 +36,13 @@ export function WeekAgenda({ days }: { days: AgendaDay[] }) {
               <ul className="space-y-1.5">
                 {d.items.map((it, i) => {
                   const body = (
-                    <div className="flex items-center gap-3 rounded-xl border border-black/5 bg-white p-3">
+                    <div className="flex items-center gap-4 rounded-2xl border border-line bg-surface p-5 shadow-card">
                       <span className={cn("size-2.5 shrink-0 rounded-full", DOT[it.state])} aria-hidden />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-ink">
+                        <p className="text-sm font-semibold leading-relaxed text-ink">
                           {timeLabel(new Date(it.startsAt))}–{timeLabel(new Date(it.endsAt))} · {it.courtName}
                         </p>
-                        <p className="truncate text-xs text-muted">
+                        <p className="mt-1 text-xs leading-relaxed text-muted">
                           {STATE_LABEL[it.state]} · {it.label}
                         </p>
                       </div>
@@ -51,7 +51,7 @@ export function WeekAgenda({ days }: { days: AgendaDay[] }) {
                   return (
                     <li key={i}>
                       {it.reference ? (
-                        <Link href={`/owner/reservations/${it.reference}`}>{body}</Link>
+                        <Link href={`/owner/reservations/${it.reference}`} className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">{body}</Link>
                       ) : (
                         body
                       )}

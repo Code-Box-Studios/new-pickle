@@ -43,41 +43,41 @@ export default async function OwnerReservationDetail({
   const actionable = b.status === "PENDING_CONFIRMATION" || b.status === "PAYMENT_SUBMITTED";
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-3xl">
       <Link
         href="/owner/reservations"
-        className="inline-flex items-center gap-1 text-sm text-muted hover:text-ink"
+        className="inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-medium text-muted hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
       >
         <ArrowLeft className="size-4" aria-hidden /> Reservations
       </Link>
 
-      <div className="mt-3 flex items-start justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Reservation</p>
-          <h1 className="text-2xl font-extrabold tracking-tight text-ink">{b.reference}</h1>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className="eyebrow mb-2">Reservation</p>
+          <h1 className="page-title break-all">{b.reference}</h1>
         </div>
         <BookingStatusBadge status={b.status} />
       </div>
 
       {/* Customer */}
-      <Card className="mt-4 p-5">
+      <Card className="mt-6 p-5 sm:p-6">
         <SectionHeader>Customer</SectionHeader>
-        <p className="mt-1 font-medium text-ink">{b.customerName ?? b.user?.name ?? "Guest"}</p>
-        <div className="mt-1 space-y-0.5 text-sm text-ink-soft">
+        <p className="mt-4 text-lg font-semibold text-ink">{b.customerName ?? b.user?.name ?? "Guest"}</p>
+        <div className="mt-3 space-y-2 text-sm text-ink-soft">
           {b.customerMobile && (
-            <p className="flex items-center gap-2">
-              <Phone className="size-4" aria-hidden /> {b.customerMobile}
+            <p className="flex items-center gap-3">
+              <Phone className="size-4 shrink-0 text-muted" aria-hidden /> {b.customerMobile}
             </p>
           )}
           {(b.customerEmail || b.user?.email) && (
-            <p className="flex items-center gap-2">
-              <Mail className="size-4" aria-hidden /> {b.customerEmail ?? b.user?.email}
+            <p className="flex min-w-0 items-center gap-3">
+              <Mail className="size-4 shrink-0 text-muted" aria-hidden /> <span className="break-all">{b.customerEmail ?? b.user?.email}</span>
             </p>
           )}
         </div>
       </Card>
 
-      <Card className="mt-4 p-5">
+      <Card className="mt-5 p-5 sm:p-6">
         <SectionHeader className="mb-3">Booking</SectionHeader>
         <BookingSummary
           venueName={b.venue.name}
@@ -96,11 +96,11 @@ export default async function OwnerReservationDetail({
       )}
 
       {/* Payment proof */}
-      <Card className="mt-4 p-5">
+      <Card className="mt-5 p-5 sm:p-6">
         <SectionHeader>Payment proof</SectionHeader>
         {b.payment ? (
           <div className="mt-2">
-            <p className="text-sm text-ink-soft">
+            <p className="break-words text-sm leading-relaxed text-ink-soft">
               {channelLabel(b.payment.channel)} · ref {b.payment.reference} ·{" "}
               {pesos(b.payment.amountCents)}
             </p>
@@ -124,7 +124,7 @@ export default async function OwnerReservationDetail({
       </Card>
 
       {actionable && (
-        <Card className="mt-4 border-brand-200 bg-brand-50/50 p-5">
+        <Card className="mt-5 border-brand-200 bg-mist p-5 sm:p-6">
           <SectionHeader className="mb-3">Action required</SectionHeader>
           <p className="mb-3 text-sm text-ink-soft">
             Review the payment above, then confirm or reject this reservation.
@@ -133,7 +133,7 @@ export default async function OwnerReservationDetail({
         </Card>
       )}
 
-      <Card className="mt-4 p-5">
+      <Card className="mt-5 p-5 sm:p-6">
         <SectionHeader className="mb-3">Manage</SectionHeader>
         <ManageActions
           bookingId={b.id}
@@ -143,7 +143,7 @@ export default async function OwnerReservationDetail({
         />
       </Card>
 
-      <Card className="mt-4 p-5">
+      <Card className="mt-5 p-5 sm:p-6">
         <SectionHeader className="mb-3">Activity</SectionHeader>
         <StatusTimeline
           history={b.history.map((h) => ({ toStatus: h.toStatus, at: h.at, note: h.note }))}

@@ -5,11 +5,11 @@ import { cn } from "@/lib/cn";
 type Tone = "neutral" | "brand" | "amber" | "blue" | "red";
 
 const TONE: Record<Tone, string> = {
-  neutral: "bg-slate-100 text-slate-700",
+  neutral: "bg-canvas text-ink-soft",
   brand: "bg-brand-100 text-brand-800",
-  amber: "bg-amber-100 text-amber-800",
-  blue: "bg-sky-100 text-sky-800",
-  red: "bg-red-100 text-red-700",
+  amber: "bg-amber-50 text-amber-900",
+  blue: "bg-sky-50 text-sky-800",
+  red: "bg-red-50 text-red-800",
 };
 const DOT: Record<Tone, string> = {
   neutral: "bg-slate-400",
@@ -33,12 +33,12 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
+        "inline-flex max-w-full items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium leading-snug",
         TONE[tone],
         className,
       )}
     >
-      {dot && <span className={cn("size-1.5 rounded-full", DOT[tone])} aria-hidden />}
+      {dot && <span className={cn("size-1.5 shrink-0 rounded-full", DOT[tone])} aria-hidden />}
       {children}
     </span>
   );

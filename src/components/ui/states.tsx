@@ -1,7 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
-import { Button } from "./button";
+import { Button, buttonVariants } from "./button";
 
 export function EmptyState({
   icon,
@@ -17,18 +17,18 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={cn("mx-auto max-w-sm py-14 text-center", className)}>
+    <div className={cn("mx-auto max-w-md px-4 py-16 text-center sm:py-20", className)}>
       {icon && (
-        <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-brand-50 text-brand-600">
+        <div className="mx-auto mb-5 grid size-16 place-items-center rounded-2xl bg-mist text-brand-700">
           {icon}
         </div>
       )}
-      <h2 className="text-lg font-semibold text-ink">{title}</h2>
-      {description && <p className="mt-1.5 text-muted">{description}</p>}
+      <h2 className="text-xl font-semibold tracking-tight text-ink">{title}</h2>
+      {description && <p className="mt-3 text-sm leading-relaxed text-muted">{description}</p>}
       {action && (
-        <div className="mt-5">
-          <Link href={action.href}>
-            <Button size="lg">{action.label}</Button>
+        <div className="mt-6">
+          <Link href={action.href} className={buttonVariants({size: "lg"})}>
+            {action.label}
           </Link>
         </div>
       )}
@@ -46,9 +46,9 @@ export function ErrorState({
   onRetry?: () => void;
 }) {
   return (
-    <div className="mx-auto max-w-sm py-14 text-center">
+    <div role="alert" className="mx-auto max-w-md px-4 py-16 text-center">
       <h2 className="text-lg font-semibold text-ink">{title}</h2>
-      {description && <p className="mt-1.5 text-muted">{description}</p>}
+      {description && <p className="mt-3 text-sm leading-relaxed text-muted">{description}</p>}
       {onRetry && (
         <Button variant="outline" className="mt-5" onClick={onRetry}>
           Try again

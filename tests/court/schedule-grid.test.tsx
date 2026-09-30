@@ -49,29 +49,24 @@ describe("ScheduleGrid", () => {
   it("calls onSelect with correct court and slot when available cell clicked", () => {
     const onSelect = vi.fn();
     render(<ScheduleGrid courts={courts} selected={null} onSelect={onSelect} />);
-    // The 8:00 AM slot for Court 1 should be clickable
-    const buttons = screen.getAllByRole("button");
-    const available = buttons.find((b) => !b.hasAttribute("disabled") && b.textContent?.includes("8:00"));
-    expect(available).toBeDefined();
-    fireEvent.click(available!);
+    const available = screen.getByRole("button", { name: /Court 1.*8:00 AM.*₱300/ });
+    fireEvent.click(available);
     expect(onSelect).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "c1" }),
-      expect.objectContaining({ available: true })
+      courts[0],
+      courts[0].slots[0],
     );
   });
 
   it("disables unavailable slots", () => {
     render(<ScheduleGrid courts={courts} selected={null} onSelect={() => {}} />);
-    const buttons = screen.getAllByRole("button");
-    const disabled = buttons.filter((b) => b.hasAttribute("disabled"));
-    expect(disabled.length).toBeGreaterThan(0);
+    const unavailable = screen.getByRole("button", { name: /Court 1.*9:00 AM.*unavailable/i });
+    expect(unavailable).toBeDisabled();
   });
 
   it("applies selected style to the selected slot", () => {
     const sel = { courtId: "c1", startsAt: courts[0].slots[0].startsAt, courtName: "Court 1", priceCents: 30000 };
     render(<ScheduleGrid courts={courts} selected={sel} onSelect={() => {}} />);
-    const buttons = screen.getAllByRole("button");
-    const selBtn = buttons.find((b) => b.getAttribute("aria-pressed") === "true");
-    expect(selBtn).toBeDefined();
+    expect(screen.getByRole("button", { name: /Court 1.*8:00 AM.*₱300/, pressed: true })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Court 2.*8:00 AM.*₱300/, pressed: false })).toBeInTheDocument();
   });
 });

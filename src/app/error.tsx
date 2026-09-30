@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { CircleAlert } from "lucide-react";
 
 export default function Error({
   error,
@@ -15,13 +16,14 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="mx-auto grid min-h-[60dvh] max-w-sm place-items-center px-4 text-center">
+    <div role="alert" className="mx-auto grid min-h-[65dvh] max-w-md place-items-center px-6 py-12 text-center">
       <div>
-        <h1 className="text-xl font-bold text-ink">Something went wrong</h1>
-        <p className="mt-2 text-muted">
+        <div className="mx-auto mb-6 grid size-16 place-items-center rounded-2xl bg-amber-50 text-amber-800"><CircleAlert className="size-7" strokeWidth={1.5} aria-hidden /></div>
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">Something went wrong</h1>
+        <p className="mt-3 leading-relaxed text-muted">
           We hit a snag loading this page. Please try again.
         </p>
-        <Button className="mt-5" onClick={reset}>
+        <Button className="mt-7" onClick={reset}>
           Try again
         </Button>
       </div>

@@ -9,7 +9,7 @@ import { OCCUPYING } from "@/lib/booking/status";
 import { VenueSwitcher } from "@/components/owner/VenueSwitcher";
 import { VenueStatusBadge } from "@/components/venue-admin/VenueStatusBadge";
 import { BookingStatusBadge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StatCard } from "@/components/ui/stat-card";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -81,12 +81,12 @@ export default async function OwnerDashboard({
   const live = active.isPublished && active.status === "APPROVED";
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-7">
+      <div className="flex flex-wrap items-center justify-between gap-5 border-b border-line pb-7">
         <div>
-          <p className="text-sm text-muted">Good day 👋</p>
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-extrabold tracking-tight text-ink">{active.name}</h1>
+          <p className="eyebrow mb-2">Good day 👋</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="page-title">{active.name}</h1>
             <VenueStatusBadge status={active.status} />
             {active.status === "APPROVED" && (
               <span className="text-xs font-medium text-muted">{live ? "· Live" : "· Not published"}</span>
@@ -106,7 +106,7 @@ export default async function OwnerDashboard({
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5 xl:gap-4">
             <StatCard icon={<CalendarDays className="size-4" />} label="Today" value={`${todayCount}`} />
             <StatCard
               icon={<Clock className="size-4" />}
@@ -119,35 +119,36 @@ export default async function OwnerDashboard({
             <StatCard icon={<LayoutGrid className="size-4" />} label="Occupancy" value={occupancy} />
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            <Link href={`/owner/calendar?venue=${venueId}`}>
-              <Button><CalendarDays className="size-4" /> Open calendar</Button>
+          <div className="flex flex-wrap gap-3">
+            <Link href={`/owner/calendar?venue=${venueId}`} className={buttonVariants()}>
+              <CalendarDays className="size-4" aria-hidden /> Open calendar
             </Link>
-            <Link href={`/owner/calendar?venue=${venueId}&new=1`}>
-              <Button variant="secondary"><Plus className="size-4" /> New booking</Button>
+            <Link href={`/owner/calendar?venue=${venueId}&new=1`} className={buttonVariants({ variant: "secondary" })}>
+              <Plus className="size-4" aria-hidden /> New booking
             </Link>
-            <Link href={`/owner/calendar?venue=${venueId}&block=1`}>
-              <Button variant="outline"><Ban className="size-4" /> Block court</Button>
+            <Link href={`/owner/calendar?venue=${venueId}&block=1`} className={buttonVariants({ variant: "outline" })}>
+              <Ban className="size-4" aria-hidden /> Block court
             </Link>
           </div>
 
-          <section>
-            <SectionHeader className="mb-2">Needs confirmation ({pendingCount})</SectionHeader>
+          <div className="grid items-start gap-6 xl:grid-cols-2">
+          <section className="rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-card sm:p-6">
+            <SectionHeader className="mb-5">Needs confirmation ({pendingCount})</SectionHeader>
             {pendingList.length === 0 ? (
-              <p className="text-sm text-muted">Nothing waiting on you. 🎉</p>
+              <p className="rounded-xl bg-canvas px-4 py-5 text-sm text-muted">Nothing waiting on you. 🎉</p>
             ) : (
               <ul className="space-y-2">
                 {pendingList.map((b) => (
                   <li key={b.id}>
-                    <Card className="flex items-center justify-between gap-3 p-3">
+                    <Card className="flex flex-wrap items-center justify-between gap-3 rounded-xl border-0 bg-canvas p-4 shadow-none">
                       <div className="min-w-0">
                         <p className="truncate font-medium text-ink">{b.customerName ?? "Guest"}</p>
-                        <p className="text-sm text-muted">
+                        <p className="mt-1 text-sm leading-relaxed text-muted">
                           {b.court.name} · {dateLabel(b.startsAt)} {timeLabel(b.startsAt)}
                         </p>
                       </div>
-                      <Link href={`/owner/reservations/${b.reference}`}>
-                        <Button size="sm">Review</Button>
+                      <Link href={`/owner/reservations/${b.reference}`} className={buttonVariants({ size: "sm" })}>
+                        Review
                       </Link>
                     </Card>
                   </li>
@@ -156,25 +157,25 @@ export default async function OwnerDashboard({
             )}
           </section>
 
-          <section>
-            <SectionHeader className="mb-2">Upcoming</SectionHeader>
+          <section className="rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-card sm:p-6">
+            <SectionHeader className="mb-5">Upcoming</SectionHeader>
             {upcoming.length === 0 ? (
-              <p className="text-sm text-muted">No upcoming bookings.</p>
+              <p className="rounded-xl bg-canvas px-4 py-5 text-sm text-muted">No upcoming bookings.</p>
             ) : (
               <ul className="space-y-2">
                 {upcoming.map((b) => (
                   <li key={b.id}>
-                    <Card className="flex items-center justify-between gap-3 p-3">
+                    <Card className="flex flex-wrap items-center justify-between gap-3 rounded-xl border-0 bg-canvas p-4 shadow-none">
                       <div className="min-w-0">
                         <p className="truncate font-medium text-ink">{b.customerName ?? "Guest"}</p>
-                        <p className="text-sm text-muted">
+                        <p className="mt-1 text-sm leading-relaxed text-muted">
                           {b.court.name} · {dateLabel(b.startsAt)} {timeLabel(b.startsAt)}–{timeLabel(b.endsAt)}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
                         <BookingStatusBadge status={b.status} />
-                        <Link href={`/owner/reservations/${b.reference}`}>
-                          <Button size="sm" variant="outline">View</Button>
+                        <Link href={`/owner/reservations/${b.reference}`} className={buttonVariants({ size: "sm", variant: "outline" })}>
+                          View
                         </Link>
                       </div>
                     </Card>
@@ -183,6 +184,7 @@ export default async function OwnerDashboard({
               </ul>
             )}
           </section>
+          </div>
         </>
       )}
     </div>

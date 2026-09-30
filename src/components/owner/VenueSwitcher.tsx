@@ -24,7 +24,7 @@ export function VenueSwitcher({
   }
 
   return (
-    <div className="w-full max-w-xs">
+    <div className="w-full sm:w-64">
       <Select value={activeId} onChange={onChange} aria-label="Select venue">
         {venues.map((v) => (
           <option key={v.id} value={v.id}>

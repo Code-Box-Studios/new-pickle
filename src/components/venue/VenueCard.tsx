@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Star } from "lucide-react";
+import { ArrowUpRight, ImageOff, MapPin, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { pesos, timeLabel } from "@/lib/format";
 import type { Slot } from "@/lib/availability/engine";
@@ -31,54 +31,61 @@ export function VenueCard({
   const href = isoDate ? `/venues/${venue.slug}?date=${isoDate}` : `/venues/${venue.slug}`;
 
   return (
-    <Card className="overflow-hidden transition hover:shadow-lg">
+    <div className="court-photo-hover h-full">
+    <Card className="court-photo-card h-full shadow-none hover:border-brand-200">
     <Link
       href={href}
-      className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+      className="motion-trigger relative block h-full overflow-hidden rounded-[var(--radius-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-inset"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-mist">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={photo}
             alt={venue.name}
-            className="size-full object-cover transition duration-300 group-hover:scale-105"
+            className="court-photo-image size-full object-cover"
             loading="lazy"
           />
         ) : (
-          <div className="grid size-full place-items-center text-muted">No photo</div>
+          <div className="flex size-full flex-col items-center justify-center gap-3 text-sm text-muted"><ImageOff className="size-6" strokeWidth={1.5} aria-hidden />No photo</div>
         )}
-        <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-ink shadow-sm">
+        <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-medium text-ink shadow-sm">
           {venue.indoor ? "Indoor" : "Outdoor"} · {venue.courtCount} court
           {venue.courtCount === 1 ? "" : "s"}
         </span>
       </div>
 
-      <div className="space-y-1.5 p-4">
-        <div className="flex items-center gap-1 text-sm text-ink-soft">
-          <Star className="size-4 fill-amber-400 text-amber-400" aria-hidden />
-          <span className="font-semibold text-ink">{venue.ratingAvg.toFixed(1)}</span>
-          <span className="text-muted">({venue.ratingCount})</span>
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="min-w-0 text-lg font-semibold leading-snug tracking-tight text-ink">{venue.name}</h3>
+          {venue.ratingCount > 0 ? (
+            <span className="flex shrink-0 items-center gap-1 pt-0.5 text-xs text-ink-soft" aria-label={`${venue.ratingAvg.toFixed(1)} out of 5, ${venue.ratingCount} reviews`}>
+              <Star className="size-3.5 fill-amber-600 text-amber-600" aria-hidden />
+              <span className="font-semibold text-ink">{venue.ratingAvg.toFixed(1)}</span>
+              <span className="text-muted">({venue.ratingCount})</span>
+            </span>
+          ) : <span className="shrink-0 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-800">New venue</span>}
         </div>
-        <h3 className="text-[15px] font-bold text-ink">{venue.name}</h3>
-        <p className="flex items-center gap-1 text-sm text-muted">
-          <MapPin className="size-3.5" aria-hidden />
+        <p className="mt-2 flex items-start gap-1.5 text-sm leading-relaxed text-muted">
+          <MapPin className="mt-1 size-3.5 shrink-0" aria-hidden />
+          <span>
           {venue.barangay ? `${venue.barangay}, ` : ""}
-          {venue.city}
+          {venue.city}</span>
         </p>
-        {venue.priceFromCents != null && (
-          <p className="text-sm font-semibold text-ink">
-            From {pesos(venue.priceFromCents)}<span className="font-normal text-muted">/hr</span>
-          </p>
-        )}
+        <div className="mt-5 flex min-h-10 items-center justify-between gap-3 border-t border-line pt-4">
+          {venue.priceFromCents != null ? (
+            <p className="text-sm text-muted">From <span className="text-lg font-semibold tracking-tight text-ink">{pesos(venue.priceFromCents)}</span><span className="ml-1 text-xs">/hr</span></p>
+          ) : <span className="text-sm text-muted">View venue details</span>}
+          <ArrowUpRight className="motion-arrow size-4 text-brand-700" data-direction="up-right" aria-hidden />
+        </div>
 
         {nextSlots && nextSlots.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 pt-2">
+          <div className="mt-4 flex flex-wrap gap-2" aria-label="Next available times">
             {nextSlots.map((s) => (
               <span
                 key={s.startsAt.toISOString()}
                 className={cn(
-                  "rounded-lg bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-800",
+                  "rounded-lg bg-brand-50 px-2.5 py-1.5 text-xs font-medium text-brand-800",
                 )}
               >
                 {timeLabel(s.startsAt)}
@@ -87,10 +94,11 @@ export function VenueCard({
           </div>
         )}
         {nextSlots && nextSlots.length === 0 && (
-          <p className="pt-2 text-xs font-medium text-muted">No open slots for this time</p>
+          <p className="mt-4 text-xs leading-relaxed text-muted">No open slots for this time</p>
         )}
       </div>
     </Link>
     </Card>
+    </div>
   );
 }

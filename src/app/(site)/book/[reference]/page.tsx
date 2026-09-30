@@ -6,7 +6,7 @@ import { nowMs } from "@/lib/now";
 import { BookingSummary } from "@/components/booking/BookingSummary";
 import { DetailsForm } from "@/components/booking/DetailsForm";
 import { PaymentStep } from "@/components/booking/PaymentStep";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 export const metadata = { title: "Complete your booking" };
@@ -37,60 +37,63 @@ export default async function BookPage({
   const dead = b.status === "EXPIRED" || b.status === "CANCELLED" || expired;
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-6">
-      <p className="text-sm text-muted">
-        Booking <span className="font-semibold text-ink">{b.reference}</span>
-      </p>
+    <div className="page-shell py-8 sm:py-12">
+      <div className="mx-auto max-w-2xl">
+        <p className="eyebrow break-words">
+          Booking <span className="font-semibold text-ink">{b.reference}</span>
+        </p>
+        <h1 className="page-title mt-3">Complete your booking</h1>
 
-      <div className="mt-3">
-        <BookingSummary
-          venueName={b.venue.name}
-          courtName={b.court.name}
-          startsAt={b.startsAt}
-          endsAt={b.endsAt}
-          priceCents={b.priceCents}
-        />
-      </div>
+        <div className="mt-7 sm:mt-8">
+          <BookingSummary
+            venueName={b.venue.name}
+            courtName={b.court.name}
+            startsAt={b.startsAt}
+            endsAt={b.endsAt}
+            priceCents={b.priceCents}
+          />
+        </div>
 
-      <div className="mt-6">
-        {dead ? (
-          <Card className="p-5 text-center">
-            <h2 className="text-lg font-bold text-ink">Your hold expired</h2>
-            <p className="mt-1 text-muted">
-              This slot was released. Pick another time — it only takes a moment.
-            </p>
-            <Link href={`/venues/${b.venue.slug}`} className="mt-4 inline-block">
-              <Button size="lg">Find another court</Button>
-            </Link>
-          </Card>
-        ) : b.status === "HELD" ? (
-          <Card className="p-5">
-            <DetailsForm
-              bookingId={b.id}
-              expiresAt={b.holdExpiresAt!.toISOString()}
-              defaultName={b.customerName ?? ""}
-              defaultMobile={b.customerMobile ?? ""}
-              defaultEmail={b.customerEmail ?? session.email}
-            />
-          </Card>
-        ) : (
-          <Card className="p-5">
-            <PaymentStep
-              bookingId={b.id}
-              reference={b.reference}
-              expiresAt={b.holdExpiresAt!.toISOString()}
-              amountCents={b.priceCents}
-              venueName={b.venue.name}
-              methods={b.venue.paymentMethods.map((m) => ({
-                id: m.id,
-                channel: m.channel,
-                accountName: m.accountName,
-                accountNumber: m.accountNumber,
-                instructions: m.instructions,
-              }))}
-            />
-          </Card>
-        )}
+        <div className="mt-5 sm:mt-6">
+          {dead ? (
+            <Card className="p-6 text-center sm:p-7">
+              <h2 className="section-title">Your hold expired</h2>
+              <p className="mt-3 leading-7 text-muted">
+                This slot was released. Pick another time — it only takes a moment.
+              </p>
+              <Link href={`/venues/${b.venue.slug}`} className={`${buttonVariants({ size: "lg" })} mt-5`}>
+                Find another court
+              </Link>
+            </Card>
+          ) : b.status === "HELD" ? (
+            <Card className="p-6 sm:p-7">
+              <DetailsForm
+                bookingId={b.id}
+                expiresAt={b.holdExpiresAt!.toISOString()}
+                defaultName={b.customerName ?? ""}
+                defaultMobile={b.customerMobile ?? ""}
+                defaultEmail={b.customerEmail ?? session.email}
+              />
+            </Card>
+          ) : (
+            <Card className="p-6 sm:p-7">
+              <PaymentStep
+                bookingId={b.id}
+                reference={b.reference}
+                expiresAt={b.holdExpiresAt!.toISOString()}
+                amountCents={b.priceCents}
+                venueName={b.venue.name}
+                methods={b.venue.paymentMethods.map((m) => ({
+                  id: m.id,
+                  channel: m.channel,
+                  accountName: m.accountName,
+                  accountNumber: m.accountNumber,
+                  instructions: m.instructions,
+                }))}
+              />
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );

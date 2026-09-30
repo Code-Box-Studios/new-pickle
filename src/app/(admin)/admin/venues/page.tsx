@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Inbox } from "lucide-react";
+import { ChevronRight, Inbox } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { EmptyState } from "@/components/ui/states";
 import { VenueStatusBadge } from "@/components/venue-admin/VenueStatusBadge";
@@ -34,44 +34,45 @@ export default async function AdminVenuesPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-extrabold tracking-tight text-ink">Venues</h1>
+      <p className="eyebrow mb-2">Admin</p>
+      <h1 className="page-title">Venues</h1>
 
       {/* Segmented control */}
-      <div className="mt-4 inline-flex rounded-xl border border-black/10 bg-white">
-        {FILTERS.map((f, i) => (
+      <div className="mt-6 overflow-x-auto pb-1">
+      <nav aria-label="Venue status" className="inline-flex min-w-max gap-1 rounded-2xl border border-line bg-surface p-1.5">
+        {FILTERS.map((f) => (
           <Link
             key={f.value}
             href={`/admin/venues?status=${f.value}`}
+            aria-current={filter.value === f.value ? "page" : undefined}
             className={cn(
-              "px-3.5 py-1.5 text-sm font-medium",
-              i === 0 && "rounded-l-xl",
-              i === FILTERS.length - 1 && "rounded-r-xl",
-              i > 0 && "border-l border-black/10",
+              "flex min-h-11 items-center rounded-xl px-4 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
               filter.value === f.value
-                ? "bg-brand-600 text-white"
-                : "text-ink-soft hover:bg-black/5 hover:text-ink",
+                ? "bg-brand-700 text-white shadow-sm"
+                : "text-ink-soft hover:bg-canvas hover:text-ink",
             )}
           >
             {f.label}
           </Link>
         ))}
+      </nav>
       </div>
 
       {venues.length === 0 ? (
         <EmptyState icon={<Inbox className="size-7" />} title="Nothing here" description="No venues match this filter." />
       ) : (
-        <ul className="mt-5 space-y-3">
+        <ul className="mt-6 space-y-3">
           {venues.map((v) => (
-            <li key={v.id} className="rounded-2xl border border-black/5 bg-white p-4">
-              <Link href={`/admin/venues/${v.id}`} className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-ink">{v.name}</p>
-                  <p className="text-sm text-muted">
+            <li key={v.id} className="overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface shadow-card">
+              <Link href={`/admin/venues/${v.id}`} className="motion-trigger flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-card)] p-5 hover:bg-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 sm:p-6">
+                <div className="min-w-0 flex-1 basis-64">
+                  <p className="text-lg font-semibold tracking-tight text-ink">{v.name}</p>
+                  <p className="mt-1 break-words text-sm leading-relaxed text-muted">
                     {v.owner.email} · {v.barangay ? `${v.barangay}, ` : ""}{v.city}
                   </p>
-                  <p className="mt-0.5 text-xs text-muted">Updated {dateLabel(v.updatedAt)}</p>
+                  <p className="mt-3 text-xs text-muted">Updated {dateLabel(v.updatedAt)}</p>
                 </div>
-                <VenueStatusBadge status={v.status} />
+                <div className="flex shrink-0 items-center gap-3"><VenueStatusBadge status={v.status} /><ChevronRight className="motion-arrow size-4 text-muted" data-direction="right" aria-hidden /></div>
               </Link>
             </li>
           ))}

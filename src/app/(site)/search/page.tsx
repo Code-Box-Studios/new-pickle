@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { SearchBar } from "@/components/search/SearchBar";
 import { VenueCard } from "@/components/venue/VenueCard";
 import { EmptyState } from "@/components/ui/states";
-import { SectionHeader } from "@/components/ui/section-header";
 import { SearchX } from "lucide-react";
 import { listCities } from "@/lib/venues";
 import { searchAvailability } from "@/lib/availability/engine";
@@ -46,7 +45,7 @@ export default async function SearchPage({
   const withOpenings = results.filter((r) => r.nextSlots.length > 0).length;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
+    <div className="page-shell py-8 sm:py-10 lg:py-12">
       <SearchBar
         cities={cityOptions}
         defaultCity={city}
@@ -55,11 +54,11 @@ export default async function SearchPage({
         defaultDuration={duration}
       />
 
-      <div className="mt-6 mb-4">
-        <SectionHeader className="text-lg font-bold text-ink">
+      <div className="mb-6 mt-9 sm:mb-8 sm:mt-12">
+        <h1 className="page-title">
           Courts in {city}
-        </SectionHeader>
-        <p className="text-sm text-muted">
+        </h1>
+        <p className="page-description mt-3">
           {longDateLabel(date)} · {withOpenings} of {results.length} venue
           {results.length === 1 ? "" : "s"} with openings
         </p>
@@ -72,7 +71,7 @@ export default async function SearchPage({
           description="We couldn't find venues in this area. Try another city."
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {results.map((r) => (
             <VenueCard
               key={r.venue.slug}

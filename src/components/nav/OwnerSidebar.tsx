@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
-import { LayoutDashboard, CalendarDays, BookOpen, Star, Building2 } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { LayoutDashboard, CalendarDays, BookOpen, Star, Building2, LogOut } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { Brand } from "@/components/ui/brand";
+import { cn } from "@/lib/cn";
 
 const NAV = [
   { href: "/owner", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -17,22 +22,24 @@ export function OwnerSidebar({
   session: { email: string };
   activeVenueId?: string;
 }) {
+  const pathname = usePathname();
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r border-black/5 bg-white lg:flex">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-brand-700 text-white lg:flex">
       {/* Wordmark */}
-      <div className="flex h-16 items-center border-b border-black/5 px-5">
+      <div className="flex h-24 items-center border-b border-white/10 px-6">
         <Link
           href="/owner"
-          className="text-[15px] font-extrabold tracking-tight text-brand-700"
+          className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-4 focus-visible:ring-offset-brand-700"
         >
-          Rally<span className="text-accent-dark">Point</span>
+          <Brand inverse />
         </Link>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-3">
+      <nav aria-label="Owner navigation" className="flex-1 overflow-y-auto px-3 py-6">
         {NAV.map((item) => {
           const Icon = item.icon;
+          const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
           const href =
             activeVenueId && item.href !== "/owner"
               ? `${item.href}?venue=${activeVenueId}`
@@ -41,9 +48,13 @@ export function OwnerSidebar({
             <Link
               key={item.href}
               href={href}
-              className="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-ink-soft hover:bg-black/5 hover:text-ink"
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "mb-1 flex min-h-12 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70",
+                active ? "bg-white/12 font-semibold text-white ring-1 ring-white/10" : "text-white/65 hover:bg-white/7 hover:text-white",
+              )}
             >
-              <Icon className="size-4 shrink-0" aria-hidden />
+              <Icon className="size-5 shrink-0" aria-hidden />
               {item.label}
             </Link>
           );
@@ -51,13 +62,14 @@ export function OwnerSidebar({
       </nav>
 
       {/* Bottom: notifications + account */}
-      <div className="border-t border-black/5 px-5 py-4">
-        <div className="flex items-center gap-3">
-          <NotificationBell />
-          <span className="min-w-0 truncate text-xs text-muted">{session.email}</span>
+      <div className="border-t border-white/10 px-5 py-5">
+        <div className="flex items-center gap-2">
+          <div className="shrink-0 [&_button]:size-11 [&_button]:hover:bg-white/10 [&_svg]:text-white/75"><NotificationBell /></div>
+          <span className="min-w-0 truncate text-xs text-white/65">{session.email}</span>
         </div>
         <form action="/api/auth/logout" method="post" className="mt-2">
-          <button type="submit" className="text-sm font-medium text-muted hover:text-ink">
+          <button type="submit" className="flex min-h-11 items-center gap-2 rounded-lg px-2 text-sm font-medium text-white/75 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">
+            <LogOut className="size-4" aria-hidden />
             Sign out
           </button>
         </form>

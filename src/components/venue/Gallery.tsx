@@ -1,32 +1,24 @@
 export function Gallery({ photos, name }: { photos: string[]; name: string }) {
   if (photos.length === 0) {
     return (
-      <div className="grid aspect-[16/9] w-full place-items-center rounded-b-3xl bg-slate-100 text-muted sm:rounded-2xl">
+      <div className="grid aspect-[4/3] w-full place-items-center rounded-b-[20px] bg-mist text-sm text-muted sm:rounded-2xl">
         No photos yet
       </div>
     );
   }
-  const [hero, ...rest] = photos;
+  const [hero] = photos;
   return (
-    <div className="grid gap-2 sm:grid-cols-[2fr_1fr]">
+    <div className="court-photo-frame relative overflow-hidden rounded-b-[20px] sm:rounded-2xl">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={hero}
         alt={name}
-        className="aspect-[16/10] w-full rounded-b-3xl object-cover sm:aspect-auto sm:h-full sm:rounded-2xl"
+        className="court-photo-image aspect-[4/3] w-full object-cover"
       />
-      {rest.length > 0 && (
-        <div className="hidden grid-rows-2 gap-2 sm:grid">
-          {rest.slice(0, 2).map((p, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={i}
-              src={p}
-              alt={`${name} photo ${i + 2}`}
-              className="h-full w-full rounded-2xl object-cover"
-            />
-          ))}
-        </div>
+      {photos.length > 1 && (
+        <span className="absolute bottom-3 left-3 rounded-lg border border-white/15 bg-ink/75 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+          1 / {photos.length}
+        </span>
       )}
     </div>
   );

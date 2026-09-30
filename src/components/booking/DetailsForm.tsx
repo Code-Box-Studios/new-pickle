@@ -51,9 +51,9 @@ export function DetailsForm({
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-ink">Your details</h2>
+    <form onSubmit={submit} className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-1">
+        <h2 className="section-title">Your details</h2>
         <HoldCountdown expiresAt={expiresAt} />
       </div>
       <Field label="Full name" htmlFor="name">
@@ -72,7 +72,11 @@ export function DetailsForm({
       <Field label="Email" htmlFor="email">
         <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
       </Field>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="break-words rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
+          {error}
+        </p>
+      )}
       <Button type="submit" size="lg" block loading={submitting} disabled={expired}>
         {expired ? "Hold expired" : "Continue to payment"}
       </Button>

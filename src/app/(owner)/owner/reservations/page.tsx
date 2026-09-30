@@ -38,23 +38,24 @@ export default async function OwnerReservationsPage({
 
   return (
     <div>
-      <h1 className="text-2xl font-extrabold tracking-tight text-ink">Reservations</h1>
+      <h1 className="page-title">Reservations</h1>
 
-      <div className="mt-4">
-        <div className="inline-flex overflow-hidden rounded-xl border border-black/10 bg-white text-sm font-medium">
+      <div className="mt-6 overflow-x-auto pb-1">
+        <nav aria-label="Reservation status" className="inline-flex min-w-max gap-1 rounded-2xl border border-line bg-surface p-1.5 text-sm font-medium">
           {(["action", "confirmed", "all"] as const).map((f) => (
             <Link
               key={f}
               href={`/owner/reservations?status=${f}`}
+              aria-current={filter === f ? "page" : undefined}
               className={cn(
-                "px-4 py-2 transition",
-                filter === f ? "bg-brand-600 text-white" : "text-ink-soft hover:bg-black/5",
+                "flex min-h-11 items-center rounded-xl px-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+                filter === f ? "bg-brand-700 text-white shadow-sm" : "text-ink-soft hover:bg-canvas",
               )}
             >
               {f === "action" ? "Needs action" : f === "confirmed" ? "Confirmed" : "All"}
             </Link>
           ))}
-        </div>
+        </nav>
       </div>
 
       {bookings.length === 0 ? (
@@ -68,7 +69,7 @@ export default async function OwnerReservationsPage({
           }
         />
       ) : (
-        <ul className="mt-5 space-y-3">
+        <ul className="mt-6 space-y-3">
           {bookings.map((b) => (
             <ReservationRow
               key={b.id}

@@ -60,7 +60,7 @@ export function PhotoManager({
       {photos.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {photos.map((p, i) => (
-            <div key={p} className="group relative overflow-hidden rounded-xl border border-black/5">
+            <div key={p} className="group relative overflow-hidden rounded-2xl border border-line">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={p} alt={`Photo ${i + 1}`} className="aspect-square w-full object-cover" />
               {i === 0 && (
@@ -74,7 +74,7 @@ export function PhotoManager({
                     type="button"
                     onClick={() => mutate("PATCH", p)}
                     disabled={busy || i === 0}
-                    className="rounded-xl bg-white/90 p-1.5 text-ink disabled:opacity-40"
+                    className="grid size-11 shrink-0 place-items-center rounded-xl bg-white/95 text-ink hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-40"
                     aria-label="Set as cover"
                   >
                     <Star className="size-4" />
@@ -83,7 +83,7 @@ export function PhotoManager({
                     type="button"
                     onClick={() => mutate("DELETE", p)}
                     disabled={busy}
-                    className="rounded-xl bg-white/90 p-1.5 text-red-600"
+                    className="grid size-11 shrink-0 place-items-center rounded-xl bg-white/95 text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-40"
                     aria-label="Remove photo"
                   >
                     <Trash2 className="size-4" />
@@ -96,10 +96,11 @@ export function PhotoManager({
       )}
 
       {!locked && (
-        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-black/20 p-4 hover:bg-black/5">
-          <ImagePlus className="size-5 text-brand-600" aria-hidden />
+        <label htmlFor={`venue-photo-${venueId}`} className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border border-dashed border-brand-200 bg-canvas p-4 hover:bg-mist focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2">
+          <ImagePlus className="size-5 shrink-0 text-brand-700" aria-hidden />
           <span className="text-sm text-ink-soft">{busy ? "Uploading…" : "Upload a photo (JPG, PNG, WebP · max 5 MB)"}</span>
           <input
+            id={`venue-photo-${venueId}`}
             ref={fileRef}
             type="file"
             accept="image/jpeg,image/png,image/webp"

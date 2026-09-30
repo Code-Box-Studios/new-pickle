@@ -15,7 +15,7 @@ const TABS = [
 export function BottomTabBar() {
   const pathname = usePathname();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+    <nav aria-label="Mobile navigation" className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden">
       <ul className="mx-auto flex max-w-md">
         {TABS.map((t) => {
           const active = t.exact ? pathname === t.href : pathname.startsWith(t.href);
@@ -24,12 +24,15 @@ export function BottomTabBar() {
             <li key={t.href} className="flex-1">
               <Link
                 href={t.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium",
-                  active ? "text-brand-700" : "text-muted",
+                  "relative flex min-h-16 flex-col items-center justify-center gap-1 px-2 text-[11px] font-medium transition-colors",
+                  active ? "text-brand-800" : "text-muted hover:text-ink",
                 )}
               >
-                <Icon className="size-[22px]" aria-hidden />
+                <span className={cn("grid h-7 w-12 place-items-center rounded-xl", active && "bg-mist")}>
+                  <Icon className="size-5" strokeWidth={1.8} aria-hidden />
+                </span>
                 {t.label}
               </Link>
             </li>

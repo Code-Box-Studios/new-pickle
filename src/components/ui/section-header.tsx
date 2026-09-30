@@ -10,7 +10,7 @@ export function SectionHeader({
   return (
     <h2
       className={cn(
-        "text-sm font-semibold uppercase tracking-wide text-muted",
+        "text-base font-semibold tracking-tight text-ink",
         className,
       )}
     >

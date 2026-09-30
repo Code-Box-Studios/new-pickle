@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,30 +57,31 @@ function toPayload(d: Draft) {
 }
 
 function CourtFields({ value, onChange }: { value: Draft; onChange: (d: Draft) => void }) {
+  const fieldId = useId();
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => onChange({ ...value, [k]: v });
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      <Field label="Court name" htmlFor="cname">
-        <Input id="cname" value={value.name} onChange={(e) => set("name", e.target.value)} />
+    <div className="grid gap-4 sm:grid-cols-2">
+      <Field label="Court name" htmlFor={`${fieldId}-name`}>
+        <Input id={`${fieldId}-name`} value={value.name} onChange={(e) => set("name", e.target.value)} />
       </Field>
-      <Field label="Price / hour (₱)" htmlFor="cprice">
-        <Input id="cprice" type="number" min={0} value={value.pricePeso} onChange={(e) => set("pricePeso", Number(e.target.value))} />
+      <Field label="Price / hour (₱)" htmlFor={`${fieldId}-price`}>
+        <Input id={`${fieldId}-price`} type="number" min={0} value={value.pricePeso} onChange={(e) => set("pricePeso", Number(e.target.value))} />
       </Field>
-      <Field label="Type" htmlFor="ctype">
-        <Select id="ctype" value={value.indoor ? "indoor" : "outdoor"} onChange={(e) => set("indoor", e.target.value === "indoor")}>
+      <Field label="Type" htmlFor={`${fieldId}-type`}>
+        <Select id={`${fieldId}-type`} value={value.indoor ? "indoor" : "outdoor"} onChange={(e) => set("indoor", e.target.value === "indoor")}>
           <option value="indoor">Indoor</option>
           <option value="outdoor">Outdoor</option>
         </Select>
       </Field>
-      <Field label="Surface" htmlFor="csurf">
-        <Input id="csurf" value={value.surface} onChange={(e) => set("surface", e.target.value)} placeholder="e.g. Acrylic" />
+      <Field label="Surface" htmlFor={`${fieldId}-surface`}>
+        <Input id={`${fieldId}-surface`} value={value.surface} onChange={(e) => set("surface", e.target.value)} placeholder="e.g. Acrylic" />
       </Field>
-      <label className="flex items-center gap-2 text-sm text-ink-soft">
-        <input type="checkbox" className="accent-brand-600" checked={value.covered} onChange={(e) => set("covered", e.target.checked)} />
+      <label className="flex min-h-11 items-center gap-2 rounded-lg text-sm text-ink-soft">
+        <input type="checkbox" className="size-4 accent-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" checked={value.covered} onChange={(e) => set("covered", e.target.checked)} />
         Covered
       </label>
-      <label className="flex items-center gap-2 text-sm text-ink-soft">
-        <input type="checkbox" className="accent-brand-600" checked={value.active} onChange={(e) => set("active", e.target.checked)} />
+      <label className="flex min-h-11 items-center gap-2 rounded-lg text-sm text-ink-soft">
+        <input type="checkbox" className="size-4 accent-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" checked={value.active} onChange={(e) => set("active", e.target.checked)} />
         Active
       </label>
     </div>
@@ -133,8 +134,8 @@ export function CourtEditor({
               </div>
             ) : (
               <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-medium text-ink">
+                <div className="min-w-0 flex-1">
+                  <p className="break-words font-medium text-ink">
                     {c.name} {!c.active && <span className="text-xs text-muted">(inactive)</span>}
                   </p>
                   <p className="text-xs text-muted">
@@ -143,11 +144,11 @@ export function CourtEditor({
                   </p>
                 </div>
                 {!locked && (
-                  <div className="flex gap-1">
-                    <button type="button" onClick={() => setEditing({ id: c.id, draft: toDraft(c) })} className="rounded-xl p-2 text-muted hover:bg-black/5" aria-label="Edit court">
+                  <div className="flex shrink-0 gap-1">
+                    <button type="button" onClick={() => setEditing({ id: c.id, draft: toDraft(c) })} className="grid size-11 shrink-0 place-items-center rounded-xl text-muted hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" aria-label="Edit court">
                       <Pencil className="size-4" />
                     </button>
-                    <button type="button" onClick={() => run(() => sendJson(`/api/owner/venues/${venueId}/courts/${c.id}`, "DELETE"))} className="rounded-xl p-2 text-red-600 hover:bg-red-50" aria-label="Delete court">
+                    <button type="button" onClick={() => run(() => sendJson(`/api/owner/venues/${venueId}/courts/${c.id}`, "DELETE"))} className="grid size-11 shrink-0 place-items-center rounded-xl text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" aria-label="Delete court">
                       <Trash2 className="size-4" />
                     </button>
                   </div>

@@ -85,12 +85,13 @@ export function NotificationBell() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button
-          className="relative grid size-9 place-items-center rounded-lg hover:bg-black/5"
+          type="button"
+          className="relative grid size-11 place-items-center rounded-xl transition-colors hover:bg-mist"
           aria-label={`Notifications${unread ? ` (${unread} unread)` : ""}`}
         >
-          <Bell className="size-5 text-ink-soft" />
+          <Bell className="size-5 text-ink-soft" strokeWidth={1.8} aria-hidden />
           {unread > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-red-500 px-1 text-center text-[10px] font-bold leading-4 text-white">
+            <span className="absolute right-0 top-0 min-w-4 rounded-full bg-brand-700 px-1 text-center text-[10px] font-semibold leading-4 text-white">
               {unread > 9 ? "9+" : unread}
             </span>
           )}
@@ -98,20 +99,21 @@ export function NotificationBell() {
       </DialogTrigger>
       <DialogContent title="Notifications">
         <div className="-mt-2 mb-2 flex justify-end">
-          <button onClick={markAll} className="text-sm font-medium text-brand-700 hover:underline">
+          <button type="button" onClick={markAll} className="min-h-11 rounded-lg px-2 text-sm font-medium text-brand-700 hover:underline">
             Mark all read
           </button>
         </div>
         {items.length === 0 ? (
-          <p className="py-10 text-center text-muted">No notifications yet.</p>
+          <p className="rounded-2xl bg-canvas px-5 py-12 text-center text-sm text-muted">No notifications yet.</p>
         ) : (
-          <ul className="max-h-[60vh] space-y-1 overflow-y-auto">
+          <ul className="max-h-[60vh] space-y-2 overflow-y-auto">
             {items.map((n) => (
               <li key={n.id}>
                 <button
+                  type="button"
                   onClick={() => openItem(n)}
                   className={cn(
-                    "flex w-full gap-3 rounded-xl p-3 text-left hover:bg-black/5",
+                    "flex w-full gap-3 rounded-xl p-4 text-left transition-colors hover:bg-mist",
                     !n.readAt && "bg-brand-50/60",
                   )}
                 >
@@ -121,8 +123,8 @@ export function NotificationBell() {
                   />
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-semibold text-ink">{n.title}</span>
-                    {n.body && <span className="block truncate text-sm text-muted">{n.body}</span>}
-                    <span className="block text-xs text-muted">
+                    {n.body && <span className="mt-1 block text-sm leading-relaxed text-muted">{n.body}</span>}
+                    <span className="mt-2 block text-xs text-muted">
                       {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                     </span>
                   </span>

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input, Field } from "@/components/ui/input";
 import { HoldCountdown, useCountdown } from "./HoldCountdown";
 import { pesos } from "@/lib/format";
@@ -75,58 +74,57 @@ export function PaymentStep({
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-ink">Pay the venue</h2>
+    <form onSubmit={submit} className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-1">
+        <h2 className="section-title">Pay the venue</h2>
         <HoldCountdown expiresAt={expiresAt} />
       </div>
 
-      <div className="rounded-2xl bg-brand-50 p-4">
-        <p className="text-sm text-brand-800">
+      <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+        <p className="break-words text-sm leading-6 text-brand-800">
           Payment is made <strong>directly to {venueName}</strong>. RallyPoint never
           holds your money. Send the exact amount, then upload your screenshot below.
         </p>
-        <p className="mt-2 text-2xl font-extrabold text-ink">{pesos(amountCents)}</p>
+        <p className="mt-4 text-3xl font-semibold tracking-tight text-ink">{pesos(amountCents)}</p>
       </div>
 
-      <fieldset className="space-y-2">
-        <legend className="mb-1 text-sm font-medium text-ink-soft">Pay via</legend>
+      <fieldset className="space-y-3">
+        <legend className="mb-3 text-sm font-medium text-ink">Pay via</legend>
         {methods.length === 0 && (
-          <p className="text-sm text-muted">
+          <p className="text-sm leading-6 text-muted">
             This venue hasn&apos;t configured a payment method yet.
           </p>
         )}
         {methods.map((m) => (
-          <label key={m.id}>
-            <Card
-              className={cn(
-                "cursor-pointer p-3.5 transition",
-                methodId === m.id
-                  ? "border-brand-600 bg-brand-50"
-                  : "hover:border-black/10",
-              )}
-            >
+          <label
+            key={m.id}
+            className={cn(
+              "block cursor-pointer rounded-2xl border p-4 transition-colors duration-150 focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2",
+              methodId === m.id
+                ? "border-brand-700 bg-brand-50"
+                : "border-line bg-surface hover:border-brand-200 hover:bg-mist/50",
+            )}
+          >
             <span className="flex items-start gap-3">
               <input
                 type="radio"
                 name="method"
-                className="mt-1 accent-brand-600"
+                className="mt-1 size-4 shrink-0 accent-brand-700 focus-visible:outline-none"
                 checked={methodId === m.id}
                 onChange={() => setMethodId(m.id)}
               />
               <span className="min-w-0">
-                <span className="block text-sm font-semibold text-ink">
+                <span className="block text-sm font-semibold leading-6 text-ink">
                   {channelLabel(m.channel)}
                 </span>
-                <span className="block text-sm text-ink-soft">
+                <span className="mt-1 block break-words text-sm leading-6 text-ink-soft">
                   {m.accountName} · {m.accountNumber}
                 </span>
                 {m.instructions && (
-                  <span className="mt-0.5 block text-xs text-muted">{m.instructions}</span>
+                  <span className="mt-2 block break-words text-sm leading-6 text-muted">{m.instructions}</span>
                 )}
               </span>
             </span>
-            </Card>
           </label>
         ))}
       </fieldset>
@@ -141,28 +139,37 @@ export function PaymentStep({
         />
       </Field>
 
-      <div className="space-y-1.5">
-        <span className="block text-sm font-medium text-ink-soft">Payment screenshot</span>
-        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-black/20 p-4 hover:bg-black/5">
-          <Upload className="size-5 text-brand-600" aria-hidden />
-          <span className="text-sm text-ink-soft">
+      <div className="space-y-2">
+        <span id="payment-screenshot-label" className="block text-sm font-medium text-ink">Payment screenshot</span>
+        <label
+          htmlFor="payment-screenshot"
+          className="flex min-h-20 cursor-pointer items-center gap-3 rounded-xl border border-dashed border-brand-200 bg-mist/40 p-4 transition-colors duration-150 hover:bg-mist focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2 sm:p-5"
+        >
+          <Upload className="size-5 shrink-0 text-brand-700" aria-hidden />
+          <span className="min-w-0 break-words text-sm leading-6 text-ink-soft">
             {file ? file.name : "Tap to upload JPG, PNG, or WebP (max 5 MB)"}
           </span>
           <input
+            id="payment-screenshot"
             type="file"
             accept="image/jpeg,image/png,image/webp"
             className="sr-only"
+            aria-labelledby="payment-screenshot-label"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />
         </label>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="break-words rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
+          {error}
+        </p>
+      )}
 
       <Button type="submit" size="lg" block loading={submitting} disabled={expired}>
         {expired ? "Hold expired" : "Submit payment"}
       </Button>
-      <p className="text-center text-xs text-muted">
+      <p className="text-center text-sm leading-6 text-muted">
         The venue confirms within their stated window — we&apos;ll notify you.
       </p>
     </form>

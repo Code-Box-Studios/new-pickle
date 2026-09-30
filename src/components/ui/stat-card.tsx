@@ -14,19 +14,19 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-black/5 bg-white p-4 shadow-[var(--shadow-card)]",
+        "rounded-[var(--radius-card)] border border-line/80 bg-surface p-5 shadow-card sm:p-6",
         urgent && "border-amber-200 bg-amber-50",
       )}
     >
-      <div className="flex items-center gap-2 text-muted">
-        {icon}
-        <span className="text-xs font-medium uppercase tracking-wide">
+      <div className="flex items-center gap-3 text-muted">
+        <span className={cn("grid size-9 shrink-0 place-items-center rounded-xl bg-mist text-brand-700", urgent && "bg-amber-100 text-amber-800")}>{icon}</span>
+        <span className="text-sm font-medium">
           {label}
         </span>
       </div>
       <p
         className={cn(
-          "mt-1.5 text-2xl font-extrabold",
+          "mt-4 break-words text-2xl font-semibold tracking-[-0.035em] tabular-nums sm:text-3xl",
           urgent ? "text-amber-800" : "text-ink",
         )}
       >

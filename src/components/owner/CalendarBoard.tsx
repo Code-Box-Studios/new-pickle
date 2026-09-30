@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Ban, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Legend } from "@/components/ui/legend";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { minuteLabel } from "./cal-utils";
@@ -13,12 +14,12 @@ import { BlockDialog } from "./BlockDialog";
 import type { CellState, DayCourt } from "@/lib/venue/ops";
 
 const META: Record<CellState, { label: string; cls: string; swatch: string }> = {
-  AVAILABLE: { label: "Open", cls: "bg-white text-brand-700 border border-dashed border-brand-300 hover:bg-brand-50", swatch: "bg-white border border-brand-300" },
+  AVAILABLE: { label: "Open", cls: "bg-surface text-brand-700 border border-dashed border-brand-300 hover:bg-mist", swatch: "bg-white border border-brand-300" },
   HELD: { label: "Held", cls: "bg-amber-100 text-amber-900", swatch: "bg-amber-300" },
   PENDING: { label: "Pending", cls: "bg-sky-100 text-sky-900", swatch: "bg-sky-300" },
   CONFIRMED: { label: "Confirmed", cls: "bg-brand-100 text-brand-900", swatch: "bg-brand-500" },
-  BLOCKED: { label: "Blocked", cls: "bg-slate-200 text-slate-700", swatch: "bg-slate-400" },
-  CLOSED: { label: "Closed", cls: "bg-slate-50 text-slate-300", swatch: "bg-slate-200" },
+  BLOCKED: { label: "Blocked", cls: "bg-line text-ink-soft", swatch: "bg-slate-400" },
+  CLOSED: { label: "Closed", cls: "bg-canvas text-muted/70", swatch: "bg-slate-200" },
 };
 const LEGEND: CellState[] = ["AVAILABLE", "HELD", "PENDING", "CONFIRMED", "BLOCKED", "CLOSED"];
 
@@ -47,7 +48,7 @@ export function CalendarBoard({
 
   const courtRefs = courts.map((c) => ({ id: c.id, name: c.name }));
   const rows = courts[0]?.cells.length ?? 0;
-  const template = `4.5rem repeat(${courts.length}, minmax(7rem, 1fr))`;
+  const template = `4.5rem repeat(${courts.length}, minmax(8rem, 1fr))`;
 
   function openNew(p: Prefill) {
     setPrefill(p);
@@ -70,16 +71,9 @@ export function CalendarBoard({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Legend — color + label (never color alone) */}
-      <div className="flex flex-wrap gap-3">
-        {LEGEND.map((s) => (
-          <span key={s} className="flex items-center gap-1.5 text-xs text-ink-soft">
-            <span className={cn("size-3 rounded", META[s].swatch)} aria-hidden />
-            {META[s].label}
-          </span>
-        ))}
-      </div>
+      <Legend items={LEGEND.map((state) => ({ dotClass: META[state].swatch, label: state === "AVAILABLE" ? "Available" : META[state].label }))} />
 
       {/* Actions (desktop) */}
       <div className="hidden gap-2 sm:flex">
@@ -92,11 +86,11 @@ export function CalendarBoard({
           No operating hours set for this day.
         </p>
       ) : (
-        <div className="overflow-x-auto pb-2">
-          <div className="grid min-w-fit gap-1" style={{ gridTemplateColumns: template }}>
+        <div className="overflow-x-auto rounded-2xl border border-line bg-surface p-3 shadow-card sm:p-4">
+          <div className="grid min-w-fit gap-1.5" style={{ gridTemplateColumns: template }}>
             <div />
             {courts.map((c) => (
-              <div key={c.id} className="px-1 pb-1 text-center text-xs font-semibold text-ink">
+              <div key={c.id} className="px-2 pb-3 pt-1 text-center text-sm font-semibold text-ink">
                 {c.name}
               </div>
             ))}
@@ -108,12 +102,13 @@ export function CalendarBoard({
                 {courts.map((c) => {
                   const cell = c.cells[r];
                   const meta = META[cell.state];
-                  const base = "flex min-h-14 flex-col items-center justify-center rounded-lg px-1 py-1.5 text-center text-[11px] font-medium leading-tight";
+                  const base = "flex min-h-18 min-w-0 flex-col items-center justify-center rounded-xl px-2 py-2 text-center text-xs font-medium leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1";
                   if (cell.state === "AVAILABLE") {
                     return (
                       <button
                         key={c.id}
                         type="button"
+                        aria-label={`Book ${c.name} at ${minuteLabel(cell.startMinute)}`}
                         onClick={() => openNew({ courtId: c.id, startMinute: cell.startMinute })}
                         className={cn(base, meta.cls)}
                       >
@@ -123,15 +118,15 @@ export function CalendarBoard({
                   }
                   if (cell.reference) {
                     return (
-                      <Link key={c.id} href={`/owner/reservations/${cell.reference}`} className={cn(base, meta.cls)}>
+                      <Link key={c.id} href={`/owner/reservations/${cell.reference}`} aria-label={`${meta.label}: ${c.name} at ${minuteLabel(cell.startMinute)}${cell.label ? `, ${cell.label}` : ""}`} className={cn(base, meta.cls)}>
                         <span>{meta.label}</span>
-                        {cell.label && <span className="mt-0.5 truncate text-[10px] opacity-80">{cell.label}</span>}
+                        {cell.label && <span className="mt-1 max-w-full truncate text-[11px] opacity-80">{cell.label}</span>}
                       </Link>
                     );
                   }
                   if (cell.state === "BLOCKED") {
                     return (
-                      <div key={c.id} className={cn(base, meta.cls, "relative")}>
+                      <div key={c.id} className={cn(base, meta.cls, "relative pr-11")}>
                         <span>{meta.label}</span>
                         {cell.label && <span className="mt-0.5 truncate text-[10px] opacity-80">{cell.label}</span>}
                         {cell.blockId && (
@@ -139,10 +134,10 @@ export function CalendarBoard({
                             type="button"
                             onClick={() => removeBlock(cell.blockId!)}
                             disabled={busyBlock === cell.blockId}
-                            className="absolute right-0.5 top-0.5 rounded p-0.5 text-slate-500 hover:bg-black/10"
-                            aria-label="Remove block"
+                            className="absolute right-0 top-0 grid size-11 place-items-center rounded-xl text-muted hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-50"
+                            aria-label={`Remove block from ${c.name} at ${minuteLabel(cell.startMinute)}`}
                           >
-                            <X className="size-3" />
+                            <X className="size-4" />
                           </button>
                         )}
                       </div>
@@ -161,9 +156,9 @@ export function CalendarBoard({
       )}
 
       {/* Sticky mobile actions */}
-      <div className="fixed inset-x-0 bottom-14 z-30 flex gap-2 border-t border-black/5 bg-white/95 p-3 backdrop-blur sm:hidden">
-        <Button block onClick={() => openNew({})}><Plus className="size-4" /> New booking</Button>
-        <Button block variant="outline" onClick={() => setMode("block")}><Ban className="size-4" /> Block</Button>
+      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 grid grid-cols-2 gap-3 border-t border-line bg-surface/95 p-3 backdrop-blur-lg sm:hidden">
+        <Button block className="min-w-0 px-3" onClick={() => openNew({})}><Plus className="size-4" /> New booking</Button>
+        <Button block className="min-w-0 px-3" variant="outline" onClick={() => setMode("block")}><Ban className="size-4" /> Block</Button>
       </div>
 
       <NewBookingDialog

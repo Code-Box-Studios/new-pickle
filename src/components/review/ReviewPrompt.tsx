@@ -57,7 +57,7 @@ export function ReviewPrompt({
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="text-sm font-medium text-brand-700 hover:underline"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-sm font-medium text-brand-700 hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
           >
             Edit
           </button>
@@ -77,15 +77,17 @@ export function ReviewPrompt({
       <div className="mt-3">
         <StarRating value={rating} onChange={setRating} />
       </div>
+      <label htmlFor={`review-body-${bookingId}`} className="sr-only">Share a little about your visit (optional)</label>
       <textarea
+        id={`review-body-${bookingId}`}
         value={body}
         onChange={(e) => setBody(e.target.value)}
         rows={3}
         maxLength={1000}
         placeholder="Share a little about your visit (optional)"
-        className="mt-3 w-full rounded-xl border border-black/10 p-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+        className="form-control mt-4 min-h-32 px-4 py-3 leading-relaxed placeholder:text-muted/80"
       />
-      <div className="mt-3 flex gap-2">
+      <div className="mt-4 flex flex-wrap gap-2">
         <Button onClick={submit} loading={busy} size="lg">
           {existing ? "Save changes" : "Submit review"}
         </Button>

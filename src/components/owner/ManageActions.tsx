@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/input";
+import { Field, Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import type { BookingStatus } from "@/generated/prisma";
@@ -69,13 +69,13 @@ export function ManageActions({
   return (
     <div className="space-y-3">
       {rescheduling ? (
-        <div className="space-y-3 rounded-xl border border-brand-200 bg-brand-50/40 p-3">
-          <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-4 rounded-2xl border border-brand-200 bg-mist p-4">
+          <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Date" htmlFor="rs-date">
-              <input id="rs-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-11 w-full rounded-xl border border-black/10 px-3 text-[15px]" />
+              <Input id="rs-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="min-w-0 px-3" />
             </Field>
             <Field label="Start" htmlFor="rs-time">
-              <input id="rs-time" type="time" value={time} onChange={(e) => setTime(e.target.value)} className="h-11 w-full rounded-xl border border-black/10 px-3 text-[15px]" />
+              <Input id="rs-time" type="time" value={time} onChange={(e) => setTime(e.target.value)} className="min-w-0 px-3" />
             </Field>
           </div>
           <Field label="Duration" htmlFor="rs-dur">
@@ -85,7 +85,7 @@ export function ManageActions({
               <option value={3}>3 hours</option>
             </Select>
           </Field>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button loading={busy === "reschedule"} onClick={submitReschedule}>Save new time</Button>
             <Button variant="ghost" onClick={() => setRescheduling(false)}>Cancel</Button>
           </div>

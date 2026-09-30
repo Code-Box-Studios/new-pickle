@@ -32,7 +32,7 @@ export function MagicLinkBanner() {
   if (process.env.NODE_ENV === "production" || !link || link.url === dismissedUrl) return null;
 
   return (
-    <div className="fixed inset-x-0 top-0 z-[95] flex items-center justify-center gap-2 bg-amber-400 px-3 py-1.5 text-center text-xs font-medium text-amber-950">
+    <div className="relative z-50 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-b border-amber-200 bg-amber-100 px-4 py-1 text-center text-xs font-medium text-amber-950">
       <KeyRound className="size-3.5" aria-hidden />
       <span className="truncate">
         Dev magic link for <strong>{link.email}</strong>
@@ -40,7 +40,7 @@ export function MagicLinkBanner() {
       <a
         href={link.url}
         onClick={() => setDismissedUrl(link.url)}
-        className="rounded-xl bg-amber-950/10 px-2 py-0.5 font-semibold underline underline-offset-2 hover:bg-amber-950/20"
+        className="inline-flex min-h-11 items-center rounded-lg px-2 font-semibold underline underline-offset-4 hover:bg-amber-950/10"
       >
         Open link →
       </a>
@@ -48,7 +48,7 @@ export function MagicLinkBanner() {
         type="button"
         onClick={() => setDismissedUrl(link.url)}
         aria-label="Dismiss magic link"
-        className="rounded-xl p-0.5 hover:bg-amber-950/15"
+        className="grid size-11 shrink-0 place-items-center rounded-xl hover:bg-amber-950/10"
       >
         <X className="size-3.5" aria-hidden />
       </button>

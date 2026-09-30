@@ -8,9 +8,7 @@ export const Input = React.forwardRef<
   <input
     ref={ref}
     className={cn(
-      "h-11 w-full rounded-xl border border-black/10 bg-white px-3.5 text-[15px] text-ink placeholder:text-muted",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:border-transparent",
-      "disabled:opacity-50",
+      "form-control px-4 py-2.5 placeholder:text-muted/80",
       className,
     )}
     {...props}
@@ -30,16 +28,30 @@ export const Field = ({
   hint?: string;
   error?: string;
   children: React.ReactNode;
-}) => (
-  <div className="space-y-1.5">
-    <label htmlFor={htmlFor} className="block text-sm font-medium text-ink-soft">
-      {label}
-    </label>
-    {children}
-    {error ? (
-      <p className="text-sm text-red-600">{error}</p>
-    ) : hint ? (
-      <p className="text-sm text-muted">{hint}</p>
-    ) : null}
-  </div>
-);
+}) => {
+  const descriptionId = htmlFor && (error || hint) ? `${htmlFor}-description` : undefined;
+  let control = children;
+  if (
+    htmlFor &&
+    React.isValidElement<{ id?: string } & React.AriaAttributes>(children) &&
+    children.props.id === htmlFor
+  ) {
+    control = React.cloneElement(children, {
+      "aria-invalid": error ? true : children.props["aria-invalid"],
+      "aria-describedby": [children.props["aria-describedby"], descriptionId].filter(Boolean).join(" ") || undefined,
+    });
+  }
+  return (
+    <div className="space-y-2">
+      <label htmlFor={htmlFor} className="block text-sm font-medium text-ink">
+        {label}
+      </label>
+      {control}
+      {error ? (
+        <p id={descriptionId} role="alert" className="text-sm leading-relaxed text-red-700">{error}</p>
+      ) : hint ? (
+        <p id={descriptionId} className="text-sm leading-relaxed text-muted">{hint}</p>
+      ) : null}
+    </div>
+  );
+};

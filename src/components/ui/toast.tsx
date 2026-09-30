@@ -41,7 +41,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             key={item.id}
             onOpenChange={(open) => !open && remove(item.id)}
             className={cn(
-              "rounded-xl border border-black/5 border-l-4 bg-white p-4 shadow-[var(--shadow-card)]",
+              "toast-item rounded-2xl border border-line border-l-4 bg-surface p-5 shadow-elevated",
               TONE_BAR[item.tone ?? "default"],
             )}
           >
@@ -49,13 +49,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               {item.title}
             </ToastPrimitive.Title>
             {item.description && (
-              <ToastPrimitive.Description className="mt-0.5 text-sm text-muted">
+              <ToastPrimitive.Description className="mt-1 text-sm leading-relaxed text-muted">
                 {item.description}
               </ToastPrimitive.Description>
             )}
           </ToastPrimitive.Root>
         ))}
-        <ToastPrimitive.Viewport className="fixed bottom-0 right-0 z-[100] m-4 flex w-[calc(100vw-2rem)] max-w-sm flex-col gap-2 outline-none" />
+        <ToastPrimitive.Viewport className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-0 z-[100] m-4 flex w-[calc(100vw-2rem)] max-w-sm flex-col gap-3 outline-none lg:bottom-0" />
       </ToastPrimitive.Provider>
     </ToastContext.Provider>
   );

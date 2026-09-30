@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Check, CircleAlert, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Field } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { sendJson } from "./api";
 import type { VenueStatus } from "@/generated/prisma";
@@ -51,8 +52,8 @@ export function ReviewSubmit({
         <p className="mt-1 text-sm text-ink-soft">
           Your venue is approved. Preview it, then publish to go live.
         </p>
-        <Link href="/owner/venues" className="mt-4 inline-block">
-          <Button>Go to My venues</Button>
+        <Link href="/owner/venues" className={buttonVariants({ className: "mt-4" })}>
+          Go to My venues
         </Link>
       </div>
     );
@@ -89,7 +90,7 @@ export function ReviewSubmit({
         </div>
       )}
 
-      <div className="rounded-2xl border border-black/5 p-4">
+      <div className="rounded-2xl border border-line bg-canvas p-4">
         <h2 className="text-sm font-semibold text-ink">Before you submit</h2>
         {ready ? (
           <p className="mt-2 flex items-center gap-2 text-sm text-brand-700">
@@ -106,19 +107,16 @@ export function ReviewSubmit({
         )}
       </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor="note" className="block text-sm font-medium text-ink-soft">
-          Note for the reviewer
-        </label>
+      <Field label="Note for the reviewer" htmlFor={`review-note-${venueId}`}>
         <textarea
-          id="note"
+          id={`review-note-${venueId}`}
           rows={3}
-          className="w-full rounded-xl border border-black/10 bg-white p-3 text-[15px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          className="form-control min-h-32 px-4 py-3 leading-relaxed placeholder:text-muted/80"
           placeholder="Tell us about your venue and how we can verify it."
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
-      </div>
+      </Field>
 
       <Button size="lg" block loading={busy} disabled={!ready || !note.trim()} onClick={submit}>
         {ready ? "Submit for verification" : "Complete the steps above first"}

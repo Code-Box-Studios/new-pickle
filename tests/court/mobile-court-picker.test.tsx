@@ -47,21 +47,29 @@ describe("MobileCourtPicker", () => {
 
   it("switches to Court B slots when its chip is clicked", () => {
     render(<MobileCourtPicker courts={courts} selected={null} onSelect={() => {}} />);
-    fireEvent.click(screen.getByText("Court B"));
-    // After switching, Court B's 9 AM slot should be visible
-    const slotBtns = screen.getAllByRole("button").filter(
-      (b) => !["Court A", "Court B"].includes(b.textContent ?? "")
-    );
-    expect(slotBtns.length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "Court A", pressed: true })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Court B", pressed: false }));
+    expect(screen.getByRole("button", { name: "Court B", pressed: true })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Court A", pressed: false })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Court B.*9:00 AM.*₱300/ })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Court A.*8:00 AM/ })).not.toBeInTheDocument();
   });
 
   it("calls onSelect when an available slot is clicked", () => {
     const onSelect = vi.fn();
     render(<MobileCourtPicker courts={courts} selected={null} onSelect={onSelect} />);
-    const slotBtns = screen.getAllByRole("button").filter(
-      (b) => !["Court A", "Court B"].includes(b.textContent ?? "") && !b.hasAttribute("disabled")
-    );
-    fireEvent.click(slotBtns[0]);
-    expect(onSelect).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: /Court A.*8:00 AM.*₱300/ }));
+    expect(onSelect).toHaveBeenCalledWith(courts[0], courts[0].slots[0]);
+  });
+
+  it("announces the selected slot and prevents choosing an unavailable time", () => {
+    const onSelect = vi.fn();
+    const selected = { courtId: "c1", startsAt: courts[0].slots[0].startsAt, courtName: "Court A", priceCents: 30000 };
+    render(<MobileCourtPicker courts={courts} selected={selected} onSelect={onSelect} />);
+    expect(screen.getByRole("button", { name: /Court A.*8:00 AM.*₱300/, pressed: true })).toBeInTheDocument();
+    const unavailable = screen.getByRole("button", { name: /Court A.*1:00 PM.*unavailable/i });
+    expect(unavailable).toBeDisabled();
+    fireEvent.click(unavailable);
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });

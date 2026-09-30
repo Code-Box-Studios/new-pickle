@@ -36,9 +36,11 @@ export function HoldCountdown({ expiresAt }: { expiresAt: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold tabular-nums",
-        expired ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-800",
+        "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium tabular-nums",
+        expired ? "border-red-200 bg-red-50 text-red-700" : "border-amber-200 bg-amber-50 text-amber-800",
       )}
+      role="timer"
+      aria-live="off"
     >
       <Clock className="size-4" aria-hidden />
       {expired ? "Hold expired" : `${text} left`}

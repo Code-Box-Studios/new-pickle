@@ -79,8 +79,8 @@ export function HoursEditor({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted">These hours apply to all your active courts.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm leading-relaxed text-muted">These hours apply to all your active courts.</p>
         {!locked && (
           <Button variant="ghost" size="sm" onClick={applyToAll}>
             Apply first day to all
@@ -88,19 +88,19 @@ export function HoursEditor({
         )}
       </div>
 
-      <fieldset disabled={locked} className="space-y-2">
+      <fieldset disabled={locked} className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
         {rows.map((r) => (
-          <div key={r.dayOfWeek} className="flex items-center gap-3">
-            <span className="w-24 text-sm text-ink-soft">{DAY_NAMES[r.dayOfWeek]}</span>
-            <label className="flex items-center gap-1.5 text-sm text-muted">
-              <input type="checkbox" className="accent-brand-600" checked={!r.closed} onChange={(e) => update(r.dayOfWeek, { closed: !e.target.checked })} />
+          <div key={r.dayOfWeek} className="grid grid-cols-[1fr_auto] items-center gap-3 px-4 py-4 sm:grid-cols-[7rem_5rem_1fr]">
+            <span className="text-sm font-semibold text-ink">{DAY_NAMES[r.dayOfWeek]}</span>
+            <label className="flex min-h-11 items-center gap-2 text-sm text-muted">
+              <input type="checkbox" aria-label={`${DAY_NAMES[r.dayOfWeek]} open`} className="size-4 accent-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" checked={!r.closed} onChange={(e) => update(r.dayOfWeek, { closed: !e.target.checked })} />
               Open
             </label>
             {!r.closed && (
-              <div className="flex items-center gap-2">
-                <input type="time" value={r.open} onChange={(e) => update(r.dayOfWeek, { open: e.target.value })} className="h-10 rounded-lg border border-black/10 px-2 text-sm" />
+              <div className="col-span-2 grid min-w-0 grid-cols-[1fr_auto_1fr] items-center gap-2 sm:col-span-1">
+                <input type="time" aria-label={`${DAY_NAMES[r.dayOfWeek]} opening time`} value={r.open} onChange={(e) => update(r.dayOfWeek, { open: e.target.value })} className="h-11 min-w-0 w-full rounded-xl border border-line bg-canvas px-3 text-base text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" />
                 <span className="text-muted">–</span>
-                <input type="time" value={r.close} onChange={(e) => update(r.dayOfWeek, { close: e.target.value })} className="h-10 rounded-lg border border-black/10 px-2 text-sm" />
+                <input type="time" aria-label={`${DAY_NAMES[r.dayOfWeek]} closing time`} value={r.close} onChange={(e) => update(r.dayOfWeek, { close: e.target.value })} className="h-11 min-w-0 w-full rounded-xl border border-line bg-canvas px-3 text-base text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" />
               </div>
             )}
           </div>

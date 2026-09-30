@@ -23,7 +23,7 @@ export function StepRail({
 }) {
   const pathname = usePathname();
   return (
-    <nav className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+    <nav aria-label="Venue setup steps" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
       {STEPS.map((s, i) => {
         const href = `/owner/venues/${venueId}/${s.k}`;
         const active = pathname === href;
@@ -31,13 +31,14 @@ export function StepRail({
           <Link
             key={s.k}
             href={href}
+            aria-current={active ? "step" : undefined}
             className={cn(
-              "flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium",
+              "flex min-h-11 shrink-0 items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
               active
-                ? "border-brand-600 bg-brand-600 text-white"
+                ? "border-brand-700 bg-brand-700 text-white"
                 : done[s.k]
                   ? "border-brand-200 bg-brand-50 text-brand-800"
-                  : "border-black/10 text-ink-soft hover:bg-black/5",
+                  : "border-line bg-surface text-ink-soft hover:bg-mist",
             )}
           >
             {done[s.k] ? (

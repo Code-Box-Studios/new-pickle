@@ -67,42 +67,42 @@ export default async function CalendarPage({
   const weekDays = view === "week" ? await ownerWeekAgenda(active.id, mondayOf(dateIso)) : null;
 
   return (
-    <div className="space-y-4 pb-28 sm:pb-4">
+    <div className="space-y-6 pb-24 sm:pb-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-extrabold tracking-tight text-ink">Calendar</h1>
+        <h1 className="page-title">Calendar</h1>
         <VenueSwitcher venues={venues} activeId={active.id} />
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="inline-flex overflow-hidden rounded-xl ring-1 ring-black/10">
-          <Link href={base({ view: "day" })} className={cn("px-3 py-1.5 text-sm font-medium", view === "day" ? "bg-brand-600 text-white" : "bg-white text-ink-soft")}>Day</Link>
-          <Link href={base({ view: "week" })} className={cn("px-3 py-1.5 text-sm font-medium", view === "week" ? "bg-brand-600 text-white" : "bg-white text-ink-soft")}>Week</Link>
-        </div>
-        <div className="flex items-center gap-1">
-          <Link href={base({ date: shiftIso(dateIso, view === "week" ? -7 : -1) })} className="grid size-9 place-items-center rounded-lg ring-1 ring-black/10 hover:bg-black/5" aria-label="Previous">
-            <ChevronLeft className="size-4" />
+        <nav aria-label="Calendar view" className="inline-flex gap-1 rounded-2xl border border-line bg-surface p-1.5">
+          <Link href={base({ view: "day" })} aria-current={view === "day" ? "page" : undefined} className={cn("flex min-h-11 items-center rounded-xl px-5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500", view === "day" ? "bg-brand-700 text-white shadow-sm" : "text-ink-soft hover:bg-canvas")}>Day</Link>
+          <Link href={base({ view: "week" })} aria-current={view === "week" ? "page" : undefined} className={cn("flex min-h-11 items-center rounded-xl px-5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500", view === "week" ? "bg-brand-700 text-white shadow-sm" : "text-ink-soft hover:bg-canvas")}>Week</Link>
+        </nav>
+        <div className="flex items-center gap-2">
+          <Link href={base({ date: shiftIso(dateIso, view === "week" ? -7 : -1) })} className="motion-trigger grid size-11 place-items-center rounded-xl border border-line bg-surface text-ink-soft hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" aria-label="Previous">
+            <ChevronLeft className="motion-arrow size-4" data-direction="left" aria-hidden />
           </Link>
-          <Link href={base({ date: isoDate(nowDate()) })} className="rounded-lg px-3 py-1.5 text-sm font-medium ring-1 ring-black/10 hover:bg-black/5">Today</Link>
-          <Link href={base({ date: shiftIso(dateIso, view === "week" ? 7 : 1) })} className="grid size-9 place-items-center rounded-lg ring-1 ring-black/10 hover:bg-black/5" aria-label="Next">
-            <ChevronRight className="size-4" />
+          <Link href={base({ date: isoDate(nowDate()) })} className="flex min-h-11 items-center rounded-xl border border-line bg-surface px-4 text-sm font-semibold text-ink-soft hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">Today</Link>
+          <Link href={base({ date: shiftIso(dateIso, view === "week" ? 7 : 1) })} className="motion-trigger grid size-11 place-items-center rounded-xl border border-line bg-surface text-ink-soft hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" aria-label="Next">
+            <ChevronRight className="motion-arrow size-4" data-direction="right" aria-hidden />
           </Link>
         </div>
       </div>
 
-      <Legend
-        items={[
-          { dotClass: "bg-white border border-dashed border-brand-500", label: "Available" },
-          { dotClass: "bg-amber-100", label: "Held" },
-          { dotClass: "bg-sky-100", label: "Pending" },
-          { dotClass: "bg-brand-100", label: "Confirmed" },
-          { dotClass: "bg-slate-200", label: "Blocked" },
-          { dotClass: "bg-slate-50 border border-black/5", label: "Closed" },
-        ]}
-      />
+      {view === "week" && (
+        <Legend items={[
+          { dotClass: "bg-white border border-dashed border-brand-300", label: "Available" },
+          { dotClass: "bg-amber-300", label: "Held" },
+          { dotClass: "bg-sky-300", label: "Pending" },
+          { dotClass: "bg-brand-500", label: "Confirmed" },
+          { dotClass: "bg-slate-400", label: "Blocked" },
+          { dotClass: "bg-slate-200", label: "Closed" },
+        ]} />
+      )}
 
       {daySched ? (
         <>
-          <p className="text-sm text-muted">{longDateLabel(parseIsoDate(dateIso))}</p>
+          <p className="text-base font-semibold tracking-tight text-ink">{longDateLabel(parseIsoDate(dateIso))}</p>
           <CalendarBoard
             venueId={active.id}
             dateIso={dateIso}

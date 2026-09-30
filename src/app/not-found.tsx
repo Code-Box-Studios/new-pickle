@@ -1,19 +1,21 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { MapPin } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="mx-auto grid min-h-[60dvh] max-w-sm place-items-center px-4 text-center">
+    <div className="mx-auto grid min-h-[65dvh] max-w-md place-items-center px-6 py-12 text-center">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-widest text-brand-600">
+        <div className="mx-auto mb-6 grid size-16 place-items-center rounded-2xl bg-mist text-brand-700"><MapPin className="size-7" strokeWidth={1.5} aria-hidden /></div>
+        <p className="eyebrow">
           404
         </p>
-        <h1 className="mt-2 text-xl font-bold text-ink">Page not found</h1>
-        <p className="mt-2 text-muted">
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">Page not found</h1>
+        <p className="mt-3 leading-relaxed text-muted">
           The court you&apos;re looking for isn&apos;t here.
         </p>
-        <Link href="/" className="mt-5 inline-block">
-          <Button>Back to home</Button>
+        <Link href="/" className={`mt-7 ${buttonVariants()}`}>
+          Back to home
         </Link>
       </div>
     </div>

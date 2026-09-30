@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Field } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -99,8 +100,8 @@ export function DetailsForm({
   }
 
   return (
-    <form onSubmit={save} className="space-y-4">
-      <fieldset disabled={locked} className="space-y-4">
+    <form onSubmit={save} className="space-y-6">
+      <fieldset disabled={locked} className="space-y-5">
         <Field label="Venue name" htmlFor="name">
           <Input id="name" required value={f.name} onChange={(e) => set("name", e.target.value)} />
         </Field>
@@ -108,12 +109,12 @@ export function DetailsForm({
           <textarea
             id="desc"
             rows={3}
-            className="w-full rounded-xl border border-black/10 bg-white p-3 text-[15px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+            className="w-full rounded-xl border border-line bg-surface p-4 text-base leading-relaxed text-ink placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60"
             value={f.description ?? ""}
             onChange={(e) => set("description", e.target.value)}
           />
         </Field>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 border-t border-line pt-5 sm:grid-cols-2">
           <Field label="Address" htmlFor="addr">
             <Input id="addr" value={f.addressLine ?? ""} onChange={(e) => set("addressLine", e.target.value)} />
           </Field>
@@ -179,13 +180,15 @@ export function DetailsForm({
                 <button
                   type="button"
                   key={key}
+                  aria-pressed={on}
                   onClick={() => toggle(key)}
                   className={cn(
-                    "rounded-xl border px-3 py-2 text-left text-sm",
-                    on ? "border-brand-600 bg-brand-50 text-brand-800" : "border-black/10 text-ink-soft",
+                    "flex min-h-12 items-center gap-2 rounded-xl border px-3 py-3 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+                    on ? "border-brand-600/50 bg-mist text-brand-800" : "border-line bg-surface text-ink-soft hover:bg-canvas",
                   )}
                 >
                   {label}
+                  {on && <Check className="ml-auto size-4 shrink-0" aria-hidden />}
                 </button>
               );
             })}
@@ -196,7 +199,7 @@ export function DetailsForm({
           <textarea
             id="rules"
             rows={3}
-            className="w-full rounded-xl border border-black/10 bg-white p-3 text-[15px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+            className="w-full rounded-xl border border-line bg-surface p-4 text-base leading-relaxed text-ink placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60"
             value={f.houseRules ?? ""}
             onChange={(e) => set("houseRules", e.target.value)}
           />

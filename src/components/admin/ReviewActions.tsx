@@ -40,15 +40,19 @@ export function ReviewActions({ venueId, status }: { venueId: string; status: Ve
   if (mode) {
     return (
       <div className="space-y-3">
+        <label htmlFor={`review-reason-${venueId}`} className="sr-only">
+          {mode === "reject" ? "What needs to change before approval?" : "Why is this venue being suspended?"}
+        </label>
         <textarea
+          id={`review-reason-${venueId}`}
           rows={3}
           autoFocus
-          className="w-full rounded-xl border border-black/10 bg-white p-3 text-[15px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          className="form-control min-h-32 px-4 py-3 leading-relaxed placeholder:text-muted/80"
           placeholder={mode === "reject" ? "What needs to change before approval?" : "Why is this venue being suspended?"}
           value={reason}
           onChange={(e) => setReason(e.target.value)}
         />
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="danger" loading={busy} disabled={!reason.trim()} onClick={() => decide(mode, reason.trim())}>
             Confirm {mode}
           </Button>
@@ -60,7 +64,7 @@ export function ReviewActions({ venueId, status }: { venueId: string; status: Ve
 
   if (status === "PENDING_REVIEW") {
     return (
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button loading={busy} onClick={() => decide("approve")}>Approve</Button>
         <Button variant="danger" onClick={() => setMode("reject")}>Reject</Button>
       </div>

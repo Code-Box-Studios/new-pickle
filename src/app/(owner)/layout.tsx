@@ -17,12 +17,13 @@ export default async function OwnerLayout({
   const { active } = await resolveOwnerVenues(session, undefined);
 
   return (
-    <div className="flex min-h-dvh bg-slate-50">
+    <div className="flex min-h-dvh bg-canvas">
+      <a href="#main-content" className="skip-link">Skip to content</a>
       <OwnerSidebar session={session} activeVenueId={active?.id} />
       {/* Content: offset by sidebar on lg+ */}
-      <div className="flex flex-1 flex-col lg:pl-56">
-        <main className="flex-1 px-4 py-6 pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-6">
-          <div className="mx-auto w-full max-w-5xl">
+      <div className="flex min-w-0 flex-1 flex-col lg:pl-64">
+        <main id="main-content" tabIndex={-1} className="flex-1 px-4 py-7 pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none sm:px-6 sm:py-9 lg:px-10 lg:pb-10">
+          <div className="mx-auto w-full max-w-6xl">
             {children}
           </div>
         </main>

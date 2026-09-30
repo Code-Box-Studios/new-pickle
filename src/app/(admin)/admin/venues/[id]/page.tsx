@@ -39,33 +39,33 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
     .sort((a, b) => a.dayOfWeek - b.dayOfWeek);
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <Link href="/admin/venues" className="inline-flex items-center gap-1 text-sm text-muted hover:text-ink">
+    <div className="mx-auto max-w-3xl">
+      <Link href="/admin/venues" className="inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-medium text-muted hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
         <ArrowLeft className="size-4" aria-hidden /> Venues
       </Link>
 
-      <div className="mt-3 flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-ink">{v.name}</h1>
-          <p className="text-sm text-muted">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="min-w-0 flex-1 basis-64">
+          <h1 className="page-title">{v.name}</h1>
+          <p className="mt-3 break-words text-sm leading-relaxed text-muted">
             {v.owner.email} · {v.barangay ? `${v.barangay}, ` : ""}{v.city}
           </p>
         </div>
         <VenueStatusBadge status={v.status} />
       </div>
 
-      <div className="mt-5 space-y-4">
+      <div className="mt-7 space-y-5">
         {v.verification?.submittedNote && (
           <Card className="p-5">
             <SectionHeader>Owner&apos;s note</SectionHeader>
-            <p className="mt-2 text-sm text-ink-soft">{v.verification.submittedNote}</p>
+            <p className="mt-3 break-words text-sm leading-relaxed text-ink-soft">{v.verification.submittedNote}</p>
           </Card>
         )}
 
         {v.photos.length > 0 && (
           <Card className="p-5">
             <SectionHeader>Photos</SectionHeader>
-            <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {v.photos.slice(0, 6).map((p, i) => (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img key={i} src={p} alt={`Photo ${i + 1}`} className="aspect-square w-full rounded-lg object-cover" />
@@ -77,7 +77,7 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
         {v.description && (
           <Card className="p-5">
             <SectionHeader>Description</SectionHeader>
-            <p className="mt-2 text-sm text-ink-soft">{v.description}</p>
+            <p className="mt-3 break-words text-sm leading-relaxed text-ink-soft">{v.description}</p>
           </Card>
         )}
 
@@ -90,7 +90,7 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
 
         <Card className="p-5">
           <SectionHeader>Courts</SectionHeader>
-          <ul className="mt-2 space-y-1 text-sm text-ink-soft">
+          <ul className="mt-3 space-y-3 text-sm leading-relaxed text-ink-soft">
             {v.courts.map((c) => (
               <li key={c.id}>
                 {c.name} — {c.indoor ? "Indoor" : "Outdoor"} · {pesos(c.priceCents)}/hr {!c.active && "(inactive)"}
@@ -102,7 +102,7 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
 
         <Card className="p-5">
           <SectionHeader>Hours</SectionHeader>
-          <ul className="mt-2 text-sm text-ink-soft">
+          <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-soft">
             {hours.length === 0 && <li className="text-muted">No hours set.</li>}
             {hours.map((s) => (
               <li key={s.id}>{DAYS[s.dayOfWeek]} {minuteLabel(s.openMinute)} – {minuteLabel(s.closeMinute)}</li>
@@ -112,7 +112,7 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
 
         <Card className="p-5">
           <SectionHeader>Payment methods</SectionHeader>
-          <ul className="mt-2 text-sm text-ink-soft">
+          <ul className="mt-3 space-y-3 break-words text-sm leading-relaxed text-ink-soft">
             {v.paymentMethods.map((m) => (
               <li key={m.id}>{channelLabel(m.channel)} · {m.accountName} · {m.accountNumber}</li>
             ))}

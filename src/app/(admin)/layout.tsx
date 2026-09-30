@@ -1,54 +1,56 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
-import { Building2 } from "lucide-react";
+import { Building2, LogOut } from "lucide-react";
+import { Brand } from "@/components/ui/brand";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
   if (!session || session.role !== "ADMIN") redirect("/login?next=/admin");
 
   return (
-    <div className="flex min-h-dvh bg-slate-50">
+    <div className="flex min-h-dvh flex-col bg-canvas lg:flex-row">
+      <a href="#main-content" className="skip-link">Skip to content</a>
       {/* Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r border-black/5 bg-white lg:flex">
-        <div className="flex h-16 items-center border-b border-black/5 px-5">
-          <Link href="/admin" className="text-[15px] font-extrabold tracking-tight text-brand-700">
-            Rally<span className="text-accent-dark">Point</span>
-            <span className="ml-1.5 align-middle text-[11px] font-semibold text-muted">Admin</span>
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-brand-700 text-white lg:flex">
+        <div className="flex h-24 items-center border-b border-white/10 px-6">
+          <Link href="/admin" className="flex items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-4 focus-visible:ring-offset-brand-700">
+            <Brand inverse />
+            <span className="ml-2 align-middle text-[10px] font-semibold uppercase tracking-[0.16em] text-white/60">Admin</span>
           </Link>
         </div>
-        <nav className="flex-1 py-3">
-          <Link href="/admin/venues" className="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-ink-soft hover:bg-black/5 hover:text-ink">
-            <Building2 className="size-4 shrink-0" aria-hidden />
+        <nav aria-label="Admin navigation" className="flex-1 px-3 py-6">
+          <Link href="/admin/venues" aria-current="page" className="flex min-h-12 items-center gap-3 rounded-xl bg-white/12 px-3 text-sm font-semibold text-white ring-1 ring-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">
+            <Building2 className="size-5 shrink-0" aria-hidden />
             Venues
           </Link>
         </nav>
-        <div className="border-t border-black/5 px-5 py-4">
-          <p className="text-xs text-muted">{session.email}</p>
-          <form action="/api/auth/logout" method="post" className="mt-1">
-            <button className="text-sm font-medium text-muted hover:text-ink">Sign out</button>
+        <div className="border-t border-white/10 px-6 py-5">
+          <p className="truncate text-xs text-white/65">{session.email}</p>
+          <form action="/api/auth/logout" method="post" className="mt-2">
+            <button type="submit" className="flex min-h-11 items-center gap-2 rounded-lg text-sm font-medium text-white/75 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"><LogOut className="size-4" aria-hidden />Sign out</button>
           </form>
         </div>
       </aside>
       {/* Mobile header — keep simple for admin (no mobile nav needed, admin is desktop-primary) */}
-      <header className="sticky top-0 z-40 border-b border-black/5 bg-white lg:hidden">
+      <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur lg:hidden">
         <div className="flex h-16 items-center justify-between px-4">
-          <Link href="/admin" className="text-[15px] font-extrabold tracking-tight text-brand-700">
-            Rally<span className="text-accent-dark">Point</span>
-            <span className="ml-1.5 text-[11px] font-semibold text-muted">Admin</span>
+          <Link href="/admin" className="flex items-center rounded-lg text-lg font-extrabold tracking-tight text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
+            <Brand className="text-lg" />
+            <span className="sr-only ml-1.5 text-[11px] font-semibold text-muted sm:not-sr-only">Admin</span>
           </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/admin/venues" className="text-sm font-medium text-ink-soft">Venues</Link>
+          <div className="flex items-center gap-1 sm:gap-3">
+            <Link href="/admin/venues" aria-current="page" className="flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">Venues</Link>
             <form action="/api/auth/logout" method="post">
-              <button className="text-sm font-medium text-muted">Sign out</button>
+              <button type="submit" className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg text-sm font-medium text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"><LogOut className="size-4" aria-hidden /><span className="sr-only sm:not-sr-only">Sign out</span></button>
             </form>
           </div>
         </div>
       </header>
       {/* Content */}
-      <div className="flex flex-1 flex-col lg:pl-56">
-        <main className="flex-1 px-4 py-6">
-          <div className="mx-auto w-full max-w-5xl">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col lg:pl-64">
+        <main id="main-content" tabIndex={-1} className="flex-1 px-4 py-7 outline-none sm:px-6 sm:py-9 lg:px-10">
+          <div className="mx-auto w-full max-w-6xl">{children}</div>
         </main>
       </div>
     </div>

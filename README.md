@@ -27,15 +27,16 @@ Radix UI · `jose` (sessions) · Vitest.
 ```bash
 npm install
 cp .env.example .env            # already present; adjust if needed
-docker compose up -d            # Postgres 16 on host port 55432
+docker compose up -d            # Postgres 16 on host port 15432
 npm run db:deploy               # apply migrations (incl. the EXCLUDE constraint)
 npm run db:generate             # generate the Prisma client
 npm run db:seed                 # 5 Davao venues + demo accounts
 npm run dev                     # http://localhost:3000
 ```
 
-> **Postgres runs on host port `55432`** (5432/5433 are used by other local
-> Postgres instances on this machine). The connection string lives in `.env`.
+> **Postgres runs on host port `15432`** (5432/5433 are used by other local
+> Postgres instances on this machine). This avoids the Windows-reserved port
+> range that can block `55432`. The connection string lives in `.env`.
 
 ## Signing in (dev)
 

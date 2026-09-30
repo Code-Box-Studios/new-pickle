@@ -19,7 +19,7 @@ export function Tabs({
   return (
     <nav
       className={cn(
-        "flex overflow-x-auto border-b border-black/5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        "flex gap-1 overflow-x-auto border-b border-line [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         className,
       )}
       aria-label="Page sections"
@@ -31,10 +31,10 @@ export function Tabs({
           scroll={false}
           aria-current={t.value === activeValue ? "page" : undefined}
           className={cn(
-            "shrink-0 px-4 py-3 text-sm font-semibold transition-colors",
+            "min-h-12 shrink-0 border-b-2 px-4 py-3 text-sm font-medium transition-colors",
             t.value === activeValue
-              ? "border-b-2 border-brand-600 text-ink"
-              : "text-muted hover:text-ink-soft",
+              ? "border-brand-600 text-brand-800"
+              : "border-transparent text-muted hover:border-line hover:text-ink",
           )}
         >
           {t.label}

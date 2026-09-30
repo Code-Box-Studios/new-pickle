@@ -106,13 +106,13 @@ export function CourtBooking({
   const durationLabel = `${hours} ${hours === 1 ? "hour" : "hours"}`;
 
   const SLOT_LEGEND = [
-    { dotClass: "bg-brand-500", label: "Available" },
-    { dotClass: "bg-brand-600", label: "Selected" },
-    { dotClass: "bg-slate-200", label: "Unavailable" },
+    { dotClass: "border border-brand-300 bg-brand-50", label: "Available" },
+    { dotClass: "bg-brand-700", label: "Selected" },
+    { dotClass: "bg-line", label: "Unavailable" },
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <Legend items={SLOT_LEGEND} />
 
       {/* Desktop: time × court grid */}
@@ -126,18 +126,18 @@ export function CourtBooking({
       </div>
 
       {selected && (
-        <div className="fixed inset-x-0 bottom-16 z-30 border-t border-black/5 bg-white/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-8px_24px_-12px_rgba(15,23,42,0.15)] backdrop-blur md:bottom-0">
-          <div className="mx-auto flex max-w-3xl items-center gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-ink">
+        <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-line bg-surface/95 px-4 py-4 shadow-[0_-8px_32px_-16px_rgba(24,37,31,0.18)] backdrop-blur md:bottom-0 md:pb-[calc(1rem+env(safe-area-inset-bottom))]">
+          <div className="mx-auto grid max-w-3xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 sm:flex sm:gap-5">
+            <div className="min-w-0 sm:flex-1" aria-live="polite" aria-atomic="true">
+              <p className="truncate text-sm font-semibold text-ink sm:text-base">
                 {selected.courtName} · {selectedDateLabel}
               </p>
-              <p className="truncate text-xs text-muted">
+              <p className="mt-1 text-xs text-muted sm:text-sm">
                 {timeLabel(new Date(selected.startsAt))} · {durationLabel}
               </p>
             </div>
-            <p className="shrink-0 text-base font-bold text-ink">{pesos(selected.priceCents)}</p>
-            <Button onClick={reserve} loading={submitting} size="lg" className="shrink-0">
+            <p className="col-start-1 row-start-2 text-base font-semibold text-ink sm:shrink-0 sm:text-lg">{pesos(selected.priceCents)}</p>
+            <Button onClick={reserve} loading={submitting} size="lg" className="col-start-2 row-span-2 row-start-1 shrink-0 px-5 sm:px-6">
               Continue
             </Button>
           </div>

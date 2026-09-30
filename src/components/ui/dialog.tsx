@@ -22,22 +22,22 @@ export function DialogContent({
 }) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40" />
+      <DialogPrimitive.Overlay className="dialog-overlay fixed inset-0 z-50 bg-brand-950/45" />
       <DialogPrimitive.Content
         className={cn(
-          "fixed z-50 bg-white shadow-xl focus:outline-none",
+          "dialog-content fixed z-50 max-h-[90dvh] overflow-y-auto overscroll-contain bg-surface shadow-elevated focus:outline-none",
           // mobile: bottom sheet
-          "inset-x-0 bottom-0 rounded-t-2xl p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]",
+          "inset-x-0 bottom-0 rounded-t-3xl p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]",
           // desktop: centered modal
-          "sm:inset-auto sm:left-1/2 sm:top-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl sm:p-6",
+          "sm:inset-auto sm:left-1/2 sm:top-1/2 sm:w-[calc(100%_-_3rem)] sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-3xl sm:p-8",
           className,
         )}
       >
-        <DialogPrimitive.Title className="pr-8 text-lg font-semibold text-ink">
+        <DialogPrimitive.Title className="pr-10 text-xl font-semibold tracking-tight text-ink">
           {title}
         </DialogPrimitive.Title>
         {description ? (
-          <DialogPrimitive.Description className="mt-1 text-sm text-muted">
+          <DialogPrimitive.Description className="mt-2 text-sm leading-relaxed text-muted">
             {description}
           </DialogPrimitive.Description>
         ) : (
@@ -45,9 +45,9 @@ export function DialogContent({
             {title}
           </DialogPrimitive.Description>
         )}
-        <div className="mt-4">{children}</div>
+        <div className="mt-6">{children}</div>
         <DialogPrimitive.Close
-          className="absolute right-4 top-4 grid size-8 place-items-center rounded-lg text-muted hover:bg-black/5"
+          className="absolute right-4 top-4 grid size-11 place-items-center rounded-xl text-muted transition-colors hover:bg-mist hover:text-ink"
           aria-label="Close"
         >
           <X className="size-5" />
