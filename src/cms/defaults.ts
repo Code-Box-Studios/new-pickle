@@ -7,7 +7,7 @@ export const siteDefaults = {
   searchLabel: "Find courts",
   signInLabel: "Sign in",
   footerDescription:
-    "Payment goes directly to the venue. The venue confirms your reservation. RallyPoint makes discovery and booking easier.",
+    "Payment goes directly to the venue. The venue confirms your reservation. Pikol makes discovery and booking easier.",
   footerTagline: "A little less planning. A lot more playing.",
   studioName: "Code Box Studios",
   footerLinks: [
@@ -35,7 +35,7 @@ export const homeDefaults = {
   stepsEyebrow: "Less planning. More playing.",
   stepsTitle: "A good game is three steps away.",
   stepsDescription:
-    "From finding your court to your first serve. Here's how RallyPoint works.",
+    "From finding your court to your first serve. Here's how Pikol works.",
   steps: [
     {
       title: "Discover",
@@ -64,7 +64,7 @@ export const venueLandingDefaults = {
   eyebrow: "For venue owners",
   title: "Fill your courts with more players.",
   description:
-    "List your venue on RallyPoint, take online reservations, and get paid directly — you stay in control of your courts.",
+    "List your venue on Pikol, take online reservations, and get paid directly — you stay in control of your courts.",
   createLabel: "Create your venue",
   signInLabel: "Get started",
   benefits: [

@@ -7,5 +7,5 @@ export function assertPhoneOrigin(request: NextRequest) {
   const expected = process.env.NODE_ENV === "production" && process.env.APP_URL
     ? new URL(process.env.APP_URL).origin
     : request.nextUrl.origin;
-  if (origin && origin !== expected) throw new ForbiddenError("Open RallyPoint directly to sign in.");
+  if (origin && origin !== expected) throw new ForbiddenError("Open Pikol directly to sign in.");
 }

@@ -130,12 +130,12 @@ const VENUES: VenueSeed[] = [
 ];
 
 const PAYMENT_METHODS: { channel: PaymentChannel; accountName: string; accountNumber: string; instructions?: string }[] = [
-  { channel: "GCASH", accountName: "RallyPoint Venue", accountNumber: "0917 555 1234", instructions: "Send the exact amount and keep your receipt." },
-  { channel: "MAYA", accountName: "RallyPoint Venue", accountNumber: "0918 555 5678" },
+  { channel: "GCASH", accountName: "Pikol Venue", accountNumber: "0917 555 1234", instructions: "Send the exact amount and keep your receipt." },
+  { channel: "MAYA", accountName: "Pikol Venue", accountNumber: "0918 555 5678" },
 ];
 
 async function main() {
-  console.log("Seeding RallyPoint…");
+  console.log("Seeding Pikol…");
 
   const admin = await prisma.user.upsert({
     where: { email: "admin@rallypoint.test" },

@@ -13,7 +13,7 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
     <div>
       <div className="mb-7 text-center">
         <BrandMark className="mx-auto mb-5 size-14" />
-        <p className="eyebrow mb-2">Welcome to RallyPoint</p>
+        <p className="eyebrow mb-2">Welcome to Pikol</p>
         <h1 className="text-3xl font-medium tracking-tight text-ink">Sign in</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">Your next game is one sign-in away.</p>
       </div>

@@ -1,4 +1,4 @@
-// The SentryClient port is expressed in RallyPoint-NORMALIZED terms, NOT in any
+// The SentryClient port is expressed in Pikol-NORMALIZED terms, NOT in any
 // Sentry wire format. A real HttpSentryClient must translate the (currently
 // unavailable) Sentry API into these types; that translation is the documented
 // TODO. MockSentryClient is the fully-tested reference implementation.

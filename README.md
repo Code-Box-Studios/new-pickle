@@ -1,4 +1,4 @@
-# RallyPoint
+# Pikol
 
 A responsive, installable **marketplace for pickleball courts** — players discover
 venues, see real availability, hold a court, pay the venue, and track
@@ -24,10 +24,13 @@ The city combobox uses `cmdk`; the calendar uses React DayPicker.
 tokens, and motion. Shared shadcn primitives live in `src/components/ui`; their
 semantic theme and reduced-motion rules live in `src/app/globals.css`.
 
-The homepage hero features RallyPoint's own paddle-and-ball logo and decorative
+The homepage hero features Pikol's own paddle-and-ball logo and decorative
 brand illustration, independent of venue listings. Venues appear in the separate
-**Popular venues** section. Hero motion is brief and respects reduced-motion
-preferences. The header has no tagline; the footer credits **Code Box Studios**.
+**Popular venues** section. Its custom wordmark uses a pickleball for the “o”,
+with continuous rally, paddle, and glow animations. The panel includes a pause
+button; motion also pauses offscreen and in background tabs. Reduced-motion
+preferences show a still composition. The header has no tagline; the footer
+credits **Code Box Studios**.
 
 Date fields use the shared shadcn **Calendar + Popover** picker, including owner
 rescheduling. They display readable dates and submit `YYYY-MM-DD` civil dates
@@ -117,7 +120,7 @@ secret to browser JavaScript.
 
 ## Installing on a phone
 
-RallyPoint is a Progressive Web App. **Install RallyPoint** in the footer opens
+Pikol is a Progressive Web App. **Install Pikol** in the footer opens
 the browser's install prompt when available, or platform instructions. Android
 supports installation through Chrome/Edge; on iPhone open Safari and choose
 Share → Add to Home Screen. The installed site opens in its own window.
@@ -139,7 +142,7 @@ Use one package manager consistently for your local `node_modules`.
 
 ## Editing website content
 
-Open **[/cms](http://localhost:3000/cms)** and sign in with an existing RallyPoint
+Open **[/cms](http://localhost:3000/cms)** and sign in with an existing Pikol
 admin account. In development use `admin@rallypoint.test` and open the magic link
 from the banner. **Edit website** links also appear in the admin navigation.
 
@@ -162,6 +165,11 @@ content and can be repeated safely. Public pages use published content; if CMS
 configuration is absent or unavailable they show the built-in copy and log
 load failures. Public reads have a two-second deadline and exclude unpublished
 content. The CMS itself requires a working database and secret.
+
+The Pikol rename migration updates the previous brand name in saved CMS copy,
+including drafts and versions, while preserving other edits and links. Run
+`npm run cms:migrate` when updating an existing installation. Existing accounts,
+development email addresses, and database names remain valid.
 
 After changing CMS fields, run `npm run cms:types`, `npm run cms:importmap`, and
 `npm run cms:migrate:create -- --name describe-the-change`. Review and commit

@@ -1,7 +1,7 @@
 export function AdminIcon() {
   return (
     <span className="cms-brand-icon" aria-hidden>
-      R
+      P
     </span>
   );
 }
@@ -10,7 +10,7 @@ export function AdminBrand() {
     <div className="cms-brand">
       <AdminIcon />
       <span>
-        RallyPoint <small>Content studio</small>
+        Pikol <small>Content studio</small>
       </span>
     </div>
   );

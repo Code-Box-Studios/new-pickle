@@ -13,7 +13,7 @@ export default buildConfig({
     user: "cms-users",
     theme: "light",
     avatar: "default",
-    meta: { titleSuffix: "· RallyPoint Content" },
+    meta: { titleSuffix: "· Pikol Content" },
     importMap: {
       baseDir: dirname,
       importMapFile: path.resolve(dirname, "app/(payload)/cms/importMap.js"),

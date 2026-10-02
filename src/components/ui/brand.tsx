@@ -13,7 +13,7 @@ export function BrandMark({ className }: { className?: string }) {
       <g className="brand-paddle" transform="rotate(-28 24 25)">
         <rect x="14" y="7" width="21" height="27" rx="9" fill="#00ed64" />
         <path d="M21 31h7v9a3.5 3.5 0 0 1-7 0z" fill="#00ed64" />
-        <path d="M20 26V15h5a3.5 3.5 0 0 1 0 7h-5m5 0 4 4" stroke="#001e2b" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M20 26V15h5a3.5 3.5 0 0 1 0 7h-5" stroke="#001e2b" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
         <path d="M22 36h5M22 39h5" stroke="#001e2b" strokeOpacity=".45" strokeWidth="1.2" />
       </g>
       <g className="brand-ball">
@@ -42,7 +42,7 @@ export function Brand({
       )}
     >
       <BrandMark />
-      <span>Rally<span className="font-normal">Point</span></span>
+      <span>Pikol</span>
     </span>
   );
 }

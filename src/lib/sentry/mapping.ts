@@ -4,7 +4,7 @@ import type { ExternalBookingState, SentryBusyRange, SentryCreateBookingInput } 
 
 // Documented mapping over the NORMALIZED port vocabulary only (not Sentry's real
 // state strings, which are unavailable here). `held -> HELD` deliberately: the
-// Sentry connector does NOT drive RallyPoint's payment-submitted /
+// Sentry connector does NOT drive Pikol's payment-submitted /
 // venue-confirmation semantics, so it never maps to PENDING_CONFIRMATION.
 const STATE_TO_STATUS: Record<ExternalBookingState, BookingStatus> = {
   held: "HELD",

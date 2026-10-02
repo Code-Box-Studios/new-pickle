@@ -7,7 +7,7 @@ import { SentryInvalidResourceError, SentryUnsupportedOperationError } from "@/l
 import { busyRangesToOccupied, externalStateToStatus, holdInputToCreateBooking } from "@/lib/sentry/mapping";
 import type { Actor, BookingBackend, HeldBooking, HoldInput, OccupiedRange } from "./backend";
 
-// Sentry is authoritative for connected venues. The RallyPoint Booking row is an
+// Sentry is authoritative for connected venues. The Pikol Booking row is an
 // INDEX (backendType=SENTRY, externalRef, last-known status), never the authority.
 export class SentryBookingBackend implements BookingBackend {
   constructor(private readonly client: SentryClient) {}

@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { getPayload, type Payload } from "payload";
+import { createLocalReq, getPayload, type Payload } from "payload";
 import config from "@/payload.config";
 import { homeDefaults } from "@/cms/defaults";
 import { seedContent } from "@/cms/seed";
@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 import { signSession, SESSION_COOKIE } from "@/lib/auth/session";
 import { sql } from "@payloadcms/db-postgres";
 import { getHomeContent } from "@/cms/content";
+import { up as renameBrand, down as restoreBrand } from "@/cms/migrations/20261002_134500_pikol_brand";
 vi.mock("server-only", () => ({}));
 
 let payload: Payload;
@@ -142,6 +143,38 @@ describe("published CMS content", () => {
         where: { externalUserId: { equals: admin.id } },
       });
       await prisma.user.delete({ where: { id: admin.id } });
+    }
+  });
+
+  it("renames CMS copy and versions while preserving edits, links, and private drafts", async () => {
+    await payload.updateGlobal({
+      slug: "homepage",
+      data: { ...homeDefaults, heroTitle: "Keep my headline", stepsDescription: "My custom RallyPoint message", primaryHref: "/search?source=RallyPoint", _status: "published" },
+      draft: false,
+    });
+    await payload.updateGlobal({
+      slug: "homepage",
+      data: { heroTitle: "Private RallyPoint headline", _status: "draft" },
+      draft: true,
+    });
+    const args = { db: payload.db.drizzle, payload, req: await createLocalReq({}, payload) };
+    await renameBrand(args);
+    const published = await payload.findGlobal({ slug: "homepage", draft: false });
+    const draft = await payload.findGlobal({ slug: "homepage", draft: true });
+    expect(published.heroTitle).toBe("Keep my headline");
+    expect(published.stepsDescription).toBe("My custom Pikol message");
+    expect(published.primaryHref).toBe("/search?source=RallyPoint");
+    expect(published._status).toBe("published");
+    expect(draft.heroTitle).toBe("Private Pikol headline");
+    expect(draft._status).toBe("draft");
+    const versions = await payload.findGlobalVersions({ slug: "homepage", limit: 100 });
+    expect(versions.docs.some(doc => doc.version.heroTitle === "Private Pikol headline")).toBe(true);
+    expect(versions.docs.every(doc => !doc.version.heroTitle?.includes("RallyPoint") && !doc.version.stepsDescription?.includes("RallyPoint"))).toBe(true);
+    try {
+      await restoreBrand(args);
+      expect((await payload.findGlobal({ slug: "homepage", draft: true })).heroTitle).toBe("Private RallyPoint headline");
+    } finally {
+      await renameBrand(args);
     }
   });
 });

@@ -1,13 +1,13 @@
 /* Dynamic/authenticated pages always use the network. No offline booking cache. */
-const CACHE = "rallypoint-static-v1";
-const ASSETS = ["/offline.html", "/brand/rallypoint-mark.svg", "/brand/icon-192.png", "/brand/icon-512.png", "/brand/icon-maskable-512.png", "/brand/apple-touch-icon.png"];
+const CACHE = "pikol-static-v2";
+const ASSETS = ["/offline.html", "/brand/pikol-mark.svg", "/brand/icon-192.png", "/brand/icon-512.png", "/brand/icon-maskable-512.png", "/brand/apple-touch-icon.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key.startsWith("rallypoint-static-") && key !== CACHE).map((key) => caches.delete(key)))).then(() => self.clients.claim()));
+  event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => (key.startsWith("rallypoint-static-") || key.startsWith("pikol-static-")) && key !== CACHE).map((key) => caches.delete(key)))).then(() => self.clients.claim()));
 });
 
 self.addEventListener("fetch", (event) => {

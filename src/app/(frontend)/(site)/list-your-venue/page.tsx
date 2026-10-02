@@ -25,7 +25,7 @@ import { CreateVenueButton } from "@/components/venue-admin/CreateVenueButton";
 export const metadata: Metadata = {
   title: "List your venue",
   description:
-    "Fill your courts with more players. List your pickleball venue on RallyPoint.",
+    "Fill your courts with more players. List your pickleball venue on Pikol.",
 };
 
 export default async function ListYourVenuePage() {

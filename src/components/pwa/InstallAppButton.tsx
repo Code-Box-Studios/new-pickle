@@ -21,13 +21,13 @@ export function InstallAppButton() {
 
   return (
     <>
-      <Button type="button" variant="outlineOnDark" size="sm" className="mt-6 gap-2" loading={loading} onClick={activate}><Download className="size-4" aria-hidden />Install RallyPoint</Button>
+      <Button type="button" variant="outlineOnDark" size="sm" className="mt-6 gap-2" loading={loading} onClick={activate}><Download className="size-4" aria-hidden />Install Pikol</Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <BrandMark className="mb-3 size-14" />
             <DialogTitle className="text-2xl">Your next game, one tap away.</DialogTitle>
-            <DialogDescription>Add RallyPoint to your home screen. It opens like an app, with live court availability.</DialogDescription>
+            <DialogDescription>Add Pikol to your home screen. It opens like an app, with live court availability.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 text-sm">
             <div className="rounded-xl border border-border bg-muted p-4">

@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: RallyPoint
+name: Pikol
 description: Modern court discovery and management using the supplied MongoDB visual reference.
 colors:
   primary: "#00ed64"
@@ -223,7 +223,7 @@ components:
     height: 44px
 ---
 
-# RallyPoint design system
+# Pikol design system
 
 ## Overview
 
@@ -285,15 +285,19 @@ random stock placeholders. The image component preserves real uploaded media.
 Outlined button tokens describe their effective white or teal surface; their
 CSS background is transparent.
 
-The RallyPoint mark combines a paddle, an R monogram, and a perforated ball.
+The Pikol mark combines a paddle, a P monogram, and a perforated ball.
 Use the same mark in the header, footer, workspace navigation, and favicon.
-The homepage hero showcases only RallyPoint branding: its mark, wordmark,
+The homepage hero showcases only Pikol branding: its mark, wordmark,
 paddles, ball, and orbital lines. Keep venue promotions in discovery sections.
 Court boundaries, net lines, score tiles, and paddle details carry the identity
 through search, discovery, booking steps, the owner banner, and the footer.
 The decorative rally follows its section's scroll timeline where supported;
-other browsers get one short entrance. Hero and logo motion settles rather
-than looping continuously, and all added motion respects reduced motion.
+other browsers get one short entrance. The hero wordmark uses a perforated ball
+for its “o”, a slanted display treatment, a soft mint sheen, and a rally swoosh.
+The brand panel has continuous ball-orbit, paddle, logo, and atmospheric motion.
+Its pause control stops all motion; animation also pauses offscreen and in
+background tabs. Reduced-motion preferences render a still composition.
+Header and footer logo motion remains brief and tied to interaction.
 Home links explicitly return to the top, including repeat activations. Search
 anchors retain their smooth scroll and the sticky header offset.
 

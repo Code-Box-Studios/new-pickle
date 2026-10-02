@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "RallyPoint — Find your next game",
-    short_name: "RallyPoint",
+    name: "Pikol — Find your next game",
+    short_name: "Pikol",
     description: "Find, reserve, and play pickleball at courts near you.",
     start_url: "/?source=pwa",
     scope: "/",

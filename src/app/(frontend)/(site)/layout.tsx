@@ -39,7 +39,7 @@ export default async function SiteLayout({
             <Link
               href="/#top"
               className="brand-link inline-block rounded-xl"
-              aria-label="RallyPoint home"
+              aria-label="Pikol home"
             >
               <Brand inverse />
             </Link>
@@ -71,7 +71,7 @@ export default async function SiteLayout({
         </div>
         <div className="page-shell relative mt-12">
           <div className="flex flex-col items-center justify-between gap-3 border-t border-white/10 py-6 text-xs sm:flex-row">
-            <p className="text-white/50">© {new Date().getFullYear()} RallyPoint</p>
+            <p className="text-white/50">© {new Date().getFullYear()} Pikol</p>
             <p className="flex items-center gap-2 text-white/60">
               <Code2
                 className="size-4 text-brand-300"

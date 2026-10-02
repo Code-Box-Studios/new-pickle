@@ -8,18 +8,18 @@ import { InstallProvider } from "@/components/pwa/InstallProvider";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
   title: {
-    default: "RallyPoint — Find your next game",
-    template: "%s · RallyPoint",
+    default: "Pikol — Find your next game",
+    template: "%s · Pikol",
   },
   description:
     "Discover and reserve pickleball courts across independent venues in Davao. Search, compare, book, and play.",
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/brand/rallypoint-mark.svg", apple: "/brand/apple-touch-icon.png" },
-  appleWebApp: { capable: true, title: "RallyPoint", statusBarStyle: "default" },
+  icons: { icon: "/brand/pikol-mark.svg", apple: "/brand/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "Pikol", statusBarStyle: "default" },
   openGraph: {
     type: "website",
-    siteName: "RallyPoint",
-    title: "RallyPoint — Find your next game",
+    siteName: "Pikol",
+    title: "Pikol — Find your next game",
     description:
       "Discover and reserve pickleball courts across independent venues in Davao.",
   },

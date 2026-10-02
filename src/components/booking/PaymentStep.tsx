@@ -85,7 +85,7 @@ export function PaymentStep({
 
       <Card className="rounded-lg border border-brand-100 bg-brand-50 p-5">
         <p className="break-words text-sm leading-6 text-brand-800">
-          Payment is made <strong>directly to {venueName}</strong>. RallyPoint
+          Payment is made <strong>directly to {venueName}</strong>. Pikol
           never holds your money. Send the exact amount, then upload your
           screenshot below.
         </p>

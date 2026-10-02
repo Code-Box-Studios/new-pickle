@@ -56,7 +56,7 @@ export function SiteHeader({
         <Link
           href="/#top"
           className="brand-link group shrink-0 rounded-lg"
-          aria-label="RallyPoint home"
+          aria-label="Pikol home"
         >
           <Brand className="text-lg sm:text-[22px]" />
         </Link>
