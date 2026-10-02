@@ -298,6 +298,12 @@ The brand panel has continuous ball-orbit, paddle, logo, and atmospheric motion.
 Its pause control stops all motion; animation also pauses offscreen and in
 background tabs. Reduced-motion preferences render a still composition.
 Header and footer logo motion remains brief and tied to interaction.
+The sticky header frames its navigation in a floating white panel with a light
+border and restrained shadow. On the homepage its transparent surround overlays
+the hero, with extra hero padding to keep content clear of the bar. Active links
+use dark teal pills with green icons.
+Mobile navigation opens in an inset, rounded shadcn Sheet with a teal brand area,
+large navigation targets, and a scrollable link region for shorter screens.
 Home links explicitly return to the top, including repeat activations. Search
 anchors retain their smooth scroll and the sticky header offset.
 

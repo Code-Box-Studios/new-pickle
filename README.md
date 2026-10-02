@@ -29,8 +29,9 @@ brand illustration, independent of venue listings. Venues appear in the separate
 **Popular venues** section. Its custom wordmark uses a pickleball for the “o”,
 with continuous rally, paddle, and glow animations. The panel includes a pause
 button; motion also pauses offscreen and in background tabs. Reduced-motion
-preferences show a still composition. The header has no tagline; the footer
-credits **Code Box Studios**.
+preferences show a still composition. The floating white header sits over the
+hero background, with dark teal active navigation, green search actions, and a
+branded mobile drawer. It has no tagline; the footer credits **Code Box Studios**.
 
 Date fields use the shared shadcn **Calendar + Popover** picker, including owner
 rescheduling. They display readable dates and submit `YYYY-MM-DD` civil dates

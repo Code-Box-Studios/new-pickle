@@ -12,9 +12,12 @@ import {
   Menu,
   Search,
   FilePenLine,
+  UserRound,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Brand } from "@/components/ui/brand";
+import { PaddleIcon, PickleballIcon } from "@/components/ui/pickleball";
 import {
   Sheet,
   SheetTrigger,
@@ -51,18 +54,18 @@ export function SiteHeader({
   const active = (href: string) =>
     href === "/" ? pathname === href : pathname.startsWith(href);
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-white/95 shadow-[0_1px_12px_rgb(0_30_43/0.025)] backdrop-blur-xl">
-      <div className="page-shell flex h-[72px] items-center gap-2 sm:gap-4 lg:h-[88px]">
+    <header className={cn("site-header sticky top-0 z-40 px-3 py-3 sm:px-6 lg:px-8", pathname === "/" ? "-mb-[88px] bg-transparent lg:-mb-24" : "bg-surface/85 backdrop-blur-xl")}>
+      <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-2 rounded-[20px] border border-border/80 bg-white px-3 shadow-[0_4px_24px_-12px_rgb(0_30_43/0.16)] sm:gap-4 sm:px-5 lg:h-[72px] lg:gap-6 lg:px-6">
         <Link
           href="/#top"
-          className="brand-link group shrink-0 rounded-lg"
+          className="brand-link group flex min-h-11 shrink-0 items-center rounded-xl"
           aria-label="Pikol home"
         >
-          <Brand className="text-lg sm:text-[22px]" />
+          <Brand className="gap-2 text-[22px] sm:gap-3 sm:text-[25px]" />
         </Link>
         <nav
           aria-label="Main navigation"
-          className="ml-auto hidden items-center gap-1 rounded-full border border-border/70 bg-muted/75 p-1 lg:flex"
+          className="mx-auto hidden min-w-0 items-center gap-1.5 lg:flex"
         >
           {NAV.map((item) => (
             <Button
@@ -70,27 +73,27 @@ export function SiteHeader({
               asChild
               variant="ghost"
               className={cn(
-                "h-10 max-w-40 gap-2 px-4 text-[13px] font-medium",
+                "h-11 max-w-40 gap-2 px-4 text-[13px] font-medium transition-colors duration-200",
                 active(item.href)
-                  ? "bg-white text-brand-700 shadow-[0_1px_4px_rgb(0_30_43/0.08)] ring-1 ring-border/60"
-                  : "text-ink-soft",
+                  ? "bg-brand-950 text-white shadow-[0_3px_10px_-3px_rgb(0_30_43/0.24)] hover:bg-brand-950 hover:text-white"
+                  : "text-ink-soft hover:bg-surface",
               )}
             >
               <Link
                 href={item.href}
                 aria-current={active(item.href) ? "page" : undefined}
               >
-                <item.icon className="size-3.5" strokeWidth={1.8} aria-hidden />
+                <item.icon className={cn("size-4 shrink-0", active(item.href) && "text-primary")} strokeWidth={1.8} aria-hidden />
                 <span className="truncate">{item.label}</span>
               </Link>
             </Button>
           ))}
         </nav>
-        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:ml-4">
+        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 lg:ml-0">
           <Button
             asChild
             variant="ghost"
-            className="hidden gap-1.5 px-3 text-[13px] font-medium text-muted-foreground xl:inline-flex"
+            className="hidden max-w-36 gap-2 px-3 text-[13px] font-medium text-ink-soft xl:inline-flex"
           >
             <Link
               href={session?.role === "ADMIN" ? "/cms" : "/list-your-venue"}
@@ -100,7 +103,7 @@ export function SiteHeader({
               ) : (
                 <Building2 className="size-4" aria-hidden />
               )}
-              {session?.role === "ADMIN" ? "Edit website" : content.venueLabel}
+              <span className="truncate">{session?.role === "ADMIN" ? "Edit website" : content.venueLabel}</span>
             </Link>
           </Button>
           {session ? (
@@ -119,7 +122,7 @@ export function SiteHeader({
                   type="submit"
                   size="icon"
                   aria-label="Sign out"
-                  className="text-muted-foreground"
+                  className="border border-border/70 bg-surface/60 text-muted-foreground"
                 >
                   <LogOut aria-hidden />
                   <span className="sr-only">Sign out</span>
@@ -129,20 +132,20 @@ export function SiteHeader({
           ) : (
             <Button
               asChild
-              variant="ghost"
-              size="sm"
-              className="hidden px-3 text-[13px] text-ink-soft sm:inline-flex"
+              variant="outline"
+              className="hidden max-w-32 gap-2 border-border/80 px-4 text-[13px] text-ink sm:inline-flex"
             >
-              <Link href="/login">{content.signInLabel}</Link>
+              <Link href="/login"><UserRound className="size-4" strokeWidth={1.8} aria-hidden /><span className="truncate">{content.signInLabel}</span></Link>
             </Button>
           )}
           <Button
             asChild
-            className="motion-trigger size-11 p-0 sm:w-auto sm:max-w-44 sm:gap-2 sm:px-5 lg:h-12"
+            className="motion-trigger size-11 p-0 shadow-[0_3px_10px_-4px_rgb(0_104_74/0.24)] sm:w-auto sm:max-w-44 sm:gap-2 sm:px-5"
             aria-label={content.searchLabel}
           >
             <Link href="/search">
               <Search className="size-4 sm:hidden" aria-hidden />
+              <PickleballIcon className="hidden size-4 sm:block" />
               <span className="hidden truncate sm:inline">
                 {content.searchLabel}
               </span>
@@ -158,24 +161,30 @@ export function SiteHeader({
               <Button
                 variant="outline"
                 size="icon"
-                className="ml-1 border-border lg:hidden"
+                className="border-border/80 bg-surface/60 lg:hidden"
                 aria-label="Open menu"
               >
                 <Menu className="size-5" aria-hidden />
               </Button>
             </SheetTrigger>
-            <SheetContent className="w-[min(92vw,380px)] gap-0 p-6">
-              <SheetHeader className="p-0 pr-12">
-                <SheetTitle>
-                  <Brand />
-                </SheetTitle>
-                <SheetDescription>
-                  Find a court and get back to the game.
-                </SheetDescription>
-              </SheetHeader>
+            <SheetContent showCloseButton={false} className="top-[max(12px,env(safe-area-inset-top))] right-3 bottom-[max(12px,env(safe-area-inset-bottom))] h-auto w-[calc(100vw-24px)] max-w-[400px] gap-0 overflow-hidden rounded-3xl border border-border/70 p-0 sm:max-w-[400px]">
+              <div className="relative shrink-0 overflow-hidden bg-brand-950 p-5 text-white">
+                <PaddleIcon className="pointer-events-none absolute -bottom-8 right-10 size-32 rotate-12 text-brand-300/10" />
+                <SheetHeader className="relative gap-4 p-0">
+                  <div className="flex items-center justify-between gap-3">
+                    <SheetTitle><Brand inverse className="text-[26px]" /></SheetTitle>
+                    <SheetClose asChild>
+                      <Button type="button" variant="ghost" size="icon" className="shrink-0 border border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white" aria-label="Close menu"><X className="size-5" aria-hidden /></Button>
+                    </SheetClose>
+                  </div>
+                  <SheetDescription className="max-w-56 text-sm leading-relaxed text-white/65">
+                    Find a court and get back to the game.
+                  </SheetDescription>
+                </SheetHeader>
+              </div>
               <nav
                 aria-label="Menu navigation"
-                className="mt-8 flex flex-col gap-2 border-t border-border pt-5"
+                className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain p-4"
               >
                 {[
                   ...NAV,
@@ -199,20 +208,18 @@ export function SiteHeader({
                       asChild
                       variant="ghost"
                       className={cn(
-                        "h-12 justify-start gap-3 px-4 font-medium",
-                        active(item.href) && "bg-secondary text-brand-700",
+                        "h-14 shrink-0 justify-between gap-3 border border-transparent px-4 text-[15px] font-medium",
+                        active(item.href)
+                          ? "border-brand-950 bg-brand-950 text-white hover:bg-brand-950 hover:text-white"
+                          : "bg-surface/70 text-ink-soft",
                       )}
                     >
                       <Link
                         href={item.href}
                         aria-current={active(item.href) ? "page" : undefined}
                       >
-                        <item.icon
-                          className="size-[18px]"
-                          strokeWidth={1.8}
-                          aria-hidden
-                        />
-                        <span className="truncate">{item.label}</span>
+                        <span className="flex min-w-0 items-center gap-3"><item.icon className={cn("size-[18px] shrink-0", active(item.href) && "text-primary")} strokeWidth={1.8} aria-hidden /><span className="truncate">{item.label}</span></span>
+                        <ArrowUpRight className={cn("size-4 shrink-0", active(item.href) ? "text-primary" : "text-muted-foreground/60")} aria-hidden />
                       </Link>
                     </Button>
                   </SheetClose>
@@ -222,7 +229,7 @@ export function SiteHeader({
                 <form
                   action="/api/auth/logout"
                   method="post"
-                  className="mt-auto border-t border-border pt-5"
+                  className="shrink-0 border-t border-border/70 p-5"
                 >
                   <Button type="submit" variant="outline" block>
                     <LogOut aria-hidden />
@@ -230,7 +237,7 @@ export function SiteHeader({
                   </Button>
                 </form>
               ) : (
-                <div className="mt-auto border-t border-border pt-5">
+                <div className="shrink-0 border-t border-border/70 p-5">
                   <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
                     Your next game is waiting.
                   </p>
