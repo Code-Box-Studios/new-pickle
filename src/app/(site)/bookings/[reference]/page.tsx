@@ -38,9 +38,12 @@ export default async function BookingStatusPage({
   const b = await getBookingByReference(reference, session.id, session.role);
   if (!b) notFound();
 
-  const paid = ["PAYMENT_SUBMITTED", "PENDING_CONFIRMATION", "CONFIRMED", "COMPLETED"].includes(
-    b.status,
-  );
+  const paid = [
+    "PAYMENT_SUBMITTED",
+    "PENDING_CONFIRMATION",
+    "CONFIRMED",
+    "COMPLETED",
+  ].includes(b.status);
   const awaiting = ["PENDING_CONFIRMATION"].includes(b.status);
   const confirmed = ["CONFIRMED", "COMPLETED"].includes(b.status);
   const done: Record<string, boolean> = {
@@ -57,7 +60,9 @@ export default async function BookingStatusPage({
     b.holdExpiresAt.getTime() > nowMs();
 
   const showReview = b.status === "COMPLETED" && b.userId === session.id;
-  const eligibility = showReview ? await reviewEligibility(b.id, session.id) : null;
+  const eligibility = showReview
+    ? await reviewEligibility(b.id, session.id)
+    : null;
 
   return (
     <div className="page-shell py-8 sm:py-12">
@@ -67,7 +72,9 @@ export default async function BookingStatusPage({
             <p className="eyebrow">Booking</p>
             <h1 className="page-title mt-3 break-words">{b.reference}</h1>
           </div>
-          <div className="shrink-0 sm:pt-1"><BookingStatusBadge status={b.status} /></div>
+          <div className="shrink-0 sm:pt-1">
+            <BookingStatusBadge status={b.status} />
+          </div>
         </div>
 
         <div className="mt-7 sm:mt-8">
@@ -81,7 +88,10 @@ export default async function BookingStatusPage({
         </div>
 
         {canResume && (
-          <Link href={`/book/${b.reference}`} className={`${buttonVariants({ size: "lg", block: true })} mt-5`}>
+          <Link
+            href={`/book/${b.reference}`}
+            className={`${buttonVariants({ size: "lg", block: true })} mt-5`}
+          >
             Resume booking
           </Link>
         )}
@@ -99,21 +109,38 @@ export default async function BookingStatusPage({
           <ul className="space-y-4">
             {STEPS.map((s) => {
               const isDone = done[s.key];
-              const isCurrent = !isDone && s.key === (paid ? "confirmed" : "paid");
+              const isCurrent =
+                !isDone && s.key === (paid ? "confirmed" : "paid");
               return (
-                <li key={s.key} className="flex items-center gap-3 text-sm leading-6" aria-current={isCurrent ? "step" : undefined}>
+                <li
+                  key={s.key}
+                  className="flex items-center gap-3 text-sm leading-6"
+                  aria-current={isCurrent ? "step" : undefined}
+                >
                   {isDone ? (
-                    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-mist" aria-hidden>
+                    <span
+                      className="grid size-7 shrink-0 place-items-center rounded-full bg-mist"
+                      aria-hidden
+                    >
                       <Check className="size-4 text-brand-700" />
                     </span>
                   ) : isCurrent ? (
-                    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-amber-50" aria-hidden>
+                    <span
+                      className="grid size-7 shrink-0 place-items-center rounded-full bg-amber-50"
+                      aria-hidden
+                    >
                       <span className="size-2 rounded-full bg-amber-600" />
                     </span>
                   ) : (
                     <Circle className="size-7 shrink-0 text-line" aria-hidden />
                   )}
-                  <span className={cn(isDone ? "text-ink" : "text-muted")}>{s.label}</span>
+                  <span
+                    className={cn(
+                      isDone ? "text-ink" : "text-muted-foreground",
+                    )}
+                  >
+                    {s.label}
+                  </span>
                 </li>
               );
             })}
@@ -129,7 +156,9 @@ export default async function BookingStatusPage({
               {pesos(b.payment.amountCents)} · submitted
             </p>
           ) : (
-            <p className="mt-3 text-sm leading-6 text-muted">Not submitted yet.</p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              Not submitted yet.
+            </p>
           )}
         </Card>
 
@@ -139,7 +168,9 @@ export default async function BookingStatusPage({
             <SectionHeader>Venue contact</SectionHeader>
             <p className="mt-3 flex items-center gap-2 text-sm leading-6 text-ink-soft">
               <Phone className="size-4 shrink-0" aria-hidden />
-              <span className="min-w-0 break-words">{b.venue.contactNumber}</span>
+              <span className="min-w-0 break-words">
+                {b.venue.contactNumber}
+              </span>
             </p>
           </Card>
         )}
@@ -148,13 +179,17 @@ export default async function BookingStatusPage({
         <Card className="mt-5 p-6 sm:p-7">
           <SectionHeader className="mb-5">Activity</SectionHeader>
           <StatusTimeline
-            history={b.history.map((h) => ({ toStatus: h.toStatus, at: h.at, note: h.note }))}
+            history={b.history.map((h) => ({
+              toStatus: h.toStatus,
+              at: h.at,
+              note: h.note,
+            }))}
           />
         </Card>
 
-        <p className="mt-6 text-center text-sm leading-6 text-muted">
-          Confirmation comes from the venue. Payment goes to the venue. This page is
-          the neutral status both sides can check.
+        <p className="mt-6 text-center text-sm leading-6 text-muted-foreground">
+          Confirmation comes from the venue. Payment goes to the venue. This
+          page is the neutral status both sides can check.
         </p>
       </div>
     </div>

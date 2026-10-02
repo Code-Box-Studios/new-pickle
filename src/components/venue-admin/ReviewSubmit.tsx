@@ -1,5 +1,7 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -31,39 +33,48 @@ export function ReviewSubmit({
 
   if (status === "PENDING_REVIEW") {
     return (
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
         <div className="flex items-center gap-2 font-semibold text-amber-900">
           <Clock className="size-5" aria-hidden /> Submitted for review
         </div>
         <p className="mt-1 text-sm text-amber-900">
           We&apos;ll notify you once an admin reviews your venue.
         </p>
-        {submittedNote && <p className="mt-3 text-sm text-ink-soft">Your note: “{submittedNote}”</p>}
+        {submittedNote && (
+          <p className="mt-3 text-sm text-ink-soft">
+            Your note: “{submittedNote}”
+          </p>
+        )}
       </div>
     );
   }
 
   if (status === "APPROVED") {
     return (
-      <div className="rounded-2xl border border-brand-200 bg-brand-50 p-5">
+      <Card className="rounded-lg border border-brand-200 bg-brand-50 p-5">
         <div className="flex items-center gap-2 font-semibold text-brand-800">
           <Check className="size-5" aria-hidden /> Approved!
         </div>
         <p className="mt-1 text-sm text-ink-soft">
           Your venue is approved. Preview it, then publish to go live.
         </p>
-        <Link href="/owner/venues" className={buttonVariants({ className: "mt-4" })}>
+        <Link
+          href="/owner/venues"
+          className={buttonVariants({ className: "mt-4" })}
+        >
           Go to My venues
         </Link>
-      </div>
+      </Card>
     );
   }
 
   if (status === "SUSPENDED") {
     return (
-      <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
+      <div className="rounded-lg border border-red-200 bg-red-50 p-5">
         <p className="font-semibold text-red-700">This venue is suspended.</p>
-        {rejectionReason && <p className="mt-1 text-sm text-red-700">Reason: {rejectionReason}</p>}
+        {rejectionReason && (
+          <p className="mt-1 text-sm text-red-700">Reason: {rejectionReason}</p>
+        )}
       </div>
     );
   }
@@ -76,7 +87,11 @@ export function ReviewSubmit({
       toast({ title: "Submitted for review", tone: "success" });
       router.refresh();
     } catch (err) {
-      toast({ title: "Couldn't submit", description: (err as Error).message, tone: "error" });
+      toast({
+        title: "Couldn't submit",
+        description: (err as Error).message,
+        tone: "error",
+      });
     } finally {
       setBusy(false);
     }
@@ -90,7 +105,7 @@ export function ReviewSubmit({
         </div>
       )}
 
-      <div className="rounded-2xl border border-line bg-canvas p-4">
+      <Card className="rounded-lg border border-line bg-canvas p-4">
         <h2 className="text-sm font-semibold text-ink">Before you submit</h2>
         {ready ? (
           <p className="mt-2 flex items-center gap-2 text-sm text-brand-700">
@@ -99,26 +114,36 @@ export function ReviewSubmit({
         ) : (
           <ul className="mt-2 space-y-1">
             {missing.map((m) => (
-              <li key={m} className="flex items-center gap-2 text-sm text-ink-soft">
-                <CircleAlert className="size-4 text-amber-500" aria-hidden /> {m}
+              <li
+                key={m}
+                className="flex items-center gap-2 text-sm text-ink-soft"
+              >
+                <CircleAlert className="size-4 text-amber-500" aria-hidden />{" "}
+                {m}
               </li>
             ))}
           </ul>
         )}
-      </div>
+      </Card>
 
       <Field label="Note for the reviewer" htmlFor={`review-note-${venueId}`}>
-        <textarea
+        <Textarea
           id={`review-note-${venueId}`}
           rows={3}
-          className="form-control min-h-32 px-4 py-3 leading-relaxed placeholder:text-muted/80"
+          className="form-control min-h-32 px-4 py-3 leading-relaxed placeholder:text-muted-foreground/80"
           placeholder="Tell us about your venue and how we can verify it."
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
       </Field>
 
-      <Button size="lg" block loading={busy} disabled={!ready || !note.trim()} onClick={submit}>
+      <Button
+        size="lg"
+        block
+        loading={busy}
+        disabled={!ready || !note.trim()}
+        onClick={submit}
+      >
         {ready ? "Submit for verification" : "Complete the steps above first"}
       </Button>
     </div>

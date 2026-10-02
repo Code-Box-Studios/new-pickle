@@ -1,11 +1,12 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Field } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import { SelectField, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { channelLabel } from "@/lib/payment";
 import { sendJson } from "./api";
@@ -33,7 +34,12 @@ export function PaymentMethodEditor({
 }) {
   const router = useRouter();
   const toast = useToast();
-  const [draft, setDraft] = useState({ channel: "GCASH" as PaymentChannel, accountName: "", accountNumber: "", instructions: "" });
+  const [draft, setDraft] = useState({
+    channel: "GCASH" as PaymentChannel,
+    accountName: "",
+    accountNumber: "",
+    instructions: "",
+  });
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -42,10 +48,19 @@ export function PaymentMethodEditor({
     try {
       await fn();
       setAdding(false);
-      setDraft({ channel: "GCASH", accountName: "", accountNumber: "", instructions: "" });
+      setDraft({
+        channel: "GCASH",
+        accountName: "",
+        accountNumber: "",
+        instructions: "",
+      });
       router.refresh();
     } catch (err) {
-      toast({ title: "Couldn't save", description: (err as Error).message, tone: "error" });
+      toast({
+        title: "Couldn't save",
+        description: (err as Error).message,
+        tone: "error",
+      });
     } finally {
       setBusy(false);
     }
@@ -55,52 +70,116 @@ export function PaymentMethodEditor({
     <div className="space-y-4">
       <ul className="space-y-2">
         {methods.map((m) => (
-          <li key={m.id} className="flex items-center justify-between gap-3 rounded-xl border border-black/5 p-3">
+          <li
+            key={m.id}
+            className="flex items-center justify-between gap-3 rounded-xl border border-black/5 p-3"
+          >
             <div>
               <p className="font-medium text-ink">{channelLabel(m.channel)}</p>
-              <p className="text-xs text-muted">{m.accountName} · {m.accountNumber}</p>
+              <p className="text-xs text-muted-foreground">
+                {m.accountName} · {m.accountNumber}
+              </p>
             </div>
             {!locked && (
-              <button
+              <Button
+                variant="ghost"
                 type="button"
-                onClick={() => run(() => sendJson(`/api/owner/venues/${venueId}/payment-methods/${m.id}`, "DELETE"))}
+                onClick={() =>
+                  run(() =>
+                    sendJson(
+                      `/api/owner/venues/${venueId}/payment-methods/${m.id}`,
+                      "DELETE",
+                    ),
+                  )
+                }
                 className="rounded-xl p-2 text-red-600 hover:bg-red-50"
                 aria-label="Remove method"
               >
                 <Trash2 className="size-4" />
-              </button>
+              </Button>
             )}
           </li>
         ))}
-        {methods.length === 0 && <li className="text-sm text-muted">No payment methods yet.</li>}
+        {methods.length === 0 && (
+          <li className="text-sm text-muted-foreground">
+            No payment methods yet.
+          </li>
+        )}
       </ul>
 
       {!locked &&
         (adding ? (
-          <div className="space-y-3 rounded-xl border border-brand-200 bg-brand-50/40 p-3">
+          <Card className="space-y-3 rounded-xl border border-brand-200 bg-brand-50/40 p-3">
             <Field label="Channel" htmlFor="pmch">
-              <Select id="pmch" value={draft.channel} onChange={(e) => setDraft({ ...draft, channel: e.target.value as PaymentChannel })}>
+              <SelectField
+                id="pmch"
+                value={draft.channel}
+                onValueChange={(value) =>
+                  setDraft({
+                    ...draft,
+                    channel: value as PaymentChannel,
+                  })
+                }
+              >
                 {CHANNELS.map((c) => (
-                  <option key={c} value={c}>{channelLabel(c)}</option>
+                  <SelectItem key={c} value={String(c)}>
+                    {channelLabel(c)}
+                  </SelectItem>
                 ))}
-              </Select>
+              </SelectField>
             </Field>
             <Field label="Account name" htmlFor="pmname">
-              <Input id="pmname" value={draft.accountName} onChange={(e) => setDraft({ ...draft, accountName: e.target.value })} />
+              <Input
+                id="pmname"
+                value={draft.accountName}
+                onChange={(e) =>
+                  setDraft({ ...draft, accountName: e.target.value })
+                }
+              />
             </Field>
             <Field label="Account number" htmlFor="pmnum">
-              <Input id="pmnum" value={draft.accountNumber} onChange={(e) => setDraft({ ...draft, accountNumber: e.target.value })} />
+              <Input
+                id="pmnum"
+                value={draft.accountNumber}
+                onChange={(e) =>
+                  setDraft({ ...draft, accountNumber: e.target.value })
+                }
+              />
             </Field>
             <Field label="Instructions (optional)" htmlFor="pmnote">
-              <Input id="pmnote" value={draft.instructions} onChange={(e) => setDraft({ ...draft, instructions: e.target.value })} />
+              <Input
+                id="pmnote"
+                value={draft.instructions}
+                onChange={(e) =>
+                  setDraft({ ...draft, instructions: e.target.value })
+                }
+              />
             </Field>
             <div className="flex gap-2">
-              <Button size="sm" loading={busy} onClick={() => run(() => sendJson(`/api/owner/venues/${venueId}/payment-methods`, "POST", draft))}>
+              <Button
+                size="sm"
+                loading={busy}
+                onClick={() =>
+                  run(() =>
+                    sendJson(
+                      `/api/owner/venues/${venueId}/payment-methods`,
+                      "POST",
+                      draft,
+                    ),
+                  )
+                }
+              >
                 Add method
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setAdding(false)}>Cancel</Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setAdding(false)}
+              >
+                Cancel
+              </Button>
             </div>
-          </div>
+          </Card>
         ) : (
           <Button variant="outline" onClick={() => setAdding(true)}>
             <Plus className="size-4" /> Add payment method
@@ -108,7 +187,14 @@ export function PaymentMethodEditor({
         ))}
 
       {!locked && (
-        <Button size="lg" block onClick={() => { router.push(`/owner/venues/${venueId}/review`); router.refresh(); }}>
+        <Button
+          size="lg"
+          block
+          onClick={() => {
+            router.push(`/owner/venues/${venueId}/review`);
+            router.refresh();
+          }}
+        >
           Continue to review
         </Button>
       )}

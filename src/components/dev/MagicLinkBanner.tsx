@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { KeyRound, X } from "lucide-react";
 
@@ -15,7 +16,9 @@ export function MagicLinkBanner() {
       try {
         const res = await fetch("/api/dev/last-magic-link");
         if (!res.ok) return;
-        const data = (await res.json()) as { links: { email: string; url: string }[] };
+        const data = (await res.json()) as {
+          links: { email: string; url: string }[];
+        };
         if (active) setLink(data.links.at(-1) ?? null);
       } catch {
         /* ignore */
@@ -29,7 +32,12 @@ export function MagicLinkBanner() {
     };
   }, []);
 
-  if (process.env.NODE_ENV === "production" || !link || link.url === dismissedUrl) return null;
+  if (
+    process.env.NODE_ENV === "production" ||
+    !link ||
+    link.url === dismissedUrl
+  )
+    return null;
 
   return (
     <div className="relative z-50 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-b border-amber-200 bg-amber-100 px-4 py-1 text-center text-xs font-medium text-amber-950">
@@ -44,14 +52,15 @@ export function MagicLinkBanner() {
       >
         Open link →
       </a>
-      <button
+      <Button
+        variant="ghost"
         type="button"
         onClick={() => setDismissedUrl(link.url)}
         aria-label="Dismiss magic link"
         className="grid size-11 shrink-0 place-items-center rounded-xl hover:bg-amber-950/10"
       >
         <X className="size-3.5" aria-hidden />
-      </button>
+      </Button>
     </div>
   );
 }

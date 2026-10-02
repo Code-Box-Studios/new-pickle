@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Inbox } from "lucide-react";
@@ -25,12 +26,16 @@ export default async function OwnerReservationsPage({
   const session = await getSession();
   if (!session) redirect("/login?next=/owner");
   const sp = await searchParams;
-  const filter = sp.status && STATUSES[sp.status] !== undefined ? sp.status : "action";
+  const filter =
+    sp.status && STATUSES[sp.status] !== undefined ? sp.status : "action";
 
   const ids = await accessibleVenueIds(session.id, session.role);
   const statuses = STATUSES[filter];
   const bookings = await prisma.booking.findMany({
-    where: { venueId: { in: ids }, ...(statuses ? { status: { in: statuses } } : {}) },
+    where: {
+      venueId: { in: ids },
+      ...(statuses ? { status: { in: statuses } } : {}),
+    },
     include: { venue: true, court: true },
     orderBy: { createdAt: "desc" },
     take: 100,
@@ -41,19 +46,34 @@ export default async function OwnerReservationsPage({
       <h1 className="page-title">Reservations</h1>
 
       <div className="mt-6 overflow-x-auto pb-1">
-        <nav aria-label="Reservation status" className="inline-flex min-w-max gap-1 rounded-2xl border border-line bg-surface p-1.5 text-sm font-medium">
+        <nav
+          aria-label="Reservation status"
+          className="inline-flex min-w-max gap-1 rounded-lg border border-line bg-surface p-1.5 text-sm font-medium"
+        >
           {(["action", "confirmed", "all"] as const).map((f) => (
-            <Link
+            <Button
               key={f}
-              href={`/owner/reservations?status=${f}`}
-              aria-current={filter === f ? "page" : undefined}
+              asChild
+              variant="ghost"
               className={cn(
+                "h-auto p-0",
                 "flex min-h-11 items-center rounded-xl px-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
-                filter === f ? "bg-brand-700 text-white shadow-sm" : "text-ink-soft hover:bg-canvas",
+                filter === f
+                  ? "bg-brand-700 text-white shadow-sm"
+                  : "text-ink-soft hover:bg-canvas",
               )}
             >
-              {f === "action" ? "Needs action" : f === "confirmed" ? "Confirmed" : "All"}
-            </Link>
+              <Link
+                href={`/owner/reservations?status=${f}`}
+                aria-current={filter === f ? "page" : undefined}
+              >
+                {f === "action"
+                  ? "Needs action"
+                  : f === "confirmed"
+                    ? "Confirmed"
+                    : "All"}
+              </Link>
+            </Button>
           ))}
         </nav>
       </div>

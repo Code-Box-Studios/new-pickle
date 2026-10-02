@@ -1,5 +1,8 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Upload } from "lucide-react";
@@ -80,56 +83,71 @@ export function PaymentStep({
         <HoldCountdown expiresAt={expiresAt} />
       </div>
 
-      <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+      <Card className="rounded-lg border border-brand-100 bg-brand-50 p-5">
         <p className="break-words text-sm leading-6 text-brand-800">
-          Payment is made <strong>directly to {venueName}</strong>. RallyPoint never
-          holds your money. Send the exact amount, then upload your screenshot below.
+          Payment is made <strong>directly to {venueName}</strong>. RallyPoint
+          never holds your money. Send the exact amount, then upload your
+          screenshot below.
         </p>
-        <p className="mt-4 text-3xl font-semibold tracking-tight text-ink">{pesos(amountCents)}</p>
-      </div>
+        <p className="mt-4 text-3xl font-medium tracking-tight text-ink">
+          {pesos(amountCents)}
+        </p>
+      </Card>
 
       <fieldset className="space-y-3">
         <legend className="mb-3 text-sm font-medium text-ink">Pay via</legend>
         {methods.length === 0 && (
-          <p className="text-sm leading-6 text-muted">
+          <p className="text-sm leading-6 text-muted-foreground">
             This venue hasn&apos;t configured a payment method yet.
           </p>
         )}
-        {methods.map((m) => (
-          <label
-            key={m.id}
-            className={cn(
-              "block cursor-pointer rounded-2xl border p-4 transition-colors duration-150 focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2",
-              methodId === m.id
-                ? "border-brand-700 bg-brand-50"
-                : "border-line bg-surface hover:border-brand-200 hover:bg-mist/50",
-            )}
-          >
-            <span className="flex items-start gap-3">
-              <input
-                type="radio"
-                name="method"
-                className="mt-1 size-4 shrink-0 accent-brand-700 focus-visible:outline-none"
-                checked={methodId === m.id}
-                onChange={() => setMethodId(m.id)}
-              />
-              <span className="min-w-0">
-                <span className="block text-sm font-semibold leading-6 text-ink">
-                  {channelLabel(m.channel)}
+        <RadioGroup
+          name="method"
+          value={methodId}
+          onValueChange={setMethodId}
+          aria-label="Pay via"
+        >
+          {methods.map((m) => (
+            <Label
+              key={m.id}
+              htmlFor={`method-${m.id}`}
+              className={cn(
+                "block cursor-pointer rounded-lg border p-4 transition-colors duration-150 focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2",
+                methodId === m.id
+                  ? "border-brand-700 bg-brand-50"
+                  : "border-line bg-surface hover:border-brand-200 hover:bg-mist/50",
+              )}
+            >
+              <span className="flex items-start gap-3">
+                <RadioGroupItem
+                  id={`method-${m.id}`}
+                  value={m.id}
+                  className="mt-1"
+                />
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold leading-6 text-ink">
+                    {channelLabel(m.channel)}
+                  </span>
+                  <span className="mt-1 block break-words text-sm leading-6 text-ink-soft">
+                    {m.accountName} · {m.accountNumber}
+                  </span>
+                  {m.instructions && (
+                    <span className="mt-2 block break-words text-sm leading-6 text-muted-foreground">
+                      {m.instructions}
+                    </span>
+                  )}
                 </span>
-                <span className="mt-1 block break-words text-sm leading-6 text-ink-soft">
-                  {m.accountName} · {m.accountNumber}
-                </span>
-                {m.instructions && (
-                  <span className="mt-2 block break-words text-sm leading-6 text-muted">{m.instructions}</span>
-                )}
               </span>
-            </span>
-          </label>
-        ))}
+            </Label>
+          ))}
+        </RadioGroup>
       </fieldset>
 
-      <Field label="Payment reference number" htmlFor="payref" hint="From your GCash/Maya receipt.">
+      <Field
+        label="Payment reference number"
+        htmlFor="payref"
+        hint="From your GCash/Maya receipt."
+      >
         <Input
           id="payref"
           required
@@ -140,8 +158,13 @@ export function PaymentStep({
       </Field>
 
       <div className="space-y-2">
-        <span id="payment-screenshot-label" className="block text-sm font-medium text-ink">Payment screenshot</span>
-        <label
+        <span
+          id="payment-screenshot-label"
+          className="block text-sm font-medium text-ink"
+        >
+          Payment screenshot
+        </span>
+        <Label
           htmlFor="payment-screenshot"
           className="flex min-h-20 cursor-pointer items-center gap-3 rounded-xl border border-dashed border-brand-200 bg-mist/40 p-4 transition-colors duration-150 hover:bg-mist focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2 sm:p-5"
         >
@@ -149,7 +172,7 @@ export function PaymentStep({
           <span className="min-w-0 break-words text-sm leading-6 text-ink-soft">
             {file ? file.name : "Tap to upload JPG, PNG, or WebP (max 5 MB)"}
           </span>
-          <input
+          <Input
             id="payment-screenshot"
             type="file"
             accept="image/jpeg,image/png,image/webp"
@@ -157,19 +180,28 @@ export function PaymentStep({
             aria-labelledby="payment-screenshot-label"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />
-        </label>
+        </Label>
       </div>
 
       {error && (
-        <p role="alert" className="break-words rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
+        <p
+          role="alert"
+          className="break-words rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
+        >
           {error}
         </p>
       )}
 
-      <Button type="submit" size="lg" block loading={submitting} disabled={expired}>
+      <Button
+        type="submit"
+        size="lg"
+        block
+        loading={submitting}
+        disabled={expired}
+      >
         {expired ? "Hold expired" : "Submit payment"}
       </Button>
-      <p className="text-center text-sm leading-6 text-muted">
+      <p className="text-center text-sm leading-6 text-muted-foreground">
         The venue confirms within their stated window — we&apos;ll notify you.
       </p>
     </form>

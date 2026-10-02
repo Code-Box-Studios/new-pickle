@@ -1,5 +1,8 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
+import { SelectField, SelectItem } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Smartphone, X, Copy } from "lucide-react";
 
@@ -60,7 +63,8 @@ export function ShareToPhonePanel() {
     // or the summary text. md+ (no bottom nav): labeled pill, bottom-right.
     return (
       <div className="fixed bottom-16 left-3 z-20 flex items-center gap-1 md:bottom-3 md:left-auto md:right-3 md:z-[80]">
-        <button
+        <Button
+          variant="ghost"
           type="button"
           onClick={share}
           aria-label="Share to phone"
@@ -68,8 +72,9 @@ export function ShareToPhonePanel() {
         >
           <Smartphone className="size-4" aria-hidden />
           <span className="hidden md:inline">Share to phone</span>
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
           type="button"
           onClick={() => setDismissed(true)}
           aria-label="Hide"
@@ -77,43 +82,43 @@ export function ShareToPhonePanel() {
           className="rounded-full bg-ink/80 p-1.5 text-white shadow-lg hover:bg-ink"
         >
           <X className="size-3.5" aria-hidden />
-        </button>
+        </Button>
       </div>
     );
   }
 
-  const current =
-    info?.candidates.find((c) => c.address === selected) ?? null;
+  const current = info?.candidates.find((c) => c.address === selected) ?? null;
 
   return (
-    <div className="fixed bottom-16 right-3 z-[90] w-64 rounded-xl border border-black/10 bg-white p-3 text-center shadow-xl md:bottom-3">
+    <Card className="fixed bottom-16 right-3 z-[90] w-64 rounded-xl border border-black/10 bg-white p-3 text-center shadow-xl md:bottom-3">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-xs font-semibold text-ink">
           Scan to open on your phone
         </span>
-        <button
+        <Button
+          variant="ghost"
           type="button"
           onClick={() => setOpen(false)}
           aria-label="Close"
           className="rounded p-0.5 hover:bg-black/5"
         >
           <X className="size-4" aria-hidden />
-        </button>
+        </Button>
       </div>
 
       {info?.error || !current ? (
         <div className="py-6">
           <p className="text-xs text-ink/60">
-            {info?.error ??
-              "You don't appear to be on a Wi-Fi/LAN network."}
+            {info?.error ?? "You don't appear to be on a Wi-Fi/LAN network."}
           </p>
-          <button
+          <Button
+            variant="ghost"
             type="button"
             onClick={share}
             className="mt-3 rounded-full bg-ink px-3 py-1.5 text-xs font-semibold text-white hover:bg-ink/90"
           >
             Try again
-          </button>
+          </Button>
         </div>
       ) : (
         <>
@@ -124,28 +129,29 @@ export function ShareToPhonePanel() {
             className="mx-auto size-40"
           />
           {info!.candidates.length > 1 && (
-            <select
+            <SelectField
               value={selected ?? ""}
-              onChange={(e) => setSelected(e.target.value)}
+              onValueChange={(value) => setSelected(value)}
               className="mt-2 w-full rounded border border-black/10 px-1.5 py-1 text-xs"
             >
               {info!.candidates.map((c) => (
-                <option key={c.address} value={c.address}>
+                <SelectItem key={c.address} value={String(c.address)}>
                   {c.iface} — {c.address}
-                </option>
+                </SelectItem>
               ))}
-            </select>
+            </SelectField>
           )}
           <div className="mt-2 flex items-center justify-center gap-1.5">
             <span className="truncate text-xs text-ink/70">{current.url}</span>
-            <button
+            <Button
+              variant="ghost"
               type="button"
               onClick={() => navigator.clipboard?.writeText(current.url)}
               aria-label="Copy URL"
               className="rounded p-0.5 hover:bg-black/5"
             >
               <Copy className="size-3.5" aria-hidden />
-            </button>
+            </Button>
           </div>
           <p className="mt-2 text-[10px] leading-tight text-ink/50">
             Phone must be on the same Wi-Fi. First time on Windows, allow Node
@@ -153,6 +159,6 @@ export function ShareToPhonePanel() {
           </p>
         </>
       )}
-    </div>
+    </Card>
   );
 }

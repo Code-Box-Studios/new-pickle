@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Select } from "@/components/ui/select";
+import { SelectField, SelectItem } from "@/components/ui/select";
 import type { OwnerVenueRef } from "@/lib/venue/owner-context";
 
 export function VenueSwitcher({
@@ -17,21 +17,25 @@ export function VenueSwitcher({
 
   if (venues.length <= 1) return null;
 
-  function onChange(e: React.ChangeEvent<HTMLSelectElement>) {
+  function onChange(value: string) {
     const p = new URLSearchParams(sp.toString());
-    p.set("venue", e.target.value);
+    p.set("venue", value);
     router.push(`${pathname}?${p.toString()}`);
   }
 
   return (
     <div className="w-full sm:w-64">
-      <Select value={activeId} onChange={onChange} aria-label="Select venue">
+      <SelectField
+        value={activeId}
+        onValueChange={onChange}
+        aria-label="Select venue"
+      >
         {venues.map((v) => (
-          <option key={v.id} value={v.id}>
+          <SelectItem key={v.id} value={String(v.id)}>
             {v.name}
-          </option>
+          </SelectItem>
         ))}
-      </Select>
+      </SelectField>
     </div>
   );
 }

@@ -1,7 +1,15 @@
 import * as React from "react";
 import Link from "next/link";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from "./empty";
 import { cn } from "@/lib/cn";
-import { Button, buttonVariants } from "./button";
+import { Button } from "./button";
 
 export function EmptyState({
   icon,
@@ -17,22 +25,29 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={cn("mx-auto max-w-md px-4 py-16 text-center sm:py-20", className)}>
-      {icon && (
-        <div className="mx-auto mb-5 grid size-16 place-items-center rounded-2xl bg-mist text-brand-700">
-          {icon}
-        </div>
-      )}
-      <h2 className="text-xl font-semibold tracking-tight text-ink">{title}</h2>
-      {description && <p className="mt-3 text-sm leading-relaxed text-muted">{description}</p>}
+    <Empty className={cn("mx-auto max-w-md py-16 sm:py-20", className)}>
+      <EmptyHeader>
+        {icon && (
+          <EmptyMedia
+            variant="icon"
+            className="size-16 bg-secondary text-brand-700"
+          >
+            {icon}
+          </EmptyMedia>
+        )}
+        <EmptyTitle>
+          <h2 className="text-xl font-medium">{title}</h2>
+        </EmptyTitle>
+        {description && <EmptyDescription>{description}</EmptyDescription>}
+      </EmptyHeader>
       {action && (
-        <div className="mt-6">
-          <Link href={action.href} className={buttonVariants({size: "lg"})}>
-            {action.label}
-          </Link>
-        </div>
+        <EmptyContent>
+          <Button asChild size="lg">
+            <Link href={action.href}>{action.label}</Link>
+          </Button>
+        </EmptyContent>
       )}
-    </div>
+    </Empty>
   );
 }
 
@@ -48,7 +63,11 @@ export function ErrorState({
   return (
     <div role="alert" className="mx-auto max-w-md px-4 py-16 text-center">
       <h2 className="text-lg font-semibold text-ink">{title}</h2>
-      {description && <p className="mt-3 text-sm leading-relaxed text-muted">{description}</p>}
+      {description && (
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+      )}
       {onRetry && (
         <Button variant="outline" className="mt-5" onClick={onRetry}>
           Try again

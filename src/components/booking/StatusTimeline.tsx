@@ -15,13 +15,24 @@ export function StatusTimeline({
       {history.map((h, i) => (
         <li key={i} className="flex gap-4">
           <div className="flex shrink-0 flex-col items-center">
-            <span className="mt-1.5 size-2 rounded-full bg-brand-700" aria-hidden />
-            {i < history.length - 1 && <span className="mt-2 w-px flex-1 bg-line" aria-hidden />}
+            <span
+              className="mt-1.5 size-2 rounded-full bg-brand-700"
+              aria-hidden
+            />
+            {i < history.length - 1 && (
+              <span className="mt-2 w-px flex-1 bg-line" aria-hidden />
+            )}
           </div>
           <div className="min-w-0 pb-1">
-            <p className="text-sm font-medium leading-6 text-ink">{humanize(h.toStatus)}</p>
-            {h.note && <p className="mt-1 break-words text-sm leading-6 text-muted">{h.note}</p>}
-            <p className="mt-1 text-sm leading-6 text-muted">
+            <p className="text-sm font-medium leading-6 text-ink">
+              {humanize(h.toStatus)}
+            </p>
+            {h.note && (
+              <p className="mt-1 break-words text-sm leading-6 text-muted-foreground">
+                {h.note}
+              </p>
+            )}
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
               {dateLabel(h.at)} · {timeLabel(h.at)}
             </p>
           </div>

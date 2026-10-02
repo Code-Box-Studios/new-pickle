@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -12,7 +13,14 @@ import { DateRail } from "@/components/court/DateRail";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { DURATIONS } from "@/lib/search-params";
-import { dateLabel, isoDate, longDateLabel, parseIsoDate, pesos, weekdayLabel } from "@/lib/format";
+import {
+  dateLabel,
+  isoDate,
+  longDateLabel,
+  parseIsoDate,
+  pesos,
+  weekdayLabel,
+} from "@/lib/format";
 import { venueJsonLd } from "@/lib/seo";
 import { venueMapUrl } from "@/lib/location/maps";
 import { venueRatingSummary, listVenueReviews } from "@/lib/review";
@@ -60,7 +68,8 @@ export async function generateMetadata({
     venue.description ??
     `Book a pickleball court at ${venue.name} in ${venue.city}.`;
   // Don't leak an unpublished venue's name or let it get indexed.
-  if (!isLive(venue)) return { title: "Venue preview", robots: { index: false, follow: false } };
+  if (!isLive(venue))
+    return { title: "Venue preview", robots: { index: false, follow: false } };
   return {
     title: venue.name,
     description: desc,
@@ -84,7 +93,8 @@ export default async function VenuePage({
   const session = await getSession();
   const live = isLive(venue);
   if (!live) {
-    const canPreview = !!session && (session.id === venue.ownerId || session.role === "ADMIN");
+    const canPreview =
+      !!session && (session.id === venue.ownerId || session.role === "ADMIN");
     if (!canPreview) notFound();
   }
 
@@ -134,7 +144,11 @@ export default async function VenuePage({
     const d = new Date();
     d.setUTCHours(0, 0, 0, 0);
     d.setUTCDate(d.getUTCDate() + i);
-    return { iso: isoDate(d), weekday: weekdayLabel(d).slice(0, 3), label: dateLabel(d) };
+    return {
+      iso: isoDate(d),
+      weekday: weekdayLabel(d).slice(0, 3),
+      label: dateLabel(d),
+    };
   });
   const selectedDateLabel = `${weekdayLabel(date).slice(0, 3)}, ${dateLabel(date)}`;
 
@@ -148,20 +162,22 @@ export default async function VenuePage({
     <div className="mx-auto max-w-7xl pb-44 md:pb-28">
       {/* Preview banner */}
       {!live && (
-        <div className="mx-4 mb-5 mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900 md:mx-6 lg:mx-8">
-          Preview — this venue isn&apos;t live yet. Only you and admins can see this page.
+        <div className="mx-4 mb-5 mt-5 rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900 md:mx-6 lg:mx-8">
+          Preview — this venue isn&apos;t live yet. Only you and admins can see
+          this page.
         </div>
       )}
       {live && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(venueJsonLd(venue)) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(venueJsonLd(venue)),
+          }}
         />
       )}
 
       {/* Two-column layout: left = venue info, right = booking schedule */}
       <div className="md:flex md:items-start md:gap-0 md:px-6 md:pt-8 lg:px-8 lg:pt-10">
-
         {/* ── LEFT: venue info ─────────────────────────────────── */}
         <div className="md:sticky md:top-24 md:max-h-[calc(100dvh-7rem)] md:w-[320px] md:shrink-0 md:overflow-y-auto md:border-r md:border-line md:pr-6 md:[scrollbar-width:none] lg:pr-7">
           {/* Gallery — full-bleed on mobile, contained on md+ */}
@@ -170,16 +186,19 @@ export default async function VenuePage({
           {/* Hero */}
           <div className="px-4 pt-6 md:px-0">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
-              <h1 className="w-full break-words text-[28px] font-semibold leading-tight tracking-tight text-ink">
+              <h1 className="w-full break-words text-[28px] font-medium leading-tight tracking-tight text-ink">
                 {venue.name}
               </h1>
               <Badge tone="brand" className="gap-1.5 px-2.5 py-1 text-xs">
                 <ShieldCheck className="size-3.5" aria-hidden /> Verified
               </Badge>
             </div>
-            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
+            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
               <span className="flex items-center gap-1 text-ink-soft">
-                <Star className="size-4 fill-amber-400 text-amber-400" aria-hidden />
+                <Star
+                  className="size-4 fill-brand-700 text-brand-700"
+                  aria-hidden
+                />
                 <span className="font-semibold text-ink">
                   {ratingSummary.avg.toFixed(1)}
                 </span>
@@ -187,7 +206,8 @@ export default async function VenuePage({
               </span>
               {minPriceCents !== null && (
                 <span className="font-medium text-ink-soft">
-                  From <span className="text-ink">{pesos(minPriceCents)}</span>/hr
+                  From <span className="text-ink">{pesos(minPriceCents)}</span>
+                  /hr
                 </span>
               )}
               <span className="flex w-full items-start gap-1.5 break-words leading-6">
@@ -207,14 +227,17 @@ export default async function VenuePage({
           {ratingSummary.count > 0 && (
             <div className="px-4 pb-7 md:px-0">
               <h2 className="section-title">Reviews</h2>
-              <ReviewsSection ratingSummary={ratingSummary} recentReviews={recentReviews} />
+              <ReviewsSection
+                ratingSummary={ratingSummary}
+                recentReviews={recentReviews}
+              />
             </div>
           )}
         </div>
 
         {/* ── RIGHT: booking schedule ───────────────────────────── */}
         <div className="min-w-0 flex-1 border-t border-line pt-7 md:border-t-0 md:pl-6 md:pt-0 lg:pl-7">
-          <h2 className="mb-5 px-4 text-2xl font-semibold tracking-tight text-ink md:px-0">
+          <h2 className="mb-5 px-4 text-2xl font-medium tracking-tight text-ink md:px-0">
             Book a court
           </h2>
           {/* DateRail — full-bleed on mobile (no outer px) */}
@@ -229,24 +252,34 @@ export default async function VenuePage({
 
           <div className="px-4 md:px-0">
             {/* Duration pills */}
-            <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Booking duration">
+            <div
+              className="mt-4 flex flex-wrap gap-2"
+              role="group"
+              aria-label="Booking duration"
+            >
               {DURATIONS.map((dur) => {
                 const active = dur.value === duration;
                 return (
-                  <Link
+                  <Button
                     key={dur.value}
-                    href={`/venues/${venue.slug}?date=${dateStr}&duration=${dur.value}`}
-                    scroll={false}
-                    aria-current={active ? "true" : undefined}
+                    asChild
+                    variant="ghost"
                     className={cn(
+                      "h-auto p-0",
                       "inline-flex min-h-11 items-center justify-center rounded-xl border px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
                       active
                         ? "border-brand-300 bg-brand-50 text-brand-800"
                         : "border-line bg-surface text-ink-soft hover:border-brand-300 hover:bg-mist",
                     )}
                   >
-                    {dur.label}
-                  </Link>
+                    <Link
+                      href={`/venues/${venue.slug}?date=${dateStr}&duration=${dur.value}`}
+                      scroll={false}
+                      aria-current={active ? "true" : undefined}
+                    >
+                      {dur.label}
+                    </Link>
+                  </Button>
                 );
               })}
             </div>
@@ -300,7 +333,9 @@ function HomeTab({
       {venue.description && (
         <section>
           <h2 className="section-title">About</h2>
-          <p className="mt-3 break-words text-sm leading-6 text-ink-soft">{venue.description}</p>
+          <p className="mt-3 break-words text-sm leading-6 text-ink-soft">
+            {venue.description}
+          </p>
         </section>
       )}
       {venue.amenities.length > 0 && (
@@ -317,12 +352,22 @@ function HomeTab({
           <ul className="mt-3 space-y-2 text-sm">
             {WEEKDAY_ORDER.map((wd) => {
               const h = hoursByDay.get(wd);
-              const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+              const names = [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+              ];
               return (
                 <li key={wd} className="flex justify-between gap-3">
                   <span className="text-ink-soft">{names[wd]}</span>
-                  <span className="text-right tabular-nums text-muted">
-                    {h ? `${minuteLabel(h.open)} – ${minuteLabel(h.close)}` : "Closed"}
+                  <span className="text-right tabular-nums text-muted-foreground">
+                    {h
+                      ? `${minuteLabel(h.open)} – ${minuteLabel(h.close)}`
+                      : "Closed"}
                   </span>
                 </li>
               );
@@ -336,7 +381,10 @@ function HomeTab({
           <ul className="mt-3 space-y-2 text-sm text-ink-soft">
             {venue.contactNumber && (
               <li>
-                <a href={`tel:${venue.contactNumber}`} className="inline-flex min-h-11 items-center rounded-lg text-brand-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">
+                <a
+                  href={`tel:${venue.contactNumber}`}
+                  className="inline-flex min-h-11 items-center rounded-lg text-brand-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                >
                   {venue.contactNumber}
                 </a>
               </li>
@@ -375,7 +423,9 @@ function HomeTab({
       {venue.houseRules && (
         <section>
           <h2 className="section-title">House rules</h2>
-          <p className="mt-3 whitespace-pre-line break-words text-sm leading-6 text-ink-soft">{venue.houseRules}</p>
+          <p className="mt-3 whitespace-pre-line break-words text-sm leading-6 text-ink-soft">
+            {venue.houseRules}
+          </p>
         </section>
       )}
     </div>
@@ -387,26 +437,55 @@ function ReviewsSection({
   ratingSummary,
   recentReviews,
 }: {
-  ratingSummary: { avg: number; count: number; distribution: Record<1 | 2 | 3 | 4 | 5, number> };
-  recentReviews: Array<{ id: string; rating: number; authorName: string; createdAt: Date; body: string | null }>;
+  ratingSummary: {
+    avg: number;
+    count: number;
+    distribution: Record<1 | 2 | 3 | 4 | 5, number>;
+  };
+  recentReviews: Array<{
+    id: string;
+    rating: number;
+    authorName: string;
+    createdAt: Date;
+    body: string | null;
+  }>;
 }) {
   return (
     <div className="mt-4">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-4">
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-semibold tracking-tight text-ink">{ratingSummary.avg.toFixed(1)}</span>
+          <span className="text-3xl font-medium tracking-tight text-ink">
+            {ratingSummary.avg.toFixed(1)}
+          </span>
           <Stars value={ratingSummary.avg} />
-          <span className="text-sm text-muted">{ratingSummary.count} reviews</span>
+          <span className="text-sm text-muted-foreground">
+            {ratingSummary.count} reviews
+          </span>
         </div>
-        <ul className="min-w-[10rem] flex-1 space-y-1.5" aria-label="Rating distribution">
+        <ul
+          className="min-w-[10rem] flex-1 space-y-1.5"
+          aria-label="Rating distribution"
+        >
           {[5, 4, 3, 2, 1].map((n) => {
             const c = ratingSummary.distribution[n as 1 | 2 | 3 | 4 | 5];
-            const pct = ratingSummary.count ? Math.round((c / ratingSummary.count) * 100) : 0;
+            const pct = ratingSummary.count
+              ? Math.round((c / ratingSummary.count) * 100)
+              : 0;
             return (
-              <li key={n} className="flex items-center gap-2 text-xs text-muted" aria-label={`${n} stars: ${c} reviews`}>
+              <li
+                key={n}
+                className="flex items-center gap-2 text-xs text-muted-foreground"
+                aria-label={`${n} stars: ${c} reviews`}
+              >
                 <span className="w-3 text-right">{n}</span>
-                <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-line" aria-hidden>
-                  <span className="block h-full rounded-full bg-amber-400" style={{ width: `${pct}%` }} />
+                <span
+                  className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"
+                  aria-hidden
+                >
+                  <span
+                    className="block h-full rounded-full bg-brand-500"
+                    style={{ width: `${pct}%` }}
+                  />
                 </span>
                 <span className="w-5 text-right">{c}</span>
               </li>
@@ -423,9 +502,15 @@ function ReviewsSection({
                   <Stars value={r.rating} />
                   <span className="font-medium text-ink">{r.authorName}</span>
                 </div>
-                <span className="text-xs text-muted">{dateLabel(r.createdAt)}</span>
+                <span className="text-xs text-muted-foreground">
+                  {dateLabel(r.createdAt)}
+                </span>
               </div>
-              {r.body && <p className="mt-3 break-words text-sm leading-6 text-ink-soft">{r.body}</p>}
+              {r.body && (
+                <p className="mt-3 break-words text-sm leading-6 text-ink-soft">
+                  {r.body}
+                </p>
+              )}
             </Card>
           </li>
         ))}

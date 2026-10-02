@@ -25,15 +25,18 @@ export default async function BookPage({
 
   // Already past the pay step → the permanent status page owns it.
   if (
-    ["PAYMENT_SUBMITTED", "PENDING_CONFIRMATION", "CONFIRMED", "COMPLETED", "REJECTED"].includes(
-      b.status,
-    )
+    [
+      "PAYMENT_SUBMITTED",
+      "PENDING_CONFIRMATION",
+      "CONFIRMED",
+      "COMPLETED",
+      "REJECTED",
+    ].includes(b.status)
   ) {
     redirect(`/bookings/${reference}`);
   }
 
-  const expired =
-    !!b.holdExpiresAt && b.holdExpiresAt.getTime() < nowMs();
+  const expired = !!b.holdExpiresAt && b.holdExpiresAt.getTime() < nowMs();
   const dead = b.status === "EXPIRED" || b.status === "CANCELLED" || expired;
 
   return (
@@ -58,10 +61,14 @@ export default async function BookPage({
           {dead ? (
             <Card className="p-6 text-center sm:p-7">
               <h2 className="section-title">Your hold expired</h2>
-              <p className="mt-3 leading-7 text-muted">
-                This slot was released. Pick another time — it only takes a moment.
+              <p className="mt-3 leading-7 text-muted-foreground">
+                This slot was released. Pick another time — it only takes a
+                moment.
               </p>
-              <Link href={`/venues/${b.venue.slug}`} className={`${buttonVariants({ size: "lg" })} mt-5`}>
+              <Link
+                href={`/venues/${b.venue.slug}`}
+                className={`${buttonVariants({ size: "lg" })} mt-5`}
+              >
                 Find another court
               </Link>
             </Card>

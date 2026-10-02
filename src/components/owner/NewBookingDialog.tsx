@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input, Field } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import { SelectField, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { isoAt, hourOptions, minuteLabel } from "./cal-utils";
 
@@ -38,8 +38,12 @@ export function NewBookingDialog({
   const router = useRouter();
   const toast = useToast();
   const hours = hourOptions(openMinute, closeMinute);
-  const [courtId, setCourtId] = useState(prefill?.courtId ?? courts[0]?.id ?? "");
-  const [startMinute, setStartMinute] = useState(prefill?.startMinute ?? hours[0] ?? 8 * 60);
+  const [courtId, setCourtId] = useState(
+    prefill?.courtId ?? courts[0]?.id ?? "",
+  );
+  const [startMinute, setStartMinute] = useState(
+    prefill?.startMinute ?? hours[0] ?? 8 * 60,
+  );
   const [durationH, setDurationH] = useState(1);
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
@@ -66,14 +70,22 @@ export function NewBookingDialog({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast({ title: "Couldn't create booking", description: data.error, tone: "error" });
+        toast({
+          title: "Couldn't create booking",
+          description: data.error,
+          tone: "error",
+        });
         return;
       }
       toast({ title: "Walk-in booked", tone: "success" });
       onOpenChange(false);
       router.refresh();
     } catch {
-      toast({ title: "Network error", description: "Please try again.", tone: "error" });
+      toast({
+        title: "Network error",
+        description: "Please try again.",
+        tone: "error",
+      });
     } finally {
       setBusy(false);
     }
@@ -84,45 +96,83 @@ export function NewBookingDialog({
       <DialogContent title="New walk-in booking">
         <form onSubmit={submit} className="space-y-3">
           <Field label="Court" htmlFor="wb-court">
-            <Select id="wb-court" value={courtId} onChange={(e) => setCourtId(e.target.value)}>
+            <SelectField
+              id="wb-court"
+              value={courtId}
+              onValueChange={(value) => setCourtId(value)}
+            >
               {courts.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+                <SelectItem key={c.id} value={String(c.id)}>
+                  {c.name}
+                </SelectItem>
               ))}
-            </Select>
+            </SelectField>
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Start" htmlFor="wb-start">
-              <Select id="wb-start" value={startMinute} onChange={(e) => setStartMinute(Number(e.target.value))}>
+              <SelectField
+                id="wb-start"
+                value={startMinute}
+                onValueChange={(value) => setStartMinute(Number(value))}
+              >
                 {hours.map((m) => (
-                  <option key={m} value={m}>{minuteLabel(m)}</option>
+                  <SelectItem key={m} value={String(m)}>
+                    {minuteLabel(m)}
+                  </SelectItem>
                 ))}
-              </Select>
+              </SelectField>
             </Field>
             <Field label="Duration" htmlFor="wb-dur">
-              <Select id="wb-dur" value={durationH} onChange={(e) => setDurationH(Number(e.target.value))}>
-                <option value={1}>1 hour</option>
-                <option value={2}>2 hours</option>
-                <option value={3}>3 hours</option>
-              </Select>
+              <SelectField
+                id="wb-dur"
+                value={durationH}
+                onValueChange={(value) => setDurationH(Number(value))}
+              >
+                <SelectItem value={String(1)}>1 hour</SelectItem>
+                <SelectItem value={String(2)}>2 hours</SelectItem>
+                <SelectItem value={String(3)}>3 hours</SelectItem>
+              </SelectField>
             </Field>
           </div>
           <Field label="Customer name" htmlFor="wb-name">
-            <Input id="wb-name" required value={name} onChange={(e) => setName(e.target.value)} />
+            <Input
+              id="wb-name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </Field>
           <Field label="Mobile (optional)" htmlFor="wb-mobile">
-            <Input id="wb-mobile" inputMode="tel" value={mobile} onChange={(e) => setMobile(e.target.value)} />
+            <Input
+              id="wb-mobile"
+              inputMode="tel"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+            />
           </Field>
           <Field label="Paid via" htmlFor="wb-pm">
-            <Select id="wb-pm" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
+            <SelectField
+              id="wb-pm"
+              value={paymentMethod}
+              onValueChange={(value) => setPaymentMethod(value)}
+            >
               {CHANNELS.map((c) => (
-                <option key={c.value} value={c.value}>{c.label}</option>
+                <SelectItem key={c.value} value={String(c.value)}>
+                  {c.label}
+                </SelectItem>
               ))}
-            </Select>
+            </SelectField>
           </Field>
           <Field label="Note (optional)" htmlFor="wb-note">
-            <Input id="wb-note" value={note} onChange={(e) => setNote(e.target.value)} />
+            <Input
+              id="wb-note"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
           </Field>
-          <Button type="submit" size="lg" block loading={busy}>Create booking</Button>
+          <Button type="submit" size="lg" block loading={busy}>
+            Create booking
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

@@ -87,7 +87,11 @@ export function CourtBooking({
       }
       const data = await res.json();
       if (!res.ok) {
-        toast({ title: "Couldn't reserve that slot", description: data.error, tone: "error" });
+        toast({
+          title: "Couldn't reserve that slot",
+          description: data.error,
+          tone: "error",
+        });
         if (res.status === 409) {
           setSelected(null);
           router.refresh();
@@ -96,7 +100,11 @@ export function CourtBooking({
       }
       router.push(`/book/${data.reference}`);
     } catch {
-      toast({ title: "Network error", description: "Please try again.", tone: "error" });
+      toast({
+        title: "Network error",
+        description: "Please try again.",
+        tone: "error",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -122,22 +130,37 @@ export function CourtBooking({
 
       {/* Mobile: court chips + banded slots */}
       <div className="md:hidden">
-        <MobileCourtPicker courts={courts} selected={selected} onSelect={select} />
+        <MobileCourtPicker
+          courts={courts}
+          selected={selected}
+          onSelect={select}
+        />
       </div>
 
       {selected && (
         <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-line bg-surface/95 px-4 py-4 shadow-[0_-8px_32px_-16px_rgba(24,37,31,0.18)] backdrop-blur md:bottom-0 md:pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <div className="mx-auto grid max-w-3xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 sm:flex sm:gap-5">
-            <div className="min-w-0 sm:flex-1" aria-live="polite" aria-atomic="true">
+            <div
+              className="min-w-0 sm:flex-1"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               <p className="truncate text-sm font-semibold text-ink sm:text-base">
                 {selected.courtName} · {selectedDateLabel}
               </p>
-              <p className="mt-1 text-xs text-muted sm:text-sm">
+              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
                 {timeLabel(new Date(selected.startsAt))} · {durationLabel}
               </p>
             </div>
-            <p className="col-start-1 row-start-2 text-base font-semibold text-ink sm:shrink-0 sm:text-lg">{pesos(selected.priceCents)}</p>
-            <Button onClick={reserve} loading={submitting} size="lg" className="col-start-2 row-span-2 row-start-1 shrink-0 px-5 sm:px-6">
+            <p className="col-start-1 row-start-2 text-base font-semibold text-ink sm:shrink-0 sm:text-lg">
+              {pesos(selected.priceCents)}
+            </p>
+            <Button
+              onClick={reserve}
+              loading={submitting}
+              size="lg"
+              className="col-start-2 row-span-2 row-start-1 shrink-0 px-5 sm:px-6"
+            >
               Continue
             </Button>
           </div>

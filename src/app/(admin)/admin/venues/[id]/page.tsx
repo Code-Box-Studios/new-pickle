@@ -1,3 +1,5 @@
+import { cn } from "@/lib/cn";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -9,6 +11,7 @@ import { channelLabel } from "@/lib/payment";
 import { pesos } from "@/lib/format";
 import { Card } from "@/components/ui/card";
 import { SectionHeader } from "@/components/ui/section-header";
+import { VenueImage } from "@/components/venue/VenueImage";
 
 export const metadata = { title: "Admin · Review venue" };
 
@@ -21,7 +24,11 @@ function minuteLabel(min: number): string {
 }
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-export default async function AdminVenueReview({ params }: { params: Promise<{ id: string }> }) {
+export default async function AdminVenueReview({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const v = await prisma.venue.findUnique({
     where: { id },
@@ -40,15 +47,25 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link href="/admin/venues" className="inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-medium text-muted hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
-        <ArrowLeft className="size-4" aria-hidden /> Venues
-      </Link>
+      <Button
+        asChild
+        variant="ghost"
+        className={cn(
+          "h-auto p-0",
+          "inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+        )}
+      >
+        <Link href="/admin/venues">
+          <ArrowLeft className="size-4" aria-hidden /> Venues
+        </Link>
+      </Button>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0 flex-1 basis-64">
           <h1 className="page-title">{v.name}</h1>
-          <p className="mt-3 break-words text-sm leading-relaxed text-muted">
-            {v.owner.email} · {v.barangay ? `${v.barangay}, ` : ""}{v.city}
+          <p className="mt-3 break-words text-sm leading-relaxed text-muted-foreground">
+            {v.owner.email} · {v.barangay ? `${v.barangay}, ` : ""}
+            {v.city}
           </p>
         </div>
         <VenueStatusBadge status={v.status} />
@@ -58,7 +75,9 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
         {v.verification?.submittedNote && (
           <Card className="p-5">
             <SectionHeader>Owner&apos;s note</SectionHeader>
-            <p className="mt-3 break-words text-sm leading-relaxed text-ink-soft">{v.verification.submittedNote}</p>
+            <p className="mt-3 break-words text-sm leading-relaxed text-ink-soft">
+              {v.verification.submittedNote}
+            </p>
           </Card>
         )}
 
@@ -67,8 +86,12 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
             <SectionHeader>Photos</SectionHeader>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {v.photos.slice(0, 6).map((p, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={i} src={p} alt={`Photo ${i + 1}`} className="aspect-square w-full rounded-lg object-cover" />
+                <VenueImage
+                  key={i}
+                  src={p}
+                  alt={`Photo ${i + 1}`}
+                  className="aspect-square w-full rounded-lg object-cover"
+                />
               ))}
             </div>
           </Card>
@@ -77,14 +100,18 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
         {v.description && (
           <Card className="p-5">
             <SectionHeader>Description</SectionHeader>
-            <p className="mt-3 break-words text-sm leading-relaxed text-ink-soft">{v.description}</p>
+            <p className="mt-3 break-words text-sm leading-relaxed text-ink-soft">
+              {v.description}
+            </p>
           </Card>
         )}
 
         {v.amenities.length > 0 && (
           <Card className="p-5">
             <SectionHeader>Amenities</SectionHeader>
-            <div className="mt-3"><Amenities amenities={v.amenities} /></div>
+            <div className="mt-3">
+              <Amenities amenities={v.amenities} />
+            </div>
           </Card>
         )}
 
@@ -93,19 +120,27 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
           <ul className="mt-3 space-y-3 text-sm leading-relaxed text-ink-soft">
             {v.courts.map((c) => (
               <li key={c.id}>
-                {c.name} — {c.indoor ? "Indoor" : "Outdoor"} · {pesos(c.priceCents)}/hr {!c.active && "(inactive)"}
+                {c.name} — {c.indoor ? "Indoor" : "Outdoor"} ·{" "}
+                {pesos(c.priceCents)}/hr {!c.active && "(inactive)"}
               </li>
             ))}
-            {v.courts.length === 0 && <li className="text-muted">No courts.</li>}
+            {v.courts.length === 0 && (
+              <li className="text-muted-foreground">No courts.</li>
+            )}
           </ul>
         </Card>
 
         <Card className="p-5">
           <SectionHeader>Hours</SectionHeader>
           <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-soft">
-            {hours.length === 0 && <li className="text-muted">No hours set.</li>}
+            {hours.length === 0 && (
+              <li className="text-muted-foreground">No hours set.</li>
+            )}
             {hours.map((s) => (
-              <li key={s.id}>{DAYS[s.dayOfWeek]} {minuteLabel(s.openMinute)} – {minuteLabel(s.closeMinute)}</li>
+              <li key={s.id}>
+                {DAYS[s.dayOfWeek]} {minuteLabel(s.openMinute)} –{" "}
+                {minuteLabel(s.closeMinute)}
+              </li>
             ))}
           </ul>
         </Card>
@@ -114,9 +149,13 @@ export default async function AdminVenueReview({ params }: { params: Promise<{ i
           <SectionHeader>Payment methods</SectionHeader>
           <ul className="mt-3 space-y-3 break-words text-sm leading-relaxed text-ink-soft">
             {v.paymentMethods.map((m) => (
-              <li key={m.id}>{channelLabel(m.channel)} · {m.accountName} · {m.accountNumber}</li>
+              <li key={m.id}>
+                {channelLabel(m.channel)} · {m.accountName} · {m.accountNumber}
+              </li>
             ))}
-            {v.paymentMethods.length === 0 && <li className="text-muted">None.</li>}
+            {v.paymentMethods.length === 0 && (
+              <li className="text-muted-foreground">None.</li>
+            )}
           </ul>
         </Card>
 

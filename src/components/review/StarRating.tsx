@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import * as React from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/cn";
@@ -19,7 +20,8 @@ export function StarRating({
   return (
     <div role="radiogroup" aria-label="Rating" className="flex gap-1">
       {[1, 2, 3, 4, 5].map((n) => (
-        <button
+        <Button
+          variant="ghost"
           key={n}
           type="button"
           role="radio"
@@ -32,8 +34,14 @@ export function StarRating({
           onClick={() => onChange(n)}
           className="rounded p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
         >
-          <Star className={cn(px, n <= shown ? "fill-amber-400 text-amber-400" : "text-slate-300")} aria-hidden />
-        </button>
+          <Star
+            className={cn(
+              px,
+              n <= shown ? "fill-brand-700 text-brand-700" : "text-slate-300",
+            )}
+            aria-hidden
+          />
+        </Button>
       ))}
     </div>
   );

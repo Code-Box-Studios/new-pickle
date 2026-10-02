@@ -1,16 +1,17 @@
+import { VenueImage } from "./VenueImage";
+
 export function Gallery({ photos, name }: { photos: string[]; name: string }) {
   if (photos.length === 0) {
     return (
-      <div className="grid aspect-[4/3] w-full place-items-center rounded-b-[20px] bg-mist text-sm text-muted sm:rounded-2xl">
+      <div className="grid aspect-[4/3] w-full place-items-center rounded-b-lg bg-mist text-sm text-muted-foreground sm:rounded-lg">
         No photos yet
       </div>
     );
   }
   const [hero] = photos;
   return (
-    <div className="court-photo-frame relative overflow-hidden rounded-b-[20px] sm:rounded-2xl">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+    <div className="court-photo-frame relative overflow-hidden rounded-b-lg sm:rounded-lg">
+      <VenueImage
         src={hero}
         alt={name}
         className="court-photo-image aspect-[4/3] w-full object-cover"

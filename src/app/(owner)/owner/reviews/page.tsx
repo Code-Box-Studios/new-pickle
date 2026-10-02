@@ -21,7 +21,9 @@ export default async function OwnerReviewsPage() {
   return (
     <div>
       <h1 className="page-title">Reviews</h1>
-      <p className="page-description mt-3">What players say about your venues.</p>
+      <p className="page-description mt-3">
+        What players say about your venues.
+      </p>
 
       {reviews.length === 0 ? (
         <div className="mt-6">
@@ -41,12 +43,22 @@ export default async function OwnerReviewsPage() {
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex min-w-0 flex-wrap items-center gap-3 text-sm">
                       <Stars value={r.rating} />
-                      <span className="font-medium text-ink">{r.authorName}</span>
+                      <span className="font-medium text-ink">
+                        {r.authorName}
+                      </span>
                     </div>
-                    <span className="text-xs text-muted">{dateLabel(r.createdAt)}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {dateLabel(r.createdAt)}
+                    </span>
                   </div>
-                  <p className="mt-3 text-xs font-semibold text-brand-700">{r.venueName}</p>
-                  {r.body && <p className="mt-3 break-words text-sm leading-relaxed text-ink-soft">{r.body}</p>}
+                  <p className="mt-3 text-xs font-semibold text-brand-700">
+                    {r.venueName}
+                  </p>
+                  {r.body && (
+                    <p className="mt-3 break-words text-sm leading-relaxed text-ink-soft">
+                      {r.body}
+                    </p>
+                  )}
                 </Card>
               </li>
             ))}

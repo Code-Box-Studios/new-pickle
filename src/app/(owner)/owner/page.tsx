@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Ban, CalendarDays, CircleDollarSign, Clock, LayoutGrid, Plus } from "lucide-react";
+import {
+  Ban,
+  CalendarDays,
+  CircleDollarSign,
+  Clock,
+  LayoutGrid,
+  Plus,
+} from "lucide-react";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { resolveOwnerVenues } from "@/lib/venue/owner-context";
@@ -46,35 +53,58 @@ export default async function OwnerDashboard({
   const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60_000);
   const venueId = active.id;
 
-  const [pendingCount, todayCount, activeCourts, revenue, pendingList, upcoming, sched] =
-    await Promise.all([
-      prisma.booking.count({ where: { venueId, status: "PENDING_CONFIRMATION" } }),
-      prisma.booking.count({ where: { venueId, status: { in: OCCUPYING }, startsAt: { gte: dayStart, lt: dayEnd } } }),
-      prisma.court.count({ where: { venueId, active: true } }),
-      prisma.booking.aggregate({
-        _sum: { priceCents: true },
-        where: { venueId, status: { in: ["CONFIRMED", "COMPLETED"] }, startsAt: { gte: dayStart, lt: dayEnd } },
-      }),
-      prisma.booking.findMany({
-        where: { venueId, status: "PENDING_CONFIRMATION" },
-        include: { court: true },
-        orderBy: { startsAt: "asc" },
-        take: 5,
-      }),
-      prisma.booking.findMany({
-        where: { venueId, status: { in: OCCUPYING }, startsAt: { gte: now } },
-        include: { court: true },
-        orderBy: { startsAt: "asc" },
-        take: 5,
-      }),
-      active.status === "APPROVED" ? ownerDaySchedule(venueId, now) : Promise.resolve(null),
-    ]);
+  const [
+    pendingCount,
+    todayCount,
+    activeCourts,
+    revenue,
+    pendingList,
+    upcoming,
+    sched,
+  ] = await Promise.all([
+    prisma.booking.count({
+      where: { venueId, status: "PENDING_CONFIRMATION" },
+    }),
+    prisma.booking.count({
+      where: {
+        venueId,
+        status: { in: OCCUPYING },
+        startsAt: { gte: dayStart, lt: dayEnd },
+      },
+    }),
+    prisma.court.count({ where: { venueId, active: true } }),
+    prisma.booking.aggregate({
+      _sum: { priceCents: true },
+      where: {
+        venueId,
+        status: { in: ["CONFIRMED", "COMPLETED"] },
+        startsAt: { gte: dayStart, lt: dayEnd },
+      },
+    }),
+    prisma.booking.findMany({
+      where: { venueId, status: "PENDING_CONFIRMATION" },
+      include: { court: true },
+      orderBy: { startsAt: "asc" },
+      take: 5,
+    }),
+    prisma.booking.findMany({
+      where: { venueId, status: { in: OCCUPYING }, startsAt: { gte: now } },
+      include: { court: true },
+      orderBy: { startsAt: "asc" },
+      take: 5,
+    }),
+    active.status === "APPROVED"
+      ? ownerDaySchedule(venueId, now)
+      : Promise.resolve(null),
+  ]);
 
   let occupancy = "—";
   if (sched) {
     const cells = sched.courts.flatMap((c) => c.cells);
     const open = cells.filter((c) => c.state !== "CLOSED").length;
-    const busy = cells.filter((c) => ["HELD", "PENDING", "CONFIRMED"].includes(c.state)).length;
+    const busy = cells.filter((c) =>
+      ["HELD", "PENDING", "CONFIRMED"].includes(c.state),
+    ).length;
     occupancy = open > 0 ? `${Math.round((busy / open) * 100)}%` : "—";
   }
 
@@ -89,7 +119,9 @@ export default async function OwnerDashboard({
             <h1 className="page-title">{active.name}</h1>
             <VenueStatusBadge status={active.status} />
             {active.status === "APPROVED" && (
-              <span className="text-xs font-medium text-muted">{live ? "· Live" : "· Not published"}</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                {live ? "· Live" : "· Not published"}
+              </span>
             )}
           </div>
         </div>
@@ -97,93 +129,142 @@ export default async function OwnerDashboard({
       </div>
 
       {active.status !== "APPROVED" ? (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-          This venue isn&apos;t approved yet. Finish setup and get it approved to start taking
-          bookings.{" "}
-          <Link href={`/owner/venues/${active.id}/review`} className="font-semibold underline">
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          This venue isn&apos;t approved yet. Finish setup and get it approved
+          to start taking bookings.{" "}
+          <Link
+            href={`/owner/venues/${active.id}/review`}
+            className="font-semibold underline"
+          >
             Go to setup
           </Link>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5 xl:gap-4">
-            <StatCard icon={<CalendarDays className="size-4" />} label="Today" value={`${todayCount}`} />
+            <StatCard
+              icon={<CalendarDays className="size-4" />}
+              label="Today"
+              value={`${todayCount}`}
+            />
             <StatCard
               icon={<Clock className="size-4" />}
               label="Pending"
               value={`${pendingCount}`}
               urgent={pendingCount > 0}
             />
-            <StatCard icon={<LayoutGrid className="size-4" />} label="Courts" value={`${activeCourts}`} />
-            <StatCard icon={<CircleDollarSign className="size-4" />} label="Revenue" value={pesos(revenue._sum.priceCents ?? 0)} />
-            <StatCard icon={<LayoutGrid className="size-4" />} label="Occupancy" value={occupancy} />
+            <StatCard
+              icon={<LayoutGrid className="size-4" />}
+              label="Courts"
+              value={`${activeCourts}`}
+            />
+            <StatCard
+              icon={<CircleDollarSign className="size-4" />}
+              label="Revenue"
+              value={pesos(revenue._sum.priceCents ?? 0)}
+            />
+            <StatCard
+              icon={<LayoutGrid className="size-4" />}
+              label="Occupancy"
+              value={occupancy}
+            />
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Link href={`/owner/calendar?venue=${venueId}`} className={buttonVariants()}>
+            <Link
+              href={`/owner/calendar?venue=${venueId}`}
+              className={buttonVariants()}
+            >
               <CalendarDays className="size-4" aria-hidden /> Open calendar
             </Link>
-            <Link href={`/owner/calendar?venue=${venueId}&new=1`} className={buttonVariants({ variant: "secondary" })}>
+            <Link
+              href={`/owner/calendar?venue=${venueId}&new=1`}
+              className={buttonVariants({ variant: "secondary" })}
+            >
               <Plus className="size-4" aria-hidden /> New booking
             </Link>
-            <Link href={`/owner/calendar?venue=${venueId}&block=1`} className={buttonVariants({ variant: "outline" })}>
+            <Link
+              href={`/owner/calendar?venue=${venueId}&block=1`}
+              className={buttonVariants({ variant: "outline" })}
+            >
               <Ban className="size-4" aria-hidden /> Block court
             </Link>
           </div>
 
           <div className="grid items-start gap-6 xl:grid-cols-2">
-          <section className="rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-card sm:p-6">
-            <SectionHeader className="mb-5">Needs confirmation ({pendingCount})</SectionHeader>
-            {pendingList.length === 0 ? (
-              <p className="rounded-xl bg-canvas px-4 py-5 text-sm text-muted">Nothing waiting on you. 🎉</p>
-            ) : (
-              <ul className="space-y-2">
-                {pendingList.map((b) => (
-                  <li key={b.id}>
-                    <Card className="flex flex-wrap items-center justify-between gap-3 rounded-xl border-0 bg-canvas p-4 shadow-none">
-                      <div className="min-w-0">
-                        <p className="truncate font-medium text-ink">{b.customerName ?? "Guest"}</p>
-                        <p className="mt-1 text-sm leading-relaxed text-muted">
-                          {b.court.name} · {dateLabel(b.startsAt)} {timeLabel(b.startsAt)}
-                        </p>
-                      </div>
-                      <Link href={`/owner/reservations/${b.reference}`} className={buttonVariants({ size: "sm" })}>
-                        Review
-                      </Link>
-                    </Card>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          <section className="rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-card sm:p-6">
-            <SectionHeader className="mb-5">Upcoming</SectionHeader>
-            {upcoming.length === 0 ? (
-              <p className="rounded-xl bg-canvas px-4 py-5 text-sm text-muted">No upcoming bookings.</p>
-            ) : (
-              <ul className="space-y-2">
-                {upcoming.map((b) => (
-                  <li key={b.id}>
-                    <Card className="flex flex-wrap items-center justify-between gap-3 rounded-xl border-0 bg-canvas p-4 shadow-none">
-                      <div className="min-w-0">
-                        <p className="truncate font-medium text-ink">{b.customerName ?? "Guest"}</p>
-                        <p className="mt-1 text-sm leading-relaxed text-muted">
-                          {b.court.name} · {dateLabel(b.startsAt)} {timeLabel(b.startsAt)}–{timeLabel(b.endsAt)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <BookingStatusBadge status={b.status} />
-                        <Link href={`/owner/reservations/${b.reference}`} className={buttonVariants({ size: "sm", variant: "outline" })}>
-                          View
+            <section className="rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-card sm:p-6">
+              <SectionHeader className="mb-5">
+                Needs confirmation ({pendingCount})
+              </SectionHeader>
+              {pendingList.length === 0 ? (
+                <p className="rounded-xl bg-canvas px-4 py-5 text-sm text-muted-foreground">
+                  Nothing waiting on you. 🎉
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {pendingList.map((b) => (
+                    <li key={b.id}>
+                      <Card className="flex flex-wrap items-center justify-between gap-3 rounded-xl border-0 bg-canvas p-4 shadow-none">
+                        <div className="min-w-0">
+                          <p className="truncate font-medium text-ink">
+                            {b.customerName ?? "Guest"}
+                          </p>
+                          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                            {b.court.name} · {dateLabel(b.startsAt)}{" "}
+                            {timeLabel(b.startsAt)}
+                          </p>
+                        </div>
+                        <Link
+                          href={`/owner/reservations/${b.reference}`}
+                          className={buttonVariants({ size: "sm" })}
+                        >
+                          Review
                         </Link>
-                      </div>
-                    </Card>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+                      </Card>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            <section className="rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-card sm:p-6">
+              <SectionHeader className="mb-5">Upcoming</SectionHeader>
+              {upcoming.length === 0 ? (
+                <p className="rounded-xl bg-canvas px-4 py-5 text-sm text-muted-foreground">
+                  No upcoming bookings.
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {upcoming.map((b) => (
+                    <li key={b.id}>
+                      <Card className="flex flex-wrap items-center justify-between gap-3 rounded-xl border-0 bg-canvas p-4 shadow-none">
+                        <div className="min-w-0">
+                          <p className="truncate font-medium text-ink">
+                            {b.customerName ?? "Guest"}
+                          </p>
+                          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                            {b.court.name} · {dateLabel(b.startsAt)}{" "}
+                            {timeLabel(b.startsAt)}–{timeLabel(b.endsAt)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <BookingStatusBadge status={b.status} />
+                          <Link
+                            href={`/owner/reservations/${b.reference}`}
+                            className={buttonVariants({
+                              size: "sm",
+                              variant: "outline",
+                            })}
+                          >
+                            View
+                          </Link>
+                        </div>
+                      </Card>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
           </div>
         </>
       )}

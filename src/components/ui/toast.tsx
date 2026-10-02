@@ -1,62 +1,32 @@
 "use client";
+import type { ReactNode } from "react";
+import { toast } from "sonner";
+import { Toaster } from "./sonner";
 
-import * as React from "react";
-import * as ToastPrimitive from "@radix-ui/react-toast";
-import { cn } from "@/lib/cn";
-
-type Tone = "default" | "success" | "error";
-type ToastInput = { title: string; description?: string; tone?: Tone };
-type ToastItem = ToastInput & { id: number };
-
-const ToastContext = React.createContext<(t: ToastInput) => void>(() => {});
-
-export function useToast() {
-  return React.useContext(ToastContext);
-}
-
-const TONE_BAR: Record<Tone, string> = {
-  default: "border-l-brand-500",
-  success: "border-l-brand-600",
-  error: "border-l-red-500",
+type ToastInput = {
+  title: string;
+  description?: string;
+  tone?: "default" | "success" | "error";
 };
-
-export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = React.useState<ToastItem[]>([]);
-  const seq = React.useRef(0);
-
-  const push = React.useCallback((t: ToastInput) => {
-    seq.current += 1;
-    const id = seq.current;
-    setItems((prev) => [...prev, { ...t, id }]);
-  }, []);
-
-  const remove = (id: number) => setItems((prev) => prev.filter((i) => i.id !== id));
-
+function notify({ title, description, tone }: ToastInput) {
+  const show =
+    tone === "success" ? toast.success : tone === "error" ? toast.error : toast;
+  show(title, { description });
+}
+export function useToast() {
+  return notify;
+}
+export function ToastProvider({ children }: { children: ReactNode }) {
   return (
-    <ToastContext.Provider value={push}>
-      <ToastPrimitive.Provider swipeDirection="right" duration={5000}>
-        {children}
-        {items.map((item) => (
-          <ToastPrimitive.Root
-            key={item.id}
-            onOpenChange={(open) => !open && remove(item.id)}
-            className={cn(
-              "toast-item rounded-2xl border border-line border-l-4 bg-surface p-5 shadow-elevated",
-              TONE_BAR[item.tone ?? "default"],
-            )}
-          >
-            <ToastPrimitive.Title className="text-sm font-semibold text-ink">
-              {item.title}
-            </ToastPrimitive.Title>
-            {item.description && (
-              <ToastPrimitive.Description className="mt-1 text-sm leading-relaxed text-muted">
-                {item.description}
-              </ToastPrimitive.Description>
-            )}
-          </ToastPrimitive.Root>
-        ))}
-        <ToastPrimitive.Viewport className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-0 z-[100] m-4 flex w-[calc(100vw-2rem)] max-w-sm flex-col gap-3 outline-none lg:bottom-0" />
-      </ToastPrimitive.Provider>
-    </ToastContext.Provider>
+    <>
+      {children}
+      <Toaster
+        position="bottom-right"
+        closeButton
+        duration={5000}
+        offset={24}
+        mobileOffset={{ bottom: 100, left: 16, right: 16 }}
+      />
+    </>
   );
 }

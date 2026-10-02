@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input, Field } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import { SelectField, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { isoAt, hourOptions, minuteLabel } from "./cal-utils";
 
@@ -39,10 +39,16 @@ export function BlockDialog({
   const router = useRouter();
   const toast = useToast();
   const hours = hourOptions(openMinute, closeMinute);
-  const endChoices = [...hours.map((m) => m + 60)].filter((m) => m <= closeMinute);
+  const endChoices = [...hours.map((m) => m + 60)].filter(
+    (m) => m <= closeMinute,
+  );
   const [scope, setScope] = useState(prefill?.courtId ?? "all");
-  const [startMinute, setStartMinute] = useState(prefill?.startMinute ?? hours[0] ?? 8 * 60);
-  const [endMinute, setEndMinute] = useState((prefill?.startMinute ?? hours[0] ?? 8 * 60) + 60);
+  const [startMinute, setStartMinute] = useState(
+    prefill?.startMinute ?? hours[0] ?? 8 * 60,
+  );
+  const [endMinute, setEndMinute] = useState(
+    (prefill?.startMinute ?? hours[0] ?? 8 * 60) + 60,
+  );
   const [type, setType] = useState("MAINTENANCE");
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
@@ -68,14 +74,22 @@ export function BlockDialog({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast({ title: "Couldn't block", description: data.error, tone: "error" });
+        toast({
+          title: "Couldn't block",
+          description: data.error,
+          tone: "error",
+        });
         return;
       }
       toast({ title: "Court blocked", tone: "success" });
       onOpenChange(false);
       router.refresh();
     } catch {
-      toast({ title: "Network error", description: "Please try again.", tone: "error" });
+      toast({
+        title: "Network error",
+        description: "Please try again.",
+        tone: "error",
+      });
     } finally {
       setBusy(false);
     }
@@ -86,40 +100,71 @@ export function BlockDialog({
       <DialogContent title="Block a court">
         <form onSubmit={submit} className="space-y-3">
           <Field label="Court" htmlFor="bk-court">
-            <Select id="bk-court" value={scope} onChange={(e) => setScope(e.target.value)}>
-              <option value="all">All courts (venue-wide)</option>
+            <SelectField
+              id="bk-court"
+              value={scope}
+              onValueChange={(value) => setScope(value)}
+            >
+              <SelectItem value="all">All courts (venue-wide)</SelectItem>
               {courts.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+                <SelectItem key={c.id} value={String(c.id)}>
+                  {c.name}
+                </SelectItem>
               ))}
-            </Select>
+            </SelectField>
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="From" htmlFor="bk-start">
-              <Select id="bk-start" value={startMinute} onChange={(e) => setStartMinute(Number(e.target.value))}>
+              <SelectField
+                id="bk-start"
+                value={startMinute}
+                onValueChange={(value) => setStartMinute(Number(value))}
+              >
                 {hours.map((m) => (
-                  <option key={m} value={m}>{minuteLabel(m)}</option>
+                  <SelectItem key={m} value={String(m)}>
+                    {minuteLabel(m)}
+                  </SelectItem>
                 ))}
-              </Select>
+              </SelectField>
             </Field>
             <Field label="To" htmlFor="bk-end">
-              <Select id="bk-end" value={endMinute} onChange={(e) => setEndMinute(Number(e.target.value))}>
+              <SelectField
+                id="bk-end"
+                value={endMinute}
+                onValueChange={(value) => setEndMinute(Number(value))}
+              >
                 {endChoices.map((m) => (
-                  <option key={m} value={m}>{minuteLabel(m)}</option>
+                  <SelectItem key={m} value={String(m)}>
+                    {minuteLabel(m)}
+                  </SelectItem>
                 ))}
-              </Select>
+              </SelectField>
             </Field>
           </div>
           <Field label="Reason" htmlFor="bk-type">
-            <Select id="bk-type" value={type} onChange={(e) => setType(e.target.value)}>
+            <SelectField
+              id="bk-type"
+              value={type}
+              onValueChange={(value) => setType(value)}
+            >
               {TYPES.map((t) => (
-                <option key={t.value} value={t.value}>{t.label}</option>
+                <SelectItem key={t.value} value={String(t.value)}>
+                  {t.label}
+                </SelectItem>
               ))}
-            </Select>
+            </SelectField>
           </Field>
           <Field label="Note (optional)" htmlFor="bk-reason">
-            <Input id="bk-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Shown on the calendar" />
+            <Input
+              id="bk-reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Shown on the calendar"
+            />
           </Field>
-          <Button type="submit" size="lg" block loading={busy} variant="danger">Block court</Button>
+          <Button type="submit" size="lg" block loading={busy} variant="danger">
+            Block court
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

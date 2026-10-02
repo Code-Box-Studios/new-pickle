@@ -64,7 +64,13 @@ export default async function MyBookingsPage() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="mt-8 sm:mt-10">
       <SectionHeader className="mb-4">{title}</SectionHeader>
@@ -97,21 +103,33 @@ function BookingRow({ b, resumable }: { b: Row; resumable?: boolean }) {
       <Card className="p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 flex-1 basis-44">
-            <p className="break-words text-lg font-semibold tracking-tight text-ink">{b.venue.name}</p>
-            <p className="mt-1 break-words text-sm leading-6 text-muted">{b.court.name}</p>
+            <p className="break-words text-lg font-semibold tracking-tight text-ink">
+              {b.venue.name}
+            </p>
+            <p className="mt-1 break-words text-sm leading-6 text-muted-foreground">
+              {b.court.name}
+            </p>
             <p className="mt-3 text-sm leading-6 text-ink-soft">
-              {dateLabel(b.startsAt)} · {timeLabel(b.startsAt)} – {timeLabel(b.endsAt)} ·{" "}
-              {pesos(b.priceCents)}
+              {dateLabel(b.startsAt)} · {timeLabel(b.startsAt)} –{" "}
+              {timeLabel(b.endsAt)} · {pesos(b.priceCents)}
             </p>
           </div>
-          <div className="shrink-0"><BookingStatusBadge status={b.status} /></div>
+          <div className="shrink-0">
+            <BookingStatusBadge status={b.status} />
+          </div>
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Link href={`/bookings/${b.reference}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+          <Link
+            href={`/bookings/${b.reference}`}
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+          >
             View
           </Link>
           {canResume && (
-            <Link href={`/book/${b.reference}`} className={buttonVariants({ size: "sm" })}>
+            <Link
+              href={`/book/${b.reference}`}
+              className={buttonVariants({ size: "sm" })}
+            >
               Resume
             </Link>
           )}

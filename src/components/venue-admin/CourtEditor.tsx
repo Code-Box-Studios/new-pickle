@@ -1,11 +1,14 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Field } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import { SelectField, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { pesos } from "@/lib/format";
 import { sendJson } from "./api";
@@ -31,7 +34,15 @@ type Draft = {
   active: boolean;
 };
 
-const EMPTY: Draft = { name: "", indoor: true, covered: false, surface: "", capacity: 4, pricePeso: 400, active: true };
+const EMPTY: Draft = {
+  name: "",
+  indoor: true,
+  covered: false,
+  surface: "",
+  capacity: 4,
+  pricePeso: 400,
+  active: true,
+};
 
 function toDraft(c: CourtDTO): Draft {
   return {
@@ -56,34 +67,66 @@ function toPayload(d: Draft) {
   };
 }
 
-function CourtFields({ value, onChange }: { value: Draft; onChange: (d: Draft) => void }) {
+function CourtFields({
+  value,
+  onChange,
+}: {
+  value: Draft;
+  onChange: (d: Draft) => void;
+}) {
   const fieldId = useId();
-  const set = <K extends keyof Draft>(k: K, v: Draft[K]) => onChange({ ...value, [k]: v });
+  const set = <K extends keyof Draft>(k: K, v: Draft[K]) =>
+    onChange({ ...value, [k]: v });
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <Field label="Court name" htmlFor={`${fieldId}-name`}>
-        <Input id={`${fieldId}-name`} value={value.name} onChange={(e) => set("name", e.target.value)} />
+        <Input
+          id={`${fieldId}-name`}
+          value={value.name}
+          onChange={(e) => set("name", e.target.value)}
+        />
       </Field>
       <Field label="Price / hour (₱)" htmlFor={`${fieldId}-price`}>
-        <Input id={`${fieldId}-price`} type="number" min={0} value={value.pricePeso} onChange={(e) => set("pricePeso", Number(e.target.value))} />
+        <Input
+          id={`${fieldId}-price`}
+          type="number"
+          min={0}
+          value={value.pricePeso}
+          onChange={(e) => set("pricePeso", Number(e.target.value))}
+        />
       </Field>
       <Field label="Type" htmlFor={`${fieldId}-type`}>
-        <Select id={`${fieldId}-type`} value={value.indoor ? "indoor" : "outdoor"} onChange={(e) => set("indoor", e.target.value === "indoor")}>
-          <option value="indoor">Indoor</option>
-          <option value="outdoor">Outdoor</option>
-        </Select>
+        <SelectField
+          id={`${fieldId}-type`}
+          value={value.indoor ? "indoor" : "outdoor"}
+          onValueChange={(value) => set("indoor", value === "indoor")}
+        >
+          <SelectItem value="indoor">Indoor</SelectItem>
+          <SelectItem value="outdoor">Outdoor</SelectItem>
+        </SelectField>
       </Field>
       <Field label="Surface" htmlFor={`${fieldId}-surface`}>
-        <Input id={`${fieldId}-surface`} value={value.surface} onChange={(e) => set("surface", e.target.value)} placeholder="e.g. Acrylic" />
+        <Input
+          id={`${fieldId}-surface`}
+          value={value.surface}
+          onChange={(e) => set("surface", e.target.value)}
+          placeholder="e.g. Acrylic"
+        />
       </Field>
-      <label className="flex min-h-11 items-center gap-2 rounded-lg text-sm text-ink-soft">
-        <input type="checkbox" className="size-4 accent-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" checked={value.covered} onChange={(e) => set("covered", e.target.checked)} />
+      <Label className="flex min-h-11 items-center gap-2 rounded-lg text-sm text-ink-soft">
+        <Checkbox
+          checked={value.covered}
+          onCheckedChange={(checked) => set("covered", checked === true)}
+        />
         Covered
-      </label>
-      <label className="flex min-h-11 items-center gap-2 rounded-lg text-sm text-ink-soft">
-        <input type="checkbox" className="size-4 accent-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" checked={value.active} onChange={(e) => set("active", e.target.checked)} />
+      </Label>
+      <Label className="flex min-h-11 items-center gap-2 rounded-lg text-sm text-ink-soft">
+        <Checkbox
+          checked={value.active}
+          onCheckedChange={(checked) => set("active", checked === true)}
+        />
         Active
-      </label>
+      </Label>
     </div>
   );
 }
@@ -100,7 +143,9 @@ export function CourtEditor({
   const router = useRouter();
   const toast = useToast();
   const [adding, setAdding] = useState<Draft | null>(null);
-  const [editing, setEditing] = useState<{ id: string; draft: Draft } | null>(null);
+  const [editing, setEditing] = useState<{ id: string; draft: Draft } | null>(
+    null,
+  );
   const [busy, setBusy] = useState(false);
 
   async function run(fn: () => Promise<unknown>) {
@@ -111,7 +156,11 @@ export function CourtEditor({
       setEditing(null);
       router.refresh();
     } catch (err) {
-      toast({ title: "Couldn't save court", description: (err as Error).message, tone: "error" });
+      toast({
+        title: "Couldn't save court",
+        description: (err as Error).message,
+        tone: "error",
+      });
     } finally {
       setBusy(false);
     }
@@ -124,53 +173,118 @@ export function CourtEditor({
           <li key={c.id} className="rounded-xl border border-black/5 p-3">
             {editing?.id === c.id ? (
               <div className="space-y-3">
-                <CourtFields value={editing.draft} onChange={(draft) => setEditing({ id: c.id, draft })} />
+                <CourtFields
+                  value={editing.draft}
+                  onChange={(draft) => setEditing({ id: c.id, draft })}
+                />
                 <div className="flex gap-2">
-                  <Button size="sm" loading={busy} onClick={() => run(() => sendJson(`/api/owner/venues/${venueId}/courts/${c.id}`, "PATCH", toPayload(editing.draft)))}>
+                  <Button
+                    size="sm"
+                    loading={busy}
+                    onClick={() =>
+                      run(() =>
+                        sendJson(
+                          `/api/owner/venues/${venueId}/courts/${c.id}`,
+                          "PATCH",
+                          toPayload(editing.draft),
+                        ),
+                      )
+                    }
+                  >
                     Save
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => setEditing(null)}>Cancel</Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setEditing(null)}
+                  >
+                    Cancel
+                  </Button>
                 </div>
               </div>
             ) : (
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="break-words font-medium text-ink">
-                    {c.name} {!c.active && <span className="text-xs text-muted">(inactive)</span>}
+                    {c.name}{" "}
+                    {!c.active && (
+                      <span className="text-xs text-muted-foreground">
+                        (inactive)
+                      </span>
+                    )}
                   </p>
-                  <p className="text-xs text-muted">
+                  <p className="text-xs text-muted-foreground">
                     {c.indoor ? "Indoor" : "Outdoor"}
                     {c.covered ? " · Covered" : ""} · {pesos(c.priceCents)}/hr
                   </p>
                 </div>
                 {!locked && (
                   <div className="flex shrink-0 gap-1">
-                    <button type="button" onClick={() => setEditing({ id: c.id, draft: toDraft(c) })} className="grid size-11 shrink-0 place-items-center rounded-xl text-muted hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" aria-label="Edit court">
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      onClick={() =>
+                        setEditing({ id: c.id, draft: toDraft(c) })
+                      }
+                      className="grid size-11 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                      aria-label="Edit court"
+                    >
                       <Pencil className="size-4" />
-                    </button>
-                    <button type="button" onClick={() => run(() => sendJson(`/api/owner/venues/${venueId}/courts/${c.id}`, "DELETE"))} className="grid size-11 shrink-0 place-items-center rounded-xl text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" aria-label="Delete court">
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      onClick={() =>
+                        run(() =>
+                          sendJson(
+                            `/api/owner/venues/${venueId}/courts/${c.id}`,
+                            "DELETE",
+                          ),
+                        )
+                      }
+                      className="grid size-11 shrink-0 place-items-center rounded-xl text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                      aria-label="Delete court"
+                    >
                       <Trash2 className="size-4" />
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
             )}
           </li>
         ))}
-        {courts.length === 0 && <li className="text-sm text-muted">No courts yet — add your first below.</li>}
+        {courts.length === 0 && (
+          <li className="text-sm text-muted-foreground">
+            No courts yet — add your first below.
+          </li>
+        )}
       </ul>
 
       {!locked &&
         (adding ? (
-          <div className="space-y-3 rounded-xl border border-brand-200 bg-brand-50/40 p-3">
+          <Card className="space-y-3 rounded-xl border border-brand-200 bg-brand-50/40 p-3">
             <CourtFields value={adding} onChange={setAdding} />
             <div className="flex gap-2">
-              <Button size="sm" loading={busy} onClick={() => run(() => sendJson(`/api/owner/venues/${venueId}/courts`, "POST", toPayload(adding)))}>
+              <Button
+                size="sm"
+                loading={busy}
+                onClick={() =>
+                  run(() =>
+                    sendJson(
+                      `/api/owner/venues/${venueId}/courts`,
+                      "POST",
+                      toPayload(adding),
+                    ),
+                  )
+                }
+              >
                 Add court
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setAdding(null)}>Cancel</Button>
+              <Button size="sm" variant="ghost" onClick={() => setAdding(null)}>
+                Cancel
+              </Button>
             </div>
-          </div>
+          </Card>
         ) : (
           <Button variant="outline" onClick={() => setAdding({ ...EMPTY })}>
             <Plus className="size-4" /> Add court
@@ -178,7 +292,14 @@ export function CourtEditor({
         ))}
 
       {!locked && (
-        <Button size="lg" block onClick={() => { router.push(`/owner/venues/${venueId}/hours`); router.refresh(); }}>
+        <Button
+          size="lg"
+          block
+          onClick={() => {
+            router.push(`/owner/venues/${venueId}/hours`);
+            router.refresh();
+          }}
+        >
           Continue
         </Button>
       )}

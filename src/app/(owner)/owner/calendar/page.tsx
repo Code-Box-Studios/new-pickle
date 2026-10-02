@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ChevronLeft, ChevronRight, LayoutGrid } from "lucide-react";
@@ -30,7 +31,13 @@ function mondayOf(iso: string): Date {
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ venue?: string; date?: string; view?: string; new?: string; block?: string }>;
+  searchParams: Promise<{
+    venue?: string;
+    date?: string;
+    view?: string;
+    new?: string;
+    block?: string;
+  }>;
 }) {
   const session = await getSession();
   if (!session) redirect("/login?next=/owner/calendar");
@@ -49,9 +56,15 @@ export default async function CalendarPage({
   }
   if (active.status !== "APPROVED") {
     return (
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-        This venue isn&apos;t approved yet — the calendar activates once it&apos;s approved.{" "}
-        <Link href={`/owner/venues/${active.id}/review`} className="font-semibold underline">Go to setup</Link>
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        This venue isn&apos;t approved yet — the calendar activates once
+        it&apos;s approved.{" "}
+        <Link
+          href={`/owner/venues/${active.id}/review`}
+          className="font-semibold underline"
+        >
+          Go to setup
+        </Link>
       </div>
     );
   }
@@ -59,12 +72,23 @@ export default async function CalendarPage({
   const view = sp.view === "week" ? "week" : "day";
   const dateIso = sp.date ?? isoDate(nowDate());
   const base = (params: Record<string, string>) => {
-    const p = new URLSearchParams({ venue: active.id, view, date: dateIso, ...params });
+    const p = new URLSearchParams({
+      venue: active.id,
+      view,
+      date: dateIso,
+      ...params,
+    });
     return `/owner/calendar?${p.toString()}`;
   };
 
-  const daySched = view === "day" ? await ownerDaySchedule(active.id, parseIsoDate(dateIso)) : null;
-  const weekDays = view === "week" ? await ownerWeekAgenda(active.id, mondayOf(dateIso)) : null;
+  const daySched =
+    view === "day"
+      ? await ownerDaySchedule(active.id, parseIsoDate(dateIso))
+      : null;
+  const weekDays =
+    view === "week"
+      ? await ownerWeekAgenda(active.id, mondayOf(dateIso))
+      : null;
 
   return (
     <div className="space-y-6 pb-24 sm:pb-4">
@@ -74,42 +98,127 @@ export default async function CalendarPage({
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <nav aria-label="Calendar view" className="inline-flex gap-1 rounded-2xl border border-line bg-surface p-1.5">
-          <Link href={base({ view: "day" })} aria-current={view === "day" ? "page" : undefined} className={cn("flex min-h-11 items-center rounded-xl px-5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500", view === "day" ? "bg-brand-700 text-white shadow-sm" : "text-ink-soft hover:bg-canvas")}>Day</Link>
-          <Link href={base({ view: "week" })} aria-current={view === "week" ? "page" : undefined} className={cn("flex min-h-11 items-center rounded-xl px-5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500", view === "week" ? "bg-brand-700 text-white shadow-sm" : "text-ink-soft hover:bg-canvas")}>Week</Link>
+        <nav
+          aria-label="Calendar view"
+          className="inline-flex gap-1 rounded-lg border border-line bg-surface p-1.5"
+        >
+          <Button
+            asChild
+            variant="ghost"
+            className={cn(
+              "h-auto p-0",
+              "flex min-h-11 items-center rounded-xl px-5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+              view === "day"
+                ? "bg-brand-700 text-white shadow-sm"
+                : "text-ink-soft hover:bg-canvas",
+            )}
+          >
+            <Link
+              href={base({ view: "day" })}
+              aria-current={view === "day" ? "page" : undefined}
+            >
+              Day
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="ghost"
+            className={cn(
+              "h-auto p-0",
+              "flex min-h-11 items-center rounded-xl px-5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+              view === "week"
+                ? "bg-brand-700 text-white shadow-sm"
+                : "text-ink-soft hover:bg-canvas",
+            )}
+          >
+            <Link
+              href={base({ view: "week" })}
+              aria-current={view === "week" ? "page" : undefined}
+            >
+              Week
+            </Link>
+          </Button>
         </nav>
         <div className="flex items-center gap-2">
-          <Link href={base({ date: shiftIso(dateIso, view === "week" ? -7 : -1) })} className="motion-trigger grid size-11 place-items-center rounded-xl border border-line bg-surface text-ink-soft hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" aria-label="Previous">
-            <ChevronLeft className="motion-arrow size-4" data-direction="left" aria-hidden />
-          </Link>
-          <Link href={base({ date: isoDate(nowDate()) })} className="flex min-h-11 items-center rounded-xl border border-line bg-surface px-4 text-sm font-semibold text-ink-soft hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">Today</Link>
-          <Link href={base({ date: shiftIso(dateIso, view === "week" ? 7 : 1) })} className="motion-trigger grid size-11 place-items-center rounded-xl border border-line bg-surface text-ink-soft hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" aria-label="Next">
-            <ChevronRight className="motion-arrow size-4" data-direction="right" aria-hidden />
-          </Link>
+          <Button
+            asChild
+            variant="outline"
+            size="icon"
+            className="motion-trigger"
+          >
+            <Link
+              href={base({
+                date: shiftIso(dateIso, view === "week" ? -7 : -1),
+              })}
+              aria-label="Previous"
+            >
+              <ChevronLeft
+                className="motion-arrow size-4"
+                data-direction="left"
+                aria-hidden
+              />
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="ghost"
+            className={cn(
+              "h-auto p-0",
+              "flex min-h-11 items-center rounded-xl border border-line bg-surface px-4 text-sm font-semibold text-ink-soft hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+            )}
+          >
+            <Link href={base({ date: isoDate(nowDate()) })}>Today</Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            size="icon"
+            className="motion-trigger"
+          >
+            <Link
+              href={base({ date: shiftIso(dateIso, view === "week" ? 7 : 1) })}
+              aria-label="Next"
+            >
+              <ChevronRight
+                className="motion-arrow size-4"
+                data-direction="right"
+                aria-hidden
+              />
+            </Link>
+          </Button>
         </div>
       </div>
 
       {view === "week" && (
-        <Legend items={[
-          { dotClass: "bg-white border border-dashed border-brand-300", label: "Available" },
-          { dotClass: "bg-amber-300", label: "Held" },
-          { dotClass: "bg-sky-300", label: "Pending" },
-          { dotClass: "bg-brand-500", label: "Confirmed" },
-          { dotClass: "bg-slate-400", label: "Blocked" },
-          { dotClass: "bg-slate-200", label: "Closed" },
-        ]} />
+        <Legend
+          items={[
+            {
+              dotClass: "bg-white border border-dashed border-brand-300",
+              label: "Available",
+            },
+            { dotClass: "bg-amber-300", label: "Held" },
+            { dotClass: "bg-brand-teal-mid", label: "Pending" },
+            { dotClass: "bg-brand-500", label: "Confirmed" },
+            { dotClass: "bg-slate-400", label: "Blocked" },
+            { dotClass: "bg-slate-200", label: "Closed" },
+          ]}
+        />
       )}
 
       {daySched ? (
         <>
-          <p className="text-base font-semibold tracking-tight text-ink">{longDateLabel(parseIsoDate(dateIso))}</p>
+          <p className="text-base font-semibold tracking-tight text-ink">
+            {longDateLabel(parseIsoDate(dateIso))}
+          </p>
           <CalendarBoard
             venueId={active.id}
             dateIso={dateIso}
             openMinute={daySched.openMinute}
             closeMinute={daySched.closeMinute}
             courts={daySched.courts}
-            autoOpen={sp.new === "1" ? "new" : sp.block === "1" ? "block" : undefined}
+            autoOpen={
+              sp.new === "1" ? "new" : sp.block === "1" ? "block" : undefined
+            }
           />
         </>
       ) : weekDays ? (

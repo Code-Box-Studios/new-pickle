@@ -16,8 +16,8 @@ export default async function LoginPage({
   if (session) redirect(sp.next ?? "/bookings");
 
   return (
-    <div className="page-shell grid min-h-[75dvh] place-items-center py-10 sm:py-16">
-      <Card className="w-full max-w-md p-6 shadow-[0_20px_65px_-35px_rgba(24,37,31,0.2)] sm:p-9">
+    <div className="hero-band grid min-h-[75dvh] place-items-center px-4 py-14 sm:py-20">
+      <Card className="w-full max-w-md p-6 shadow-elevated sm:p-9">
         <LoginForm nextPath={sp.next} />
       </Card>
     </div>

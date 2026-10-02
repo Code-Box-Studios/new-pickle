@@ -15,7 +15,13 @@ for the plan.
 ## Stack
 
 Next.js 16 (App Router) · TypeScript · Prisma · PostgreSQL 16 · Tailwind CSS 4 ·
-Radix UI · `jose` (sessions) · Vitest.
+shadcn/ui (Radix) · `jose` (sessions) · Vitest.
+
+## Design
+
+[DESIGN.md](DESIGN.md) documents the teal/green palette, typography, component
+tokens, and motion. Shared shadcn primitives live in `src/components/ui`; their
+semantic theme and reduced-motion rules live in `src/app/globals.css`.
 
 ## Prerequisites
 
@@ -47,11 +53,11 @@ banner.
 
 Seeded accounts:
 
-| Role     | Email                      |
-| -------- | -------------------------- |
-| Customer | `player@rallypoint.test`   |
-| Owner    | `owner@rallypoint.test`    |
-| Admin    | `admin@rallypoint.test`    |
+| Role     | Email                    |
+| -------- | ------------------------ |
+| Customer | `player@rallypoint.test` |
+| Owner    | `owner@rallypoint.test`  |
+| Admin    | `admin@rallypoint.test`  |
 
 The owner owns all seeded venues (so the confirm flow works from any booking).
 
@@ -88,16 +94,16 @@ reads denied).
 
 ## Scripts
 
-| Script              | What it does                                  |
-| ------------------- | --------------------------------------------- |
-| `npm run dev`       | Dev server                                    |
-| `npm run build`     | Production build                              |
-| `npm run typecheck` | `tsc --noEmit`                                |
-| `npm run lint`      | ESLint                                        |
-| `npm test`          | Vitest suite                                  |
-| `npm run db:deploy` | Apply committed migrations (**use this**)     |
-| `npm run db:seed`   | Seed demo data                                |
-| `npm run db:studio` | Prisma Studio                                 |
+| Script              | What it does                              |
+| ------------------- | ----------------------------------------- |
+| `npm run dev`       | Dev server                                |
+| `npm run build`     | Production build                          |
+| `npm run typecheck` | `tsc --noEmit`                            |
+| `npm run lint`      | ESLint                                    |
+| `npm test`          | Vitest suite                              |
+| `npm run db:deploy` | Apply committed migrations (**use this**) |
+| `npm run db:seed`   | Seed demo data                            |
+| `npm run db:studio` | Prisma Studio                             |
 
 > Apply migrations with **`db:deploy`**, not `prisma migrate dev` — the
 > `bookings.period` generated column + EXCLUDE constraint make `migrate dev`

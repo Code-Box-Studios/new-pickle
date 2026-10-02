@@ -1,3 +1,5 @@
+import { cn } from "@/lib/cn";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, Mail, Phone } from "lucide-react";
@@ -40,16 +42,23 @@ export default async function OwnerReservationDetail({
   const ids = await accessibleVenueIds(session.id, session.role);
   if (!ids.includes(b.venueId)) notFound();
 
-  const actionable = b.status === "PENDING_CONFIRMATION" || b.status === "PAYMENT_SUBMITTED";
+  const actionable =
+    b.status === "PENDING_CONFIRMATION" || b.status === "PAYMENT_SUBMITTED";
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link
-        href="/owner/reservations"
-        className="inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-medium text-muted hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+      <Button
+        asChild
+        variant="ghost"
+        className={cn(
+          "h-auto p-0",
+          "inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+        )}
       >
-        <ArrowLeft className="size-4" aria-hidden /> Reservations
-      </Link>
+        <Link href="/owner/reservations">
+          <ArrowLeft className="size-4" aria-hidden /> Reservations
+        </Link>
+      </Button>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0">
@@ -62,16 +71,28 @@ export default async function OwnerReservationDetail({
       {/* Customer */}
       <Card className="mt-6 p-5 sm:p-6">
         <SectionHeader>Customer</SectionHeader>
-        <p className="mt-4 text-lg font-semibold text-ink">{b.customerName ?? b.user?.name ?? "Guest"}</p>
+        <p className="mt-4 text-lg font-semibold text-ink">
+          {b.customerName ?? b.user?.name ?? "Guest"}
+        </p>
         <div className="mt-3 space-y-2 text-sm text-ink-soft">
           {b.customerMobile && (
             <p className="flex items-center gap-3">
-              <Phone className="size-4 shrink-0 text-muted" aria-hidden /> {b.customerMobile}
+              <Phone
+                className="size-4 shrink-0 text-muted-foreground"
+                aria-hidden
+              />{" "}
+              {b.customerMobile}
             </p>
           )}
           {(b.customerEmail || b.user?.email) && (
             <p className="flex min-w-0 items-center gap-3">
-              <Mail className="size-4 shrink-0 text-muted" aria-hidden /> <span className="break-all">{b.customerEmail ?? b.user?.email}</span>
+              <Mail
+                className="size-4 shrink-0 text-muted-foreground"
+                aria-hidden
+              />{" "}
+              <span className="break-all">
+                {b.customerEmail ?? b.user?.email}
+              </span>
             </p>
           )}
         </div>
@@ -89,7 +110,7 @@ export default async function OwnerReservationDetail({
       </Card>
 
       {(b.source === "WALK_IN" || b.note) && (
-        <p className="mt-2 text-sm text-muted">
+        <p className="mt-2 text-sm text-muted-foreground">
           {b.source === "WALK_IN" ? "Walk-in" : "Note"}
           {b.note ? ` · ${b.note}` : ""}
         </p>
@@ -119,7 +140,9 @@ export default async function OwnerReservationDetail({
             </a>
           </div>
         ) : (
-          <p className="mt-1 text-sm text-muted">No payment submitted yet.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            No payment submitted yet.
+          </p>
         )}
       </Card>
 
@@ -139,14 +162,20 @@ export default async function OwnerReservationDetail({
           bookingId={b.id}
           status={b.status}
           startsAtIso={b.startsAt.toISOString()}
-          durationMinutes={Math.round((b.endsAt.getTime() - b.startsAt.getTime()) / 60000)}
+          durationMinutes={Math.round(
+            (b.endsAt.getTime() - b.startsAt.getTime()) / 60000,
+          )}
         />
       </Card>
 
       <Card className="mt-5 p-5 sm:p-6">
         <SectionHeader className="mb-3">Activity</SectionHeader>
         <StatusTimeline
-          history={b.history.map((h) => ({ toStatus: h.toStatus, at: h.at, note: h.note }))}
+          history={b.history.map((h) => ({
+            toStatus: h.toStatus,
+            at: h.at,
+            note: h.note,
+          }))}
         />
       </Card>
     </div>

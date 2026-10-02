@@ -21,16 +21,16 @@ describe("Tabs", () => {
   it("applies active styling only to the active tab", () => {
     render(<Tabs tabs={tabs} activeValue="book" />);
     const book = screen.getByText("Book").closest("a")!;
-    expect(book).toHaveClass("border-brand-600");
+    expect(book).toHaveAttribute("aria-current", "page");
     const home = screen.getByText("Home").closest("a")!;
-    expect(home).not.toHaveClass("border-brand-600");
+    expect(home).not.toHaveAttribute("aria-current");
   });
 
   it("renders tabs as links with correct hrefs", () => {
     render(<Tabs tabs={tabs} activeValue="home" />);
     expect(screen.getByText("Book").closest("a")).toHaveAttribute(
       "href",
-      "/venues/x?tab=book"
+      "/venues/x?tab=book",
     );
   });
 });

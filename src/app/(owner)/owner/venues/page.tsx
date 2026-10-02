@@ -42,21 +42,27 @@ export default async function OwnerVenuesPage() {
           {venues.map((v) => {
             const live = v.isPublished && v.status === "APPROVED";
             return (
-              <li key={v.id} className="rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-card sm:p-6">
+              <li
+                key={v.id}
+                className="rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-card sm:p-6"
+              >
                 <div className="flex flex-wrap items-start justify-between gap-5">
                   <div className="min-w-0 flex-1 basis-64">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-lg font-semibold tracking-tight text-ink">{v.name}</p>
+                      <p className="text-lg font-semibold tracking-tight text-ink">
+                        {v.name}
+                      </p>
                       <VenueStatusBadge status={v.status} />
                       {v.status === "APPROVED" && (
-                        <span className="text-xs font-medium text-muted">
+                        <span className="text-xs font-medium text-muted-foreground">
                           {live ? "· Live" : "· Not published"}
                         </span>
                       )}
                     </div>
-                    <p className="mt-2 text-sm leading-relaxed text-muted">
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                       {v.barangay ? `${v.barangay}, ` : ""}
-                      {v.city} · {v._count.courts} court{v._count.courts === 1 ? "" : "s"}
+                      {v.city} · {v._count.courts} court
+                      {v._count.courts === 1 ? "" : "s"}
                     </p>
                     {v.status === "REJECTED" && v.verification?.notes && (
                       <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -72,24 +78,48 @@ export default async function OwnerVenuesPage() {
 
                   <div className="flex flex-wrap items-center gap-2">
                     {(v.status === "DRAFT" || v.status === "REJECTED") && (
-                      <Link href={`/owner/venues/${v.id}/details`} className={buttonVariants({ size: "sm" })}>
+                      <Link
+                        href={`/owner/venues/${v.id}/details`}
+                        className={buttonVariants({ size: "sm" })}
+                      >
                         Continue setup
                       </Link>
                     )}
                     {v.status === "PENDING_REVIEW" && (
-                      <Link href={`/owner/venues/${v.id}/details`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+                      <Link
+                        href={`/owner/venues/${v.id}/details`}
+                        className={buttonVariants({
+                          variant: "outline",
+                          size: "sm",
+                        })}
+                      >
                         View
                       </Link>
                     )}
                     {v.status === "APPROVED" && (
                       <>
-                        <Link href={`/venues/${v.slug}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+                        <Link
+                          href={`/venues/${v.slug}`}
+                          className={buttonVariants({
+                            variant: "outline",
+                            size: "sm",
+                          })}
+                        >
                           Preview
                         </Link>
-                        <Link href={`/owner/venues/${v.id}/details`} className={buttonVariants({ variant: "ghost", size: "sm" })}>
+                        <Link
+                          href={`/owner/venues/${v.id}/details`}
+                          className={buttonVariants({
+                            variant: "ghost",
+                            size: "sm",
+                          })}
+                        >
                           Edit
                         </Link>
-                        <PublishControls venueId={v.id} isPublished={v.isPublished} />
+                        <PublishControls
+                          venueId={v.id}
+                          isPublished={v.isPublished}
+                        />
                       </>
                     )}
                   </div>

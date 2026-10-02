@@ -1,7 +1,11 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeAll } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ShareToPhonePanel } from "@/components/dev/ShareToPhonePanel";
+
+beforeAll(() => {
+  Element.prototype.scrollIntoView = () => {};
+});
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -106,7 +110,8 @@ describe("ShareToPhonePanel", () => {
     expect(select).toBeTruthy();
 
     // Switch to the second candidate
-    fireEvent.change(select, { target: { value: "10.0.0.5" } });
+    fireEvent.keyDown(select, { key: "ArrowDown" });
+    fireEvent.click(await screen.findByRole("option", { name: /Ethernet/ }));
 
     // QR image src and URL text update to the second candidate from cache
     await waitFor(() => {

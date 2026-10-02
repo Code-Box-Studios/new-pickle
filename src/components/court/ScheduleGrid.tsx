@@ -1,5 +1,7 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { pesos, timeLabel } from "@/lib/format";
 import type { CourtDTO, SlotDTO } from "@/components/court/CourtBooking";
@@ -54,13 +56,17 @@ export function ScheduleGrid({
 
   // Build a lookup: courtId → Map(startsAt → SlotDTO)
   const slotMap = new Map(
-    courts.map((c) => [c.id, new Map(c.slots.map((s) => [s.startsAt, s]))])
+    courts.map((c) => [c.id, new Map(c.slots.map((s) => [s.startsAt, s]))]),
   );
 
   const gridCols = `72px repeat(${courts.length}, minmax(100px, 1fr))`;
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-line bg-surface" role="group" aria-label="Court times and prices">
+    <Card
+      className="overflow-x-auto rounded-lg border border-line bg-surface"
+      role="group"
+      aria-label="Court times and prices"
+    >
       {/* Column headers */}
       <div
         className="grid border-b border-line bg-canvas"
@@ -76,7 +82,7 @@ export function ScheduleGrid({
               className="border-l border-line px-3 py-4 text-center"
             >
               <p className="text-sm font-semibold text-ink">{c.name}</p>
-              <p className="mt-1 text-xs text-muted">
+              <p className="mt-1 text-xs text-muted-foreground">
                 {c.indoor ? "Indoor" : "Outdoor"}
               </p>
               <p className="mt-1 text-xs font-medium text-brand-700">
@@ -87,7 +93,7 @@ export function ScheduleGrid({
                   className={cn(
                     "mt-2 inline-block rounded-full px-2.5 py-1 text-xs font-medium",
                     closed
-                      ? "bg-mist text-muted"
+                      ? "bg-mist text-muted-foreground"
                       : "bg-amber-50 text-amber-700",
                   )}
                 >
@@ -129,7 +135,7 @@ export function ScheduleGrid({
                   <span className="text-[13px] font-medium tabular-nums text-ink-soft leading-none">
                     {hhmm}
                   </span>
-                  <span className="mt-1 text-[11px] uppercase text-muted leading-none">
+                  <span className="mt-1 text-[11px] uppercase text-muted-foreground leading-none">
                     {period}
                   </span>
                 </div>
@@ -139,12 +145,10 @@ export function ScheduleGrid({
                   const isSel =
                     selected?.courtId === c.id && selected?.startsAt === t;
                   return (
-                    <div
-                      key={c.id}
-                      className="border-l border-line/70 p-2"
-                    >
+                    <div key={c.id} className="border-l border-line/70 p-2">
                       {slot ? (
-                        <button
+                        <Button
+                          variant="ghost"
                           type="button"
                           disabled={!slot.available}
                           aria-pressed={isSel}
@@ -153,16 +157,19 @@ export function ScheduleGrid({
                           className={cn(
                             "h-11 w-full rounded-xl border text-sm font-semibold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
                             !slot.available
-                              ? "cursor-not-allowed border-transparent bg-canvas text-muted/60"
+                              ? "cursor-not-allowed border-transparent bg-canvas text-muted-foreground/60"
                               : isSel
                                 ? "border-brand-700 bg-brand-700 text-white shadow-sm"
                                 : "border-brand-100 bg-brand-50 text-brand-800 hover:border-brand-300 hover:bg-brand-100",
                           )}
                         >
                           {slot.available ? pesos(slot.priceCents) : "—"}
-                        </button>
+                        </Button>
                       ) : (
-                        <div className="h-11 rounded-xl bg-canvas/70" aria-hidden />
+                        <div
+                          className="h-11 rounded-xl bg-canvas/70"
+                          aria-hidden
+                        />
                       )}
                     </div>
                   );
@@ -172,6 +179,6 @@ export function ScheduleGrid({
           })}
         </div>
       ))}
-    </div>
+    </Card>
   );
 }

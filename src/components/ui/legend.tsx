@@ -14,11 +14,13 @@ export function Legend({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-wrap items-center gap-x-4 gap-y-2", className)}>
+    <div
+      className={cn("flex flex-wrap items-center gap-x-4 gap-y-2", className)}
+    >
       {items.map((item) => (
         <div
           key={item.label}
-          className="flex items-center gap-1.5 text-xs text-muted"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground"
         >
           <span
             className={cn("size-2.5 rounded-sm", item.dotClass)}

@@ -1,14 +1,21 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import { SelectField, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import type { BookingStatus } from "@/generated/prisma";
 
-const OCCUPYING: BookingStatus[] = ["HELD", "PENDING_PAYMENT", "PAYMENT_SUBMITTED", "PENDING_CONFIRMATION", "CONFIRMED"];
+const OCCUPYING: BookingStatus[] = [
+  "HELD",
+  "PENDING_PAYMENT",
+  "PAYMENT_SUBMITTED",
+  "PENDING_CONFIRMATION",
+  "CONFIRMED",
+];
 
 export function ManageActions({
   bookingId,
@@ -28,7 +35,9 @@ export function ManageActions({
   const [time, setTime] = useState(
     `${String(start.getUTCHours()).padStart(2, "0")}:${String(start.getUTCMinutes()).padStart(2, "0")}`,
   );
-  const [durH, setDurH] = useState(Math.max(1, Math.round(durationMinutes / 60)));
+  const [durH, setDurH] = useState(
+    Math.max(1, Math.round(durationMinutes / 60)),
+  );
   const [rescheduling, setRescheduling] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -38,10 +47,20 @@ export function ManageActions({
   async function act(kind: "cancel" | "complete") {
     setBusy(kind);
     try {
-      const res = await fetch(`/api/owner/bookings/${bookingId}/${kind}`, { method: "POST" });
+      const res = await fetch(`/api/owner/bookings/${bookingId}/${kind}`, {
+        method: "POST",
+      });
       const d = await res.json().catch(() => ({}));
-      if (!res.ok) return toast({ title: "Action failed", description: d.error, tone: "error" });
-      toast({ title: kind === "cancel" ? "Booking cancelled" : "Marked completed", tone: "default" });
+      if (!res.ok)
+        return toast({
+          title: "Action failed",
+          description: d.error,
+          tone: "error",
+        });
+      toast({
+        title: kind === "cancel" ? "Booking cancelled" : "Marked completed",
+        tone: "default",
+      });
       router.refresh();
     } finally {
       setBusy(null);
@@ -54,10 +73,18 @@ export function ManageActions({
       const res = await fetch(`/api/owner/bookings/${bookingId}/reschedule`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ startsAt: `${date}T${time}:00.000Z`, durationMinutes: durH * 60 }),
+        body: JSON.stringify({
+          startsAt: `${date}T${time}:00.000Z`,
+          durationMinutes: durH * 60,
+        }),
       });
       const d = await res.json().catch(() => ({}));
-      if (!res.ok) return toast({ title: "Couldn't reschedule", description: d.error, tone: "error" });
+      if (!res.ok)
+        return toast({
+          title: "Couldn't reschedule",
+          description: d.error,
+          tone: "error",
+        });
       toast({ title: "Booking rescheduled", tone: "success" });
       setRescheduling(false);
       router.refresh();
@@ -69,36 +96,66 @@ export function ManageActions({
   return (
     <div className="space-y-3">
       {rescheduling ? (
-        <div className="space-y-4 rounded-2xl border border-brand-200 bg-mist p-4">
+        <Card className="space-y-4 rounded-lg border border-brand-200 bg-mist p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Date" htmlFor="rs-date">
-              <Input id="rs-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="min-w-0 px-3" />
+              <Input
+                id="rs-date"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="min-w-0 px-3"
+              />
             </Field>
             <Field label="Start" htmlFor="rs-time">
-              <Input id="rs-time" type="time" value={time} onChange={(e) => setTime(e.target.value)} className="min-w-0 px-3" />
+              <Input
+                id="rs-time"
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="min-w-0 px-3"
+              />
             </Field>
           </div>
           <Field label="Duration" htmlFor="rs-dur">
-            <Select id="rs-dur" value={durH} onChange={(e) => setDurH(Number(e.target.value))}>
-              <option value={1}>1 hour</option>
-              <option value={2}>2 hours</option>
-              <option value={3}>3 hours</option>
-            </Select>
+            <SelectField
+              id="rs-dur"
+              value={durH}
+              onValueChange={(value) => setDurH(Number(value))}
+            >
+              <SelectItem value={String(1)}>1 hour</SelectItem>
+              <SelectItem value={String(2)}>2 hours</SelectItem>
+              <SelectItem value={String(3)}>3 hours</SelectItem>
+            </SelectField>
           </Field>
           <div className="flex flex-wrap gap-2">
-            <Button loading={busy === "reschedule"} onClick={submitReschedule}>Save new time</Button>
-            <Button variant="ghost" onClick={() => setRescheduling(false)}>Cancel</Button>
+            <Button loading={busy === "reschedule"} onClick={submitReschedule}>
+              Save new time
+            </Button>
+            <Button variant="ghost" onClick={() => setRescheduling(false)}>
+              Cancel
+            </Button>
           </div>
-        </div>
+        </Card>
       ) : (
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setRescheduling(true)}>Reschedule</Button>
+          <Button variant="outline" onClick={() => setRescheduling(true)}>
+            Reschedule
+          </Button>
           {status === "CONFIRMED" && (
-            <Button variant="secondary" loading={busy === "complete"} onClick={() => act("complete")}>
+            <Button
+              variant="secondary"
+              loading={busy === "complete"}
+              onClick={() => act("complete")}
+            >
               Mark completed
             </Button>
           )}
-          <Button variant="danger" loading={busy === "cancel"} onClick={() => act("cancel")}>
+          <Button
+            variant="danger"
+            loading={busy === "cancel"}
+            onClick={() => act("cancel")}
+          >
             Cancel booking
           </Button>
         </div>

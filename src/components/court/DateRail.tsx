@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
@@ -38,7 +39,8 @@ export function DateRail({
     if (!el || !container) return;
     const elRect = el.getBoundingClientRect();
     const cRect = container.getBoundingClientRect();
-    const delta = elRect.left + elRect.width / 2 - (cRect.left + cRect.width / 2);
+    const delta =
+      elRect.left + elRect.width / 2 - (cRect.left + cRect.width / 2);
     // No smooth behavior — instant, so it's reduced-motion safe and doesn't jar.
     container.scrollBy({ left: delta });
   }, [dateStr]);
@@ -53,24 +55,35 @@ export function DateRail({
       {days.map((d) => {
         const active = d.iso === dateStr;
         return (
-          <Link
+          <Button
             key={d.iso}
-            ref={active ? activeRef : undefined}
-            href={`/venues/${slug}?date=${d.iso}&duration=${duration}${tab ? `&tab=${tab}` : ""}`}
-            scroll={false}
-            aria-current={active ? "date" : undefined}
+            asChild
+            variant="ghost"
             className={cn(
-              "flex min-h-18 w-18 shrink-0 snap-start flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
+              "h-auto p-0",
+              "flex min-h-18 w-18 shrink-0 snap-start flex-col items-center justify-center gap-1 rounded-lg border px-2 py-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
               active
                 ? "border-brand-700 bg-brand-700 text-white shadow-sm"
                 : "border-line bg-surface text-ink-soft hover:border-brand-300 hover:bg-mist",
             )}
           >
-            <span className={cn("text-xs font-medium", active ? "text-white/80" : "text-muted")}>
-              {d.weekday}
-            </span>
-            <span className="text-sm font-semibold">{d.label}</span>
-          </Link>
+            <Link
+              ref={active ? activeRef : undefined}
+              href={`/venues/${slug}?date=${d.iso}&duration=${duration}${tab ? `&tab=${tab}` : ""}`}
+              scroll={false}
+              aria-current={active ? "date" : undefined}
+            >
+              <span
+                className={cn(
+                  "text-xs font-medium",
+                  active ? "text-white/80" : "text-muted-foreground",
+                )}
+              >
+                {d.weekday}
+              </span>
+              <span className="text-sm font-semibold">{d.label}</span>
+            </Link>
+          </Button>
         );
       })}
     </div>
