@@ -1,0 +1,901 @@
+{
+  "source": "https://psa.gov.ph/classification/psgc/cities",
+  "provinceSource": "https://psgc.gitlab.io/api/",
+  "verifiedOn": "2026-10-02",
+  "cities": [
+    {
+      "code": "0105503000",
+      "name": "Alaminos City",
+      "value": "Alaminos City",
+      "province": "Pangasinan"
+    },
+    {
+      "code": "0330100000",
+      "name": "Angeles City",
+      "value": "Angeles City",
+      "province": "Pampanga"
+    },
+    {
+      "code": "0405802000",
+      "name": "Antipolo City",
+      "value": "Antipolo City",
+      "province": "Rizal"
+    },
+    {
+      "code": "1830200000",
+      "name": "Bacolod City",
+      "value": "Bacolod City",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "0402103000",
+      "name": "Bacoor City",
+      "value": "Bacoor City",
+      "province": "Cavite"
+    },
+    {
+      "code": "1804502000",
+      "name": "Bago City",
+      "value": "Bago City",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "1430300000",
+      "name": "Baguio City",
+      "value": "Baguio City",
+      "province": "Benguet"
+    },
+    {
+      "code": "1804604000",
+      "name": "Bais City",
+      "value": "Bais City",
+      "province": "Negros Oriental"
+    },
+    {
+      "code": "0300803000",
+      "name": "Balanga City",
+      "value": "Balanga City",
+      "province": "Bataan"
+    },
+    {
+      "code": "0301403000",
+      "name": "Baliwag City",
+      "value": "Baliwag City",
+      "province": "Bulacan"
+    },
+    {
+      "code": "0102805000",
+      "name": "Batac City",
+      "value": "Batac City",
+      "province": "Ilocos Norte"
+    },
+    {
+      "code": "0401005000",
+      "name": "Batangas City",
+      "value": "Batangas City",
+      "province": "Batangas"
+    },
+    {
+      "code": "1804606000",
+      "name": "Bayawan City",
+      "value": "Bayawan City",
+      "province": "Negros Oriental"
+    },
+    {
+      "code": "0803708000",
+      "name": "Baybay City",
+      "value": "Baybay City",
+      "province": "Leyte"
+    },
+    {
+      "code": "1600301000",
+      "name": "Bayugan City",
+      "value": "Bayugan City",
+      "province": "Agusan Del Sur"
+    },
+    {
+      "code": "0403403000",
+      "name": "Biñan City",
+      "value": "Biñan City",
+      "province": "Laguna"
+    },
+    {
+      "code": "1606803000",
+      "name": "Bislig City",
+      "value": "Bislig City",
+      "province": "Surigao Del Sur"
+    },
+    {
+      "code": "0702211000",
+      "name": "Bogo City",
+      "value": "Bogo City",
+      "province": "Cebu"
+    },
+    {
+      "code": "0802604000",
+      "name": "Borongan City",
+      "value": "Borongan City",
+      "province": "Eastern Samar"
+    },
+    {
+      "code": "1630400000",
+      "name": "Butuan City",
+      "value": "Butuan City",
+      "province": "Agusan Del Norte"
+    },
+    {
+      "code": "1600203000",
+      "name": "Cabadbaran City",
+      "value": "Cabadbaran City",
+      "province": "Agusan Del Norte"
+    },
+    {
+      "code": "0304903000",
+      "name": "Cabanatuan City",
+      "value": "Cabanatuan City",
+      "province": "Nueva Ecija"
+    },
+    {
+      "code": "0403404000",
+      "name": "Cabuyao City",
+      "value": "Cabuyao City",
+      "province": "Laguna"
+    },
+    {
+      "code": "1804504000",
+      "name": "Cadiz City",
+      "value": "Cadiz City",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "1030500000",
+      "name": "Cagayan De Oro City",
+      "value": "Cagayan De Oro City",
+      "province": "Misamis Oriental"
+    },
+    {
+      "code": "0401007000",
+      "name": "Calaca City",
+      "value": "Calaca City",
+      "province": "Batangas"
+    },
+    {
+      "code": "0403405000",
+      "name": "Calamba City",
+      "value": "Calamba City",
+      "province": "Laguna"
+    },
+    {
+      "code": "1705205000",
+      "name": "Calapan City",
+      "value": "Calapan City",
+      "province": "Oriental Mindoro"
+    },
+    {
+      "code": "0806003000",
+      "name": "Calbayog City",
+      "value": "Calbayog City",
+      "province": "Samar"
+    },
+    {
+      "code": "1380100000",
+      "name": "Caloocan City",
+      "value": "Caloocan City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "0102906000",
+      "name": "Candon City",
+      "value": "Candon City",
+      "province": "Ilocos Sur"
+    },
+    {
+      "code": "1804608000",
+      "name": "Canlaon City",
+      "value": "Canlaon City",
+      "province": "Negros Oriental"
+    },
+    {
+      "code": "0702214000",
+      "name": "Carcar City",
+      "value": "Carcar City",
+      "province": "Cebu"
+    },
+    {
+      "code": "0402104000",
+      "name": "Carmona City",
+      "value": "Carmona City",
+      "province": "Cavite"
+    },
+    {
+      "code": "0806005000",
+      "name": "Catbalogan City",
+      "value": "Catbalogan City",
+      "province": "Samar"
+    },
+    {
+      "code": "0203108000",
+      "name": "Cauayan City",
+      "value": "Cauayan City",
+      "province": "Isabela"
+    },
+    {
+      "code": "0402105000",
+      "name": "Cavite City",
+      "value": "Cavite City",
+      "province": "Cavite"
+    },
+    {
+      "code": "0730600000",
+      "name": "Cebu City",
+      "value": "Cebu City",
+      "province": "Cebu"
+    },
+    {
+      "code": "1908703000",
+      "name": "Cotabato City",
+      "value": "Cotabato City",
+      "province": "Bangsamoro"
+    },
+    {
+      "code": "0105518000",
+      "name": "Dagupan City",
+      "value": "Dagupan City",
+      "province": "Pangasinan"
+    },
+    {
+      "code": "0702223000",
+      "name": "Danao City",
+      "value": "Danao City",
+      "province": "Cebu"
+    },
+    {
+      "code": "0907201000",
+      "name": "Dapitan City",
+      "value": "Dapitan City",
+      "province": "Zamboanga Del Norte"
+    },
+    {
+      "code": "0402106000",
+      "name": "Dasmariñas City",
+      "value": "Dasmariñas City",
+      "province": "Cavite"
+    },
+    {
+      "code": "1130700000",
+      "name": "Davao City",
+      "value": "Davao City",
+      "province": "Davao Del Sur"
+    },
+    {
+      "code": "1102403000",
+      "name": "Digos City",
+      "value": "Digos City",
+      "province": "Davao Del Sur"
+    },
+    {
+      "code": "0907202000",
+      "name": "Dipolog City",
+      "value": "Dipolog City",
+      "province": "Zamboanga Del Norte"
+    },
+    {
+      "code": "1804610000",
+      "name": "Dumaguete City",
+      "value": "Dumaguete City",
+      "province": "Negros Oriental"
+    },
+    {
+      "code": "1004307000",
+      "name": "El Salvador City",
+      "value": "El Salvador City",
+      "province": "Misamis Oriental"
+    },
+    {
+      "code": "1804509000",
+      "name": "Escalante City",
+      "value": "Escalante City",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "0304908000",
+      "name": "Gapan City",
+      "value": "Gapan City",
+      "province": "Nueva Ecija"
+    },
+    {
+      "code": "1230800000",
+      "name": "General Santos City",
+      "value": "General Santos City",
+      "province": "South Cotabato"
+    },
+    {
+      "code": "0402108000",
+      "name": "General Trias City",
+      "value": "General Trias City",
+      "province": "Cavite"
+    },
+    {
+      "code": "1004308000",
+      "name": "Gingoog City",
+      "value": "Gingoog City",
+      "province": "Misamis Oriental"
+    },
+    {
+      "code": "1804611000",
+      "name": "Guihulngan City",
+      "value": "Guihulngan City",
+      "province": "Negros Oriental"
+    },
+    {
+      "code": "1804510000",
+      "name": "Himamaylan City",
+      "value": "Himamaylan City",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "0203114000",
+      "name": "Ilagan City",
+      "value": "Ilagan City",
+      "province": "Isabela"
+    },
+    {
+      "code": "1030900000",
+      "name": "Iligan City",
+      "value": "Iligan City",
+      "province": "Lanao Del Norte"
+    },
+    {
+      "code": "0631000000",
+      "name": "Iloilo City",
+      "value": "Iloilo City",
+      "province": "Iloilo"
+    },
+    {
+      "code": "0402109000",
+      "name": "Imus City",
+      "value": "Imus City",
+      "province": "Cavite"
+    },
+    {
+      "code": "0501716000",
+      "name": "Iriga City",
+      "value": "Iriga City",
+      "province": "Camarines Sur"
+    },
+    {
+      "code": "0990101000",
+      "name": "Isabela City",
+      "value": "Isabela City",
+      "province": "Basilan"
+    },
+    {
+      "code": "1102317000",
+      "name": "Island Garden City of Samal",
+      "value": "Island Garden City of Samal",
+      "province": "Davao Del Norte"
+    },
+    {
+      "code": "1804515000",
+      "name": "Kabankalan City",
+      "value": "Kabankalan City",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "1204704000",
+      "name": "Kidapawan City",
+      "value": "Kidapawan City",
+      "province": "Cotabato"
+    },
+    {
+      "code": "1206306000",
+      "name": "Koronadal City",
+      "value": "Koronadal City",
+      "province": "South Cotabato"
+    },
+    {
+      "code": "1804516000",
+      "name": "La Carlota City",
+      "value": "La Carlota City",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "1900702000",
+      "name": "Lamitan City",
+      "value": "Lamitan City",
+      "province": "Basilan"
+    },
+    {
+      "code": "0102812000",
+      "name": "Laoag City",
+      "value": "Laoag City",
+      "province": "Ilocos Norte"
+    },
+    {
+      "code": "0731100000",
+      "name": "Lapu-Lapu City",
+      "value": "Lapu-Lapu City",
+      "province": "Cebu"
+    },
+    {
+      "code": "1380200000",
+      "name": "Las Piñas City",
+      "value": "Las Piñas City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "0500506000",
+      "name": "Legazpi City",
+      "value": "Legazpi City",
+      "province": "Albay"
+    },
+    {
+      "code": "0500508000",
+      "name": "Ligao City",
+      "value": "Ligao City",
+      "province": "Albay"
+    },
+    {
+      "code": "0401014000",
+      "name": "Lipa City",
+      "value": "Lipa City",
+      "province": "Batangas"
+    },
+    {
+      "code": "0431200000",
+      "name": "Lucena City",
+      "value": "Lucena City",
+      "province": "Quezon"
+    },
+    {
+      "code": "0806407000",
+      "name": "Maasin City",
+      "value": "Maasin City",
+      "province": "Southern Leyte"
+    },
+    {
+      "code": "0305409000",
+      "name": "Mabalacat City",
+      "value": "Mabalacat City",
+      "province": "Pampanga"
+    },
+    {
+      "code": "1380300000",
+      "name": "Makati City",
+      "value": "Makati City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "1380400000",
+      "name": "Malabon City",
+      "value": "Malabon City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "1001312000",
+      "name": "Malaybalay City",
+      "value": "Malaybalay City",
+      "province": "Bukidnon"
+    },
+    {
+      "code": "0301410000",
+      "name": "Malolos City",
+      "value": "Malolos City",
+      "province": "Bulacan"
+    },
+    {
+      "code": "1380500000",
+      "name": "Mandaluyong City",
+      "value": "Mandaluyong City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "0731300000",
+      "name": "Mandaue City",
+      "value": "Mandaue City",
+      "province": "Cebu"
+    },
+    {
+      "code": "1380600000",
+      "name": "Manila City",
+      "value": "Manila City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "1903617000",
+      "name": "Marawi City",
+      "value": "Marawi City",
+      "province": "Lanao Del Sur"
+    },
+    {
+      "code": "1380700000",
+      "name": "Marikina City",
+      "value": "Marikina City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "0504111000",
+      "name": "Masbate City",
+      "value": "Masbate City",
+      "province": "Masbate"
+    },
+    {
+      "code": "1102509000",
+      "name": "Mati City",
+      "value": "Mati City",
+      "province": "Davao Oriental"
+    },
+    {
+      "code": "0301412000",
+      "name": "Meycauayan City",
+      "value": "Meycauayan City",
+      "province": "Bulacan"
+    },
+    {
+      "code": "1380800000",
+      "name": "Muntinlupa City",
+      "value": "Muntinlupa City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "0501724000",
+      "name": "Naga City",
+      "value": "Naga City, Camarines Sur",
+      "province": "Camarines Sur"
+    },
+    {
+      "code": "0702234000",
+      "name": "Naga City",
+      "value": "Naga City, Cebu",
+      "province": "Cebu"
+    },
+    {
+      "code": "1380900000",
+      "name": "Navotas City",
+      "value": "Navotas City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "0331400000",
+      "name": "Olongapo City",
+      "value": "Olongapo City",
+      "province": "Zambales"
+    },
+    {
+      "code": "0803738000",
+      "name": "Ormoc City",
+      "value": "Ormoc City",
+      "province": "Leyte"
+    },
+    {
+      "code": "1004209000",
+      "name": "Oroquieta City",
+      "value": "Oroquieta City",
+      "province": "Misamis Occidental"
+    },
+    {
+      "code": "1004210000",
+      "name": "Ozamiz City",
+      "value": "Ozamiz City",
+      "province": "Misamis Occidental"
+    },
+    {
+      "code": "0907322000",
+      "name": "Pagadian City",
+      "value": "Pagadian City",
+      "province": "Zamboanga Del Sur"
+    },
+    {
+      "code": "0304919000",
+      "name": "Palayan City",
+      "value": "Palayan City",
+      "province": "Nueva Ecija"
+    },
+    {
+      "code": "1102315000",
+      "name": "Panabo City",
+      "value": "Panabo City",
+      "province": "Davao Del Norte"
+    },
+    {
+      "code": "1381000000",
+      "name": "Parañaque City",
+      "value": "Parañaque City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "1381100000",
+      "name": "Pasay City",
+      "value": "Pasay City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "1381200000",
+      "name": "Pasig City",
+      "value": "Pasig City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "0603035000",
+      "name": "Passi City",
+      "value": "Passi City",
+      "province": "Iloilo"
+    },
+    {
+      "code": "1731500000",
+      "name": "Puerto Princesa City",
+      "value": "Puerto Princesa City",
+      "province": "Palawan"
+    },
+    {
+      "code": "1381300000",
+      "name": "Quezon City",
+      "value": "Quezon City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "0601914000",
+      "name": "Roxas City",
+      "value": "Roxas City",
+      "province": "Capiz"
+    },
+    {
+      "code": "1804523000",
+      "name": "Sagay City",
+      "value": "Sagay City",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "1804524000",
+      "name": "San Carlos City",
+      "value": "San Carlos City, Negros Occidental",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "0105532000",
+      "name": "San Carlos City",
+      "value": "San Carlos City, Pangasinan",
+      "province": "Pangasinan"
+    },
+    {
+      "code": "0103314000",
+      "name": "San Fernando City",
+      "value": "San Fernando City, La Union",
+      "province": "La Union"
+    },
+    {
+      "code": "0305416000",
+      "name": "San Fernando City",
+      "value": "San Fernando City, Pampanga",
+      "province": "Pampanga"
+    },
+    {
+      "code": "0304926000",
+      "name": "San Jose City",
+      "value": "San Jose City",
+      "province": "Nueva Ecija"
+    },
+    {
+      "code": "0301420000",
+      "name": "San Jose Del Monte City",
+      "value": "San Jose Del Monte City",
+      "province": "Bulacan"
+    },
+    {
+      "code": "1381400000",
+      "name": "San Juan City",
+      "value": "San Juan City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "0403424000",
+      "name": "San Pablo City",
+      "value": "San Pablo City",
+      "province": "Laguna"
+    },
+    {
+      "code": "0403425000",
+      "name": "San Pedro City",
+      "value": "San Pedro City",
+      "province": "Laguna"
+    },
+    {
+      "code": "0403428000",
+      "name": "Santa Rosa City",
+      "value": "Santa Rosa City",
+      "province": "Laguna"
+    },
+    {
+      "code": "0203135000",
+      "name": "Santiago City",
+      "value": "Santiago City",
+      "province": "Isabela"
+    },
+    {
+      "code": "0304917000",
+      "name": "Science City of Muñoz",
+      "value": "Science City of Muñoz",
+      "province": "Nueva Ecija"
+    },
+    {
+      "code": "1804526000",
+      "name": "Silay City",
+      "value": "Silay City",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "1804527000",
+      "name": "Sipalay City",
+      "value": "Sipalay City",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "0506216000",
+      "name": "Sorsogon City",
+      "value": "Sorsogon City",
+      "province": "Sorsogon"
+    },
+    {
+      "code": "0401028000",
+      "name": "Sto. Tomas City",
+      "value": "Sto. Tomas City",
+      "province": "Batangas"
+    },
+    {
+      "code": "1606724000",
+      "name": "Surigao City",
+      "value": "Surigao City",
+      "province": "Surigao Del Norte"
+    },
+    {
+      "code": "0500517000",
+      "name": "Tabaco City",
+      "value": "Tabaco City",
+      "province": "Albay"
+    },
+    {
+      "code": "1403213000",
+      "name": "Tabuk City",
+      "value": "Tabuk City",
+      "province": "Kalinga"
+    },
+    {
+      "code": "0831600000",
+      "name": "Tacloban City",
+      "value": "Tacloban City",
+      "province": "Leyte"
+    },
+    {
+      "code": "1206511000",
+      "name": "Tacurong City",
+      "value": "Tacurong City",
+      "province": "Sultan Kudarat"
+    },
+    {
+      "code": "0402119000",
+      "name": "Tagaytay City",
+      "value": "Tagaytay City",
+      "province": "Cavite"
+    },
+    {
+      "code": "0701242000",
+      "name": "Tagbilaran City",
+      "value": "Tagbilaran City",
+      "province": "Bohol"
+    },
+    {
+      "code": "1381500000",
+      "name": "Taguig City",
+      "value": "Taguig City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "1102319000",
+      "name": "Tagum City",
+      "value": "Tagum City",
+      "province": "Davao Del Norte"
+    },
+    {
+      "code": "0702250000",
+      "name": "Talisay City",
+      "value": "Talisay City, Cebu",
+      "province": "Cebu"
+    },
+    {
+      "code": "1804528000",
+      "name": "Talisay City",
+      "value": "Talisay City, Negros Occidental",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "0401031000",
+      "name": "Tanauan City",
+      "value": "Tanauan City",
+      "province": "Batangas"
+    },
+    {
+      "code": "1606819000",
+      "name": "Tandag City",
+      "value": "Tandag City",
+      "province": "Surigao Del Sur"
+    },
+    {
+      "code": "1004215000",
+      "name": "Tangub City",
+      "value": "Tangub City",
+      "province": "Misamis Occidental"
+    },
+    {
+      "code": "1804621000",
+      "name": "Tanjay City",
+      "value": "Tanjay City",
+      "province": "Negros Oriental"
+    },
+    {
+      "code": "0306916000",
+      "name": "Tarlac City",
+      "value": "Tarlac City",
+      "province": "Tarlac"
+    },
+    {
+      "code": "0405647000",
+      "name": "Tayabas City",
+      "value": "Tayabas City",
+      "province": "Quezon"
+    },
+    {
+      "code": "0702251000",
+      "name": "Toledo City",
+      "value": "Toledo City",
+      "province": "Cebu"
+    },
+    {
+      "code": "0402122000",
+      "name": "Trece Martires City",
+      "value": "Trece Martires City",
+      "province": "Cavite"
+    },
+    {
+      "code": "0201529000",
+      "name": "Tuguegarao City",
+      "value": "Tuguegarao City",
+      "province": "Cagayan"
+    },
+    {
+      "code": "0105546000",
+      "name": "Urdaneta City",
+      "value": "Urdaneta City",
+      "province": "Pangasinan"
+    },
+    {
+      "code": "1001321000",
+      "name": "Valencia City",
+      "value": "Valencia City",
+      "province": "Bukidnon"
+    },
+    {
+      "code": "1381600000",
+      "name": "Valenzuela City",
+      "value": "Valenzuela City",
+      "province": "Metro Manila"
+    },
+    {
+      "code": "1804531000",
+      "name": "Victorias City",
+      "value": "Victorias City",
+      "province": "Negros Occidental"
+    },
+    {
+      "code": "0102934000",
+      "name": "Vigan City",
+      "value": "Vigan City",
+      "province": "Ilocos Sur"
+    },
+    {
+      "code": "0931700000",
+      "name": "Zamboanga City",
+      "value": "Zamboanga City",
+      "province": "Zamboanga Del Sur"
+    }
+  ]
+}

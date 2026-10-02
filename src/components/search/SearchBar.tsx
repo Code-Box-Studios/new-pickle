@@ -7,7 +7,9 @@ import { CalendarDays, Clock3, MapPin, Search, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SelectField, SelectItem } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
+import { CityPicker } from "@/components/search/CityPicker";
+import type { CityOption } from "@/lib/cities";
 import { CourtPattern, PickleballIcon } from "@/components/ui/pickleball";
 import { DURATIONS, TIME_PRESETS } from "@/lib/search-params";
 
@@ -19,7 +21,7 @@ export function SearchBar({
   defaultDuration = "60",
   heading,
 }: {
-  cities: string[];
+  cities: CityOption[];
   defaultCity: string;
   defaultDate: string;
   defaultTime?: string;
@@ -55,31 +57,24 @@ export function SearchBar({
         aria-label="Find available courts"
         className="relative grid grid-cols-2 gap-x-4 gap-y-5 lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto] lg:items-end lg:gap-5"
       >
-        <Label className="col-span-2 block min-w-0 sm:col-span-1">
-          <span className="mb-2 flex items-center gap-2 text-xs font-medium text-ink-soft">
+        <div className="col-span-2 block min-w-0 sm:col-span-1">
+          <Label htmlFor="search-city" className="mb-2 flex items-center gap-2 text-xs font-medium text-ink-soft">
             <MapPin className="size-3.5 text-brand-600" aria-hidden />
             Location
-          </span>
-          <SelectField value={city} onValueChange={(value) => setCity(value)}>
-            {cities.map((c) => (
-              <SelectItem key={c} value={String(c)}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectField>
-        </Label>
-        <Label className="col-span-2 block min-w-0 sm:col-span-1">
-          <span className="mb-2 flex items-center gap-2 text-xs font-medium text-ink-soft">
+          </Label>
+          <CityPicker id="search-city" cities={cities} value={city} onValueChange={setCity} />
+        </div>
+        <div className="col-span-2 block min-w-0 sm:col-span-1">
+          <Label htmlFor="search-date" className="mb-2 flex items-center gap-2 text-xs font-medium text-ink-soft">
             <CalendarDays className="size-3.5 text-brand-600" aria-hidden />
             Date
-          </span>
-          <Input
-            type="date"
-            className="min-w-0"
+          </Label>
+          <DatePicker
+            id="search-date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onValueChange={setDate}
           />
-        </Label>
+        </div>
         <Label className="block min-w-0">
           <span className="mb-2 flex items-center gap-2 text-xs font-medium text-ink-soft">
             <Clock3 className="size-3.5 text-brand-600" aria-hidden />

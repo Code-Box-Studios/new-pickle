@@ -1,6 +1,6 @@
 # RallyPoint
 
-A web-only **marketplace for pickleball courts** in Davao — players discover
+A responsive, installable **marketplace for pickleball courts** — players discover
 venues, see real availability, hold a court, pay the venue, and track
 confirmation. Venue owners receive reservations and confirm payments.
 
@@ -16,12 +16,43 @@ for the plan.
 
 Next.js 16 (App Router) · TypeScript · Prisma · PostgreSQL 16 · Tailwind CSS 4 ·
 shadcn/ui (Radix) · Payload CMS · `jose` (sessions) · Vitest.
+The city combobox uses `cmdk`; the calendar uses React DayPicker.
 
 ## Design
 
 [DESIGN.md](DESIGN.md) documents the teal/green palette, typography, component
 tokens, and motion. Shared shadcn primitives live in `src/components/ui`; their
 semantic theme and reduced-motion rules live in `src/app/globals.css`.
+
+The homepage hero features RallyPoint's own paddle-and-ball logo and decorative
+brand illustration, independent of venue listings. Venues appear in the separate
+**Popular venues** section. Hero motion is brief and respects reduced-motion
+preferences. The header has no tagline; the footer credits **Code Box Studios**.
+
+Date fields use the shared shadcn **Calendar + Popover** picker, including owner
+rescheduling. They display readable dates and submit `YYYY-MM-DD` civil dates
+without shifting the selected day through UTC conversion.
+
+## Nationwide city search
+
+The homepage and search page offer a searchable catalog of all **149 Philippine
+cities**, including locations without published venues. Search accepts city or
+province names and unaccented names such as `paranaque`. Duplicate city names
+include the province in their search value. The default remains **Davao City**.
+Existing published venue location strings are retained for compatibility.
+
+The city names and current PSGC codes come from the
+[Philippine Statistics Authority's city list](https://psa.gov.ph/classification/psgc/cities),
+verified on **2026-10-02**. Province context is supplemented by the
+[PSGC API dataset](https://psgc.gitlab.io/api/). The bundled snapshot lives in
+`src/lib/data/philippine-cities.json`; there are no runtime calls to these sources.
+PSA data is licensed under [CC BY 4.0](https://psa.gov.ph/terms-of-use).
+Update the snapshot when the PSGC city list changes, retaining unique search
+values for duplicate names. Venue locations currently store text rather than
+PSGC codes; enter the catalog value when listing a venue in a duplicate-name city.
+
+The demo seeds still contain five Davao venues. Selecting another city shows
+**No venues here yet** until a venue there is published and approved.
 
 ## Prerequisites
 
@@ -114,7 +145,7 @@ from the banner. **Edit website** links also appear in the admin navigation.
 
 - **Homepage:** hero text, links, venue-section copy, how-it-works steps, and the
   venue-owner call to action.
-- **Header & footer:** navigation labels, tagline, footer links, and the
+- **Header & footer:** navigation labels, footer tagline, footer links, and the
   **Powered by Code Box Studios** credit.
 - **Venue landing page:** headline, description, button labels, and benefits.
 
@@ -138,7 +169,7 @@ the generated migration, then apply it with `npm run cms:migrate`.
 
 ## The core journey
 
-1. Search Davao → open a venue → pick a court, time, and duration.
+1. Search a city → open a venue → pick a court, time, and duration.
 2. **Reserve** → the court is `HELD` with a server-authoritative countdown.
 3. Enter details → **pay the venue** (GCash/Maya) and upload a screenshot.
 4. Booking becomes `PENDING_CONFIRMATION`.
@@ -169,6 +200,8 @@ reads denied).
 CMS tests also cover private drafts, published content, anonymous access,
 admin-role revocation, repeat seeding, and safe login return paths. The suite
 applies both Prisma and CMS migrations to `TEST_DATABASE_URL`.
+UI tests also cover date selection with ISO form values, accented city search,
+and national city options when no venues are published.
 
 ## Scripts
 

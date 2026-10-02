@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { SearchBar } from "@/components/search/SearchBar";
 import { VenueCard } from "@/components/venue/VenueCard";
-import { FeaturedCourtsSlideshow } from "@/components/venue/FeaturedCourtsSlideshow";
+import { BrandShowcase } from "@/components/ui/brand-showcase";
 import { EmptyState } from "@/components/ui/states";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { CourtPattern, PaddleIcon, PickleballIcon, RallyScene } from "@/components/ui/pickleball";
 import { featuredVenues, listCities } from "@/lib/venues";
 import { isoDate } from "@/lib/format";
+import { DEFAULT_CITY } from "@/lib/cities";
 import { getHomeContent } from "@/cms/content";
 const stepIcons = {
   map: MapPin,
@@ -33,31 +34,13 @@ export default async function HomePage() {
     featuredVenues(),
     getHomeContent(),
   ]);
-  const cityOptions = cities.length ? cities : ["Davao City"];
   const tomorrow = new Date();
   tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
   const defaultDate = isoDate(tomorrow);
-  const heroCourts = venues
-    .filter((venue) => venue.photos.length > 0)
-    .map((venue) => ({
-      slug: venue.slug,
-      name: venue.name,
-      city: venue.city,
-      photo: venue.photos[0],
-    }));
 
   return (
     <>
       <section className="hero-band relative overflow-hidden text-white">
-        <svg
-          className="hero-court-lines"
-          viewBox="0 0 600 800"
-          fill="none"
-          aria-hidden="true"
-        >
-          <rect x="40" y="40" width="520" height="720" rx="12" />
-          <path d="M40 285h520M40 515h520M300 40v245M300 515v245M40 400h520" />
-        </svg>
         <div className="page-shell relative pb-24 pt-12 sm:pb-28 sm:pt-20 lg:pb-32 lg:pt-24">
           <div className="grid items-center gap-10 lg:grid-cols-[1.12fr_1fr] lg:gap-16">
             <div className="max-w-xl">
@@ -102,40 +85,8 @@ export default async function HomePage() {
                 </span>
               </div>
             </div>
-            <div className="hero-court-frame motion-enter motion-delay-2 relative hidden min-w-0 lg:block">
-              <div className="hero-equipment" aria-hidden="true">
-                <PaddleIcon className="hero-paddle size-24 text-brand-300" />
-                <PickleballIcon className="hero-ball size-10 text-primary" />
-              </div>
-              {heroCourts.length > 0 ? (
-                <FeaturedCourtsSlideshow
-                  courts={heroCourts}
-                  isoDate={defaultDate}
-                />
-              ) : (
-                <Card
-                  className="hidden aspect-[5/4] place-items-center border-white/15 bg-brand-teal-mid p-12 lg:grid"
-                  aria-hidden="true"
-                >
-                  <svg
-                    viewBox="0 0 300 380"
-                    className="h-full text-brand-300"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <rect x="32" y="20" width="236" height="340" rx="3" />
-                    <path d="M32 138h236M32 242h236M150 20v118M150 242v118M32 190h236" />
-                    <circle
-                      cx="220"
-                      cy="282"
-                      r="9"
-                      fill="var(--primary)"
-                      stroke="none"
-                    />
-                  </svg>
-                </Card>
-              )}
+            <div className="motion-enter motion-delay-2 min-w-0">
+              <BrandShowcase />
             </div>
           </div>
         </div>
@@ -147,8 +98,8 @@ export default async function HomePage() {
       >
         <SearchBar
           heading={content.primaryLabel}
-          cities={cityOptions}
-          defaultCity={cityOptions[0]}
+          cities={cities}
+          defaultCity={DEFAULT_CITY}
           defaultDate={defaultDate}
         />
       </div>

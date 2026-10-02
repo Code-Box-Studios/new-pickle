@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { SelectField, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import type { BookingStatus } from "@/generated/prisma";
@@ -99,11 +100,10 @@ export function ManageActions({
         <Card className="space-y-4 rounded-lg border border-brand-200 bg-mist p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Date" htmlFor="rs-date">
-              <Input
+              <DatePicker
                 id="rs-date"
-                type="date"
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
+                onValueChange={setDate}
                 className="min-w-0 px-3"
               />
             </Field>

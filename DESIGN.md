@@ -207,6 +207,20 @@ components:
     backgroundColor: "{colors.brand-green-soft}"
     textColor: "{colors.brand-green-dark}"
     rounded: "{rounded.lg}"
+  brand-showcase:
+    backgroundColor: "{colors.brand-teal-deep}"
+    textColor: "{colors.on-dark}"
+    rounded: "{rounded.xxl}"
+  date-picker:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    height: 44px
+  city-combobox:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    height: 44px
 ---
 
 # RallyPoint design system
@@ -243,8 +257,8 @@ columns. Management workspaces use a 256px desktop sidebar and mobile navigation
 ## Elevation & Depth
 
 Default cards use a 1px hairline border and little or no shadow. Floating search
-and photo surfaces use restrained teal shadows. Hero gradients and faint court
-lines add depth. Dialogs use a soft backdrop blur and the shared elevated shadow.
+and photo surfaces use restrained teal shadows. Hero gradients and subtle brand
+orbits add depth. Dialogs use a soft backdrop blur and the shared elevated shadow.
 
 ## Shapes
 
@@ -256,6 +270,9 @@ Buttons and status badges are pills. Cards use {rounded.lg}; inputs use
 Shared controls use locally owned shadcn components. Booking schedules and
 calendars compose those controls while retaining their domain behavior. Radix
 Select menus support keyboard selection; links preserve route semantics.
+Date controls compose shadcn Calendar and Popover, with green selected-day pills.
+The nationwide city combobox composes shadcn Command and Popover, showing city
+and province with keyboard search. Both overlays fit the available viewport.
 
 Page changes fade for 300ms. Hero entrances stagger by 60ms with a smooth easing
 curve. Dialogs enter for 320ms and exit for 180ms. Scroll reveals enhance browsers
@@ -270,6 +287,8 @@ CSS background is transparent.
 
 The RallyPoint mark combines a paddle, an R monogram, and a perforated ball.
 Use the same mark in the header, footer, workspace navigation, and favicon.
+The homepage hero showcases only RallyPoint branding: its mark, wordmark,
+paddles, ball, and orbital lines. Keep venue promotions in discovery sections.
 Court boundaries, net lines, score tiles, and paddle details carry the identity
 through search, discovery, booking steps, the owner banner, and the footer.
 The decorative rally follows its section's scroll timeline where supported;

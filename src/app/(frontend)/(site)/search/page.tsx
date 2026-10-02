@@ -8,10 +8,11 @@ import { searchAvailability } from "@/lib/availability/engine";
 import { cached } from "@/lib/availability/cache";
 import { resolveTimeWindow } from "@/lib/search-params";
 import { isoDate, longDateLabel, parseIsoDate } from "@/lib/format";
+import { DEFAULT_CITY } from "@/lib/cities";
 
 export const metadata: Metadata = {
   title: "Search courts",
-  description: "Find available pickleball courts in Davao by date and time.",
+  description: "Find available pickleball courts across Philippine cities by date and time.",
 };
 
 function first(v: string | string[] | undefined): string | undefined {
@@ -25,12 +26,11 @@ export default async function SearchPage({
 }) {
   const sp = await searchParams;
   const cities = await listCities();
-  const cityOptions = cities.length ? cities : ["Davao City"];
 
   const tomorrow = new Date();
   tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
 
-  const city = first(sp.city) ?? cityOptions[0];
+  const city = first(sp.city) ?? DEFAULT_CITY;
   const dateStr = first(sp.date) ?? isoDate(tomorrow);
   const timePreset = first(sp.time) ?? "any";
   const duration = first(sp.duration) ?? "60";
@@ -47,7 +47,7 @@ export default async function SearchPage({
   return (
     <div className="page-shell py-8 sm:py-10 lg:py-12">
       <SearchBar
-        cities={cityOptions}
+        cities={cities}
         defaultCity={city}
         defaultDate={dateStr}
         defaultTime={timePreset}

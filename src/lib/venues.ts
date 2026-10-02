@@ -1,14 +1,19 @@
 import prisma from "@/lib/prisma";
 import type { VenueCardData } from "@/components/venue/VenueCard";
+import { PHILIPPINE_CITIES, type CityOption } from "@/lib/cities";
 
-export async function listCities(): Promise<string[]> {
+export async function listCities(): Promise<CityOption[]> {
   const rows = await prisma.venue.findMany({
     where: { isPublished: true, status: "APPROVED" },
     distinct: ["city"],
     select: { city: true },
     orderBy: { city: "asc" },
   });
-  return rows.map((r) => r.city);
+  const options = new Map(PHILIPPINE_CITIES.map(city => [city.value, city]));
+  for (const row of rows) {
+    if (!options.has(row.city)) options.set(row.city, { value: row.city, name: row.city });
+  }
+  return [...options.values()].sort((a, b) => a.value.localeCompare(b.value, "en"));
 }
 
 export async function featuredVenues(limit = 6): Promise<VenueCardData[]> {

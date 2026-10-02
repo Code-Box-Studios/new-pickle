@@ -179,17 +179,6 @@
     background:
       radial-gradient(ellipse at 80% 10%, #0c4e50 0%, transparent 55%), #001e2b;
   }
-  .hero-court-lines {
-    position: absolute;
-    top: -22%;
-    right: -14%;
-    width: 70%;
-    height: 150%;
-    transform: rotate(-24deg);
-    stroke: rgb(255 255 255 / 0.055);
-    stroke-width: 1;
-    pointer-events: none;
-  }
   .hero-accent {
     position: relative;
     display: inline-block;
@@ -206,33 +195,14 @@
     transform-origin: left;
     animation: court-line-enter 900ms var(--ease-smooth) 250ms backwards;
   }
-  .hero-court-frame::before {
-    content: "";
-    position: absolute;
-    inset: -18px;
-    border: 1px solid rgb(113 232 171 / 0.18);
-    border-radius: 24px;
-    transform: rotate(4deg);
-    pointer-events: none;
-  }
-  .hero-equipment {
-    position: absolute;
-    top: -50px;
-    left: -56px;
-    z-index: 1;
-    width: 140px;
-    height: 110px;
-    pointer-events: none;
-  }
-  .hero-paddle {
-    transform: rotate(-14deg);
-    filter: drop-shadow(0 6px 12px rgb(0 30 43 / 0.3));
-  }
-  .hero-ball {
-    position: absolute;
-    top: 0;
-    right: 5px;
+  .brand-showcase-ball {
     animation: hero-serve 2.8s var(--ease-smooth) 350ms backwards;
+  }
+  .brand-showcase-mark {
+    animation: brand-mark-settle 1.8s var(--ease-smooth) 100ms backwards;
+  }
+  .brand-showcase-paddle {
+    animation: brand-paddle-settle 1.8s var(--ease-smooth) 250ms backwards;
   }
   .rally-scene {
     aspect-ratio: 2;
@@ -423,6 +393,14 @@
   78% { transform: translate(-4px, 4px) rotate(-12deg); }
   100% { transform: translate(0, 0) rotate(0); }
 }
+@keyframes brand-mark-settle {
+  from { transform: translateY(14px) rotate(0); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes brand-paddle-settle {
+  from { transform: translate(-12px, 10px); opacity: 0; }
+  to { transform: translate(0, 0); opacity: 1; }
+}
 @keyframes pickle-rally {
   0%, 100% { transform: translate(0, 0); }
   18% { transform: translate(110px, 75px) rotate(70deg); }
@@ -580,7 +558,9 @@
     animation: none !important;
   }
   .hero-accent::after,
-  .hero-ball,
+  .brand-showcase-ball,
+  .brand-showcase-mark,
+  .brand-showcase-paddle,
   .rally-ball,
   .rally-paddle,
   .rally-trail,
