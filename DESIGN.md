@@ -195,6 +195,18 @@ components:
     backgroundColor: "{colors.brand-teal-deep}"
     textColor: "{colors.on-dark-muted}"
     padding: "{spacing.section}"
+  brand-mark:
+    backgroundColor: "{colors.brand-teal-deep}"
+    textColor: "{colors.brand-green}"
+    rounded: "{rounded.lg}"
+  court-score:
+    backgroundColor: "{colors.surface-soft}"
+    textColor: "{colors.brand-green-dark}"
+    rounded: "{rounded.md}"
+  rally-illustration:
+    backgroundColor: "{colors.brand-green-soft}"
+    textColor: "{colors.brand-green-dark}"
+    rounded: "{rounded.lg}"
 ---
 
 # RallyPoint design system
@@ -255,6 +267,16 @@ Demo venue images use a local court illustration in place of the seed data's
 random stock placeholders. The image component preserves real uploaded media.
 Outlined button tokens describe their effective white or teal surface; their
 CSS background is transparent.
+
+The RallyPoint mark combines a paddle, an R monogram, and a perforated ball.
+Use the same mark in the header, footer, workspace navigation, and favicon.
+Court boundaries, net lines, score tiles, and paddle details carry the identity
+through search, discovery, booking steps, the owner banner, and the footer.
+The decorative rally follows its section's scroll timeline where supported;
+other browsers get one short entrance. Hero and logo motion settles rather
+than looping continuously, and all added motion respects reduced motion.
+Home links explicitly return to the top, including repeat activations. Search
+anchors retain their smooth scroll and the sticky header offset.
 
 ## Do's and Don'ts
 

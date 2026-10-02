@@ -32,7 +32,7 @@ export default async function AdminVenuesPage({
 
   const venues = await prisma.venue.findMany({
     where: filter.status ? { status: filter.status } : {},
-    include: { owner: { select: { email: true } }, verification: true },
+    include: { owner: { select: { email: true, name: true, verifiedMobile: true } }, verification: true },
     orderBy: { updatedAt: "desc" },
     take: 100,
   });
@@ -94,7 +94,7 @@ export default async function AdminVenuesPage({
                     {v.name}
                   </p>
                   <p className="mt-1 break-words text-sm leading-relaxed text-muted-foreground">
-                    {v.owner.email} · {v.barangay ? `${v.barangay}, ` : ""}
+                    {v.owner.email ?? v.owner.name ?? v.owner.verifiedMobile} · {v.barangay ? `${v.barangay}, ` : ""}
                     {v.city}
                   </p>
                   <p className="mt-3 text-xs text-muted-foreground">

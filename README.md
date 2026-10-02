@@ -67,6 +67,45 @@ Seeded accounts:
 
 The owner owns all seeded venues (so the confirm flow works from any booking).
 
+The **Phone number** tab also accepts Philippine mobile numbers (`09…` or
+`+639…`). In development it shows a local six-digit verification code on that
+screen. Codes expire after ten minutes, allow five attempts, and can only be
+used once. Resend is limited to one per minute and five per hour per number.
+Accounts are created only after verification. A booking contact number is not
+a verified login identity and does not grant access to an existing email account.
+
+For real SMS, set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and
+`TWILIO_VERIFY_SERVICE_SID` for a six-digit [Twilio Verify service](https://www.twilio.com/docs/verify/api/verification).
+Production refuses development codes and requires these credentials for phone
+sign-in. Set `PHONE_AUTH_PROXY_SECRET` to a private random secret shared with
+your reverse proxy. The proxy must overwrite `X-Real-IP` with the client address
+and add `X-RallyPoint-Proxy-Secret` with that secret. The application rejects
+production SMS requests without valid proxy proof; client-supplied forwarding
+headers cannot create arbitrary rate-limit buckets. Never expose the proxy
+secret to browser JavaScript.
+
+## Installing on a phone
+
+RallyPoint is a Progressive Web App. **Install RallyPoint** in the footer opens
+the browser's install prompt when available, or platform instructions. Android
+supports installation through Chrome/Edge; on iPhone open Safari and choose
+Share → Add to Home Screen. The installed site opens in its own window.
+
+Production needs HTTPS (localhost also works). The service worker registers in
+production and caches only the static reconnect screen and brand assets. Live
+court availability, bookings, sign-in, CMS, payments, and private content stay
+on the network. Offline navigation shows a reconnect screen. Run `pnpm build`
+then `pnpm start` to test installation locally.
+
+## pnpm development
+
+`pnpm install` installs dependencies; `pnpm run dev` starts the app. pnpm 12
+defaults to auto-installing stale dependencies before scripts. This project's
+`pnpm-workspace.yaml` uses `verifyDepsBeforeRun: warn` so scripts don't install
+packages implicitly, and explicitly allows the required native package builds.
+After changing dependencies, run `pnpm install`, then `pnpm run db:generate`.
+Use one package manager consistently for your local `node_modules`.
+
 ## Editing website content
 
 Open **[/cms](http://localhost:3000/cms)** and sign in with an existing RallyPoint

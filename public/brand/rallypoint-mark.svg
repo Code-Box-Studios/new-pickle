@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <title>RallyPoint</title>
+  <rect x="1" y="1" width="46" height="46" rx="14" fill="#001e2b"/>
+  <rect x="1.5" y="1.5" width="45" height="45" rx="13.5" stroke="#71e8ab" stroke-opacity=".2"/>
+  <g transform="rotate(-28 24 25)">
+    <rect x="14" y="7" width="21" height="27" rx="9" fill="#00ed64"/>
+    <path d="M21 31h7v9a3.5 3.5 0 0 1-7 0z" fill="#00ed64"/>
+    <path d="M20 26V15h5a3.5 3.5 0 0 1 0 7h-5m5 0 4 4" stroke="#001e2b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M22 36h5M22 39h5" stroke="#001e2b" stroke-opacity=".45" stroke-width="1.2"/>
+  </g>
+  <circle cx="36" cy="11.5" r="7" fill="#e3fcf7" stroke="#001e2b" stroke-width="2"/>
+  <g fill="#00684a">
+    <circle cx="34" cy="9.5" r="1.1"/>
+    <circle cx="38.5" cy="10.5" r="1.1"/>
+    <circle cx="35.8" cy="14" r="1.1"/>
+  </g>
+</svg>

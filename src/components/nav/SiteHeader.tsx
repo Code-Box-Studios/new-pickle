@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { NavigationLink as Link } from "@/components/nav/NavigationLink";
 import { usePathname } from "next/navigation";
 import type { SessionUser } from "@/lib/auth/session";
 import {
@@ -54,14 +54,11 @@ export function SiteHeader({
     <header className="sticky top-0 z-40 border-b border-border/70 bg-white/95 shadow-[0_1px_12px_rgb(0_30_43/0.025)] backdrop-blur-xl">
       <div className="page-shell flex h-[72px] items-center gap-2 sm:gap-4 lg:h-[88px]">
         <Link
-          href="/"
-          className="group shrink-0 rounded-lg"
+          href="/#top"
+          className="brand-link group shrink-0 rounded-lg"
           aria-label="RallyPoint home"
         >
-          <Brand className="text-lg sm:text-[22px] [&>span]:shadow-[0_4px_16px_-6px_rgb(0_237_100/0.5)]" />
-          <span className="mt-0.5 hidden pl-[46px] text-[10px] font-medium tracking-wide text-muted-foreground xl:block">
-            {content.headerTagline}
-          </span>
+          <Brand className="text-lg sm:text-[22px]" />
         </Link>
         <nav
           aria-label="Main navigation"
@@ -109,8 +106,8 @@ export function SiteHeader({
           {session ? (
             <>
               <NotificationBell />
-              <span className="sr-only" title={session.email}>
-                {session.email}
+              <span className="sr-only" title={session.email ?? session.mobile ?? undefined}>
+                {session.email ?? session.mobile}
               </span>
               <form
                 action="/api/auth/logout"

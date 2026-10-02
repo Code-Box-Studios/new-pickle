@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { NavigationLink as Link } from "@/components/nav/NavigationLink";
 import { buttonVariants } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
 
@@ -16,7 +16,7 @@ export default function NotFound() {
         <p className="mt-3 leading-relaxed text-muted-foreground">
           The court you&apos;re looking for isn&apos;t here.
         </p>
-        <Link href="/" className={`mt-7 ${buttonVariants()}`}>
+        <Link href="/#top" className={`mt-7 ${buttonVariants()}`}>
           Back to home
         </Link>
       </div>

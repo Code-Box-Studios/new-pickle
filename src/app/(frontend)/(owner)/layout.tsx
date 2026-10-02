@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth/session";
 import { resolveOwnerVenues } from "@/lib/venue/owner-context";
 import { OwnerSidebar } from "@/components/nav/OwnerSidebar";
 import { OwnerMobileNav } from "@/components/nav/OwnerMobileNav";
-import Link from "next/link";
+import { NavigationLink as Link } from "@/components/nav/NavigationLink";
 import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -35,7 +35,7 @@ export default async function OwnerLayout({
             </p>
           </div>
           <Button asChild variant="outline" size="sm">
-            <Link href="/">
+            <Link href="/#top">
               Open marketplace <ArrowUpRight aria-hidden />
             </Link>
           </Button>

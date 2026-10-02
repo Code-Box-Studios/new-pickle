@@ -28,7 +28,7 @@ export function OwnerSidebar({
   session,
   activeVenueId,
 }: {
-  session: { email: string; role?: string };
+  session: { email: string | null; mobile?: string | null; role?: string };
   activeVenueId?: string;
 }) {
   const pathname = usePathname();
@@ -95,7 +95,7 @@ export function OwnerSidebar({
             <NotificationBell />
           </div>
           <span className="min-w-0 truncate text-xs text-white/65">
-            {session.email}
+            {session.email ?? session.mobile ?? "Your account"}
           </span>
         </div>
         <form action="/api/auth/logout" method="post" className="mt-2">

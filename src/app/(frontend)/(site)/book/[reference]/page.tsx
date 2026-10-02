@@ -78,8 +78,8 @@ export default async function BookPage({
                 bookingId={b.id}
                 expiresAt={b.holdExpiresAt!.toISOString()}
                 defaultName={b.customerName ?? ""}
-                defaultMobile={b.customerMobile ?? ""}
-                defaultEmail={b.customerEmail ?? session.email}
+                defaultMobile={b.customerMobile ?? session.mobile ?? ""}
+                defaultEmail={b.customerEmail ?? session.email ?? ""}
               />
             </Card>
           ) : (

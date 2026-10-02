@@ -1,6 +1,6 @@
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { NavigationLink as Link } from "@/components/nav/NavigationLink";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { ArrowUpRight, Building2, LogOut, FilePenLine } from "lucide-react";
@@ -61,7 +61,7 @@ export default async function AdminLayout({
           </Button>
         </nav>
         <div className="border-t border-white/10 px-6 py-5">
-          <p className="truncate text-xs text-white/65">{session.email}</p>
+          <p className="truncate text-xs text-white/65">{session.email ?? session.mobile}</p>
           <form action="/api/auth/logout" method="post" className="mt-2">
             <Button
               variant="ghost"
@@ -74,7 +74,7 @@ export default async function AdminLayout({
           </form>
         </div>
       </aside>
-      {/* Mobile header — keep simple for admin (no mobile nav needed, admin is desktop-primary) */}
+      {/* Mobile workspace actions */}
       <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur lg:hidden">
         <div className="flex h-16 items-center justify-between px-4">
           <Link
@@ -86,7 +86,7 @@ export default async function AdminLayout({
               Admin
             </span>
           </Link>
-          <div className="flex items-center gap-1 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <Button asChild variant="ghost" size="icon">
               <Link href="/cms" aria-label="Edit website">
                 <FilePenLine aria-hidden />
@@ -95,20 +95,20 @@ export default async function AdminLayout({
             <Button
               asChild
               variant="ghost"
-              className={cn(
-                "h-auto p-0",
-                "flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
-              )}
+              size="icon"
+              className="sm:w-auto sm:px-3"
             >
-              <Link href="/admin/venues" aria-current="page">
-                Venues
+              <Link href="/admin/venues" aria-label="Venues">
+                <Building2 aria-hidden />
+                <span className="hidden sm:inline">Venues</span>
               </Link>
             </Button>
             <form action="/api/auth/logout" method="post">
               <Button
                 variant="ghost"
                 type="submit"
-                className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg text-sm font-medium text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                size="icon"
+                className="text-muted-foreground sm:w-auto sm:px-3"
               >
                 <LogOut className="size-4" aria-hidden />
                 <span className="sr-only sm:not-sr-only">Sign out</span>
@@ -127,7 +127,7 @@ export default async function AdminLayout({
             </p>
           </div>
           <Button asChild variant="outline" size="sm">
-            <Link href="/">
+            <Link href="/#top">
               Open marketplace <ArrowUpRight aria-hidden />
             </Link>
           </Button>

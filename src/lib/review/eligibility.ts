@@ -33,6 +33,6 @@ export async function reviewEligibility(bookingId: string, userId: string): Prom
 }
 
 /** Public-safe author label. Never leak email/mobile — only a name or the email local-part. */
-export function reviewerDisplayName(user: { name: string | null; email: string }): string {
-  return user.name ?? user.email.split("@")[0];
+export function reviewerDisplayName(user: { name: string | null; email: string | null }): string {
+  return user.name ?? user.email?.split("@")[0] ?? "RallyPoint player";
 }

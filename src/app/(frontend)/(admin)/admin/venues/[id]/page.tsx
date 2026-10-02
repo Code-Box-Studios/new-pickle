@@ -33,7 +33,7 @@ export default async function AdminVenueReview({
   const v = await prisma.venue.findUnique({
     where: { id },
     include: {
-      owner: { select: { email: true, name: true } },
+      owner: { select: { email: true, name: true, verifiedMobile: true } },
       courts: { orderBy: { sortOrder: "asc" }, include: { schedules: true } },
       paymentMethods: true,
       verification: true,
@@ -64,7 +64,7 @@ export default async function AdminVenueReview({
         <div className="min-w-0 flex-1 basis-64">
           <h1 className="page-title">{v.name}</h1>
           <p className="mt-3 break-words text-sm leading-relaxed text-muted-foreground">
-            {v.owner.email} · {v.barangay ? `${v.barangay}, ` : ""}
+            {v.owner.email ?? v.owner.name ?? v.owner.verifiedMobile} · {v.barangay ? `${v.barangay}, ` : ""}
             {v.city}
           </p>
         </div>

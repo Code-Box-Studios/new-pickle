@@ -190,6 +190,88 @@
     stroke-width: 1;
     pointer-events: none;
   }
+  .hero-accent {
+    position: relative;
+    display: inline-block;
+  }
+  .hero-accent::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 2px;
+    width: 62%;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--primary), transparent);
+    transform-origin: left;
+    animation: court-line-enter 900ms var(--ease-smooth) 250ms backwards;
+  }
+  .hero-court-frame::before {
+    content: "";
+    position: absolute;
+    inset: -18px;
+    border: 1px solid rgb(113 232 171 / 0.18);
+    border-radius: 24px;
+    transform: rotate(4deg);
+    pointer-events: none;
+  }
+  .hero-equipment {
+    position: absolute;
+    top: -50px;
+    left: -56px;
+    z-index: 1;
+    width: 140px;
+    height: 110px;
+    pointer-events: none;
+  }
+  .hero-paddle {
+    transform: rotate(-14deg);
+    filter: drop-shadow(0 6px 12px rgb(0 30 43 / 0.3));
+  }
+  .hero-ball {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    animation: hero-serve 2.8s var(--ease-smooth) 350ms backwards;
+  }
+  .rally-scene {
+    aspect-ratio: 2;
+    pointer-events: none;
+  }
+  .rally-ball {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: pickle-rally 3.8s cubic-bezier(0.45, 0, 0.55, 1) 200ms backwards;
+  }
+  .rally-paddle {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .rally-paddle-left {
+    animation: paddle-return 3.8s ease-in-out 200ms backwards;
+  }
+  .rally-paddle-right {
+    animation: paddle-return 3.8s ease-in-out 200ms reverse backwards;
+  }
+  .rally-trail {
+    opacity: 0.45;
+    stroke-dashoffset: 80;
+    animation: rally-trail-enter 3.8s ease-out 200ms backwards;
+  }
+  .court-score {
+    box-shadow: inset 0 -3px 0 rgb(0 104 74 / 0.05);
+  }
+  .venue-card-details {
+    background: linear-gradient(180deg, #fff 60%, #f9fcfa);
+  }
+  .owner-court-art {
+    box-shadow: 0 12px 32px rgb(0 0 0 / 0.1);
+    transition: transform 500ms var(--ease-smooth);
+  }
+  .brand-ball {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
   .search-panel {
     box-shadow:
       0 12px 32px -12px rgb(0 30 43 / 0.14),
@@ -330,6 +412,42 @@
     opacity: 1;
   }
 }
+@keyframes court-line-enter {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+@keyframes hero-serve {
+  0% { transform: translate(-65px, 38px) rotate(-80deg) scale(0.8); opacity: 0; }
+  30% { opacity: 1; }
+  55% { transform: translate(8px, -12px) rotate(25deg); }
+  78% { transform: translate(-4px, 4px) rotate(-12deg); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+@keyframes pickle-rally {
+  0%, 100% { transform: translate(0, 0); }
+  18% { transform: translate(110px, 75px) rotate(70deg); }
+  42% { transform: translate(-108px, -4px) rotate(-55deg); }
+  67% { transform: translate(110px, 75px) rotate(70deg); }
+  85% { transform: translate(-108px, -4px) rotate(-55deg); }
+}
+@keyframes paddle-return {
+  0%, 30%, 55%, 78%, 100% { transform: rotate(0); }
+  18%, 42%, 67%, 85% { transform: rotate(-10deg); }
+}
+@keyframes rally-trail-enter {
+  from { stroke-dashoffset: 160; opacity: 0; }
+  to { stroke-dashoffset: 80; opacity: 0.45; }
+}
+@keyframes logo-ball-tap {
+  0%, 100% { transform: translate(0, 0); }
+  35% { transform: translate(2px, -3px) rotate(25deg); }
+  70% { transform: translate(-1px, 1px) rotate(-10deg); }
+}
+@keyframes button-serve {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  45% { transform: translate(3px, -3px) rotate(35deg); }
+  70% { transform: translate(1px, 1px) rotate(15deg); }
+}
 @keyframes content-enter {
   from {
     opacity: 0;
@@ -369,6 +487,19 @@
       animation-timeline: view();
       animation-range: entry 0% entry 18%;
     }
+    .rally-scene {
+      view-timeline-name: --pickle-rally;
+      view-timeline-axis: block;
+    }
+    .rally-scene .rally-ball,
+    .rally-scene .rally-paddle,
+    .rally-scene .rally-trail {
+      animation-timeline: --pickle-rally;
+      animation-range: entry 5% cover 45%;
+      animation-delay: 0ms;
+      animation-duration: auto;
+      animation-fill-mode: both;
+    }
   }
 }
 
@@ -386,6 +517,15 @@
   color: var(--destructive);
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .owner-cta:hover .owner-court-art {
+    transform: rotate(-3deg) translateY(-3px);
+  }
+  .brand-link:hover .brand-ball {
+    animation: logo-ball-tap 650ms var(--ease-smooth);
+  }
+  .serve-button:hover .serve-ball {
+    animation: button-serve 650ms var(--ease-smooth);
+  }
   .feature-card:hover {
     border-color: var(--color-brand-200);
     transform: translateY(-3px);
@@ -437,6 +577,15 @@
   .motion-enter,
   .stagger-enter > *,
   .reveal-section {
+    animation: none !important;
+  }
+  .hero-accent::after,
+  .hero-ball,
+  .rally-ball,
+  .rally-paddle,
+  .rally-trail,
+  .brand-ball,
+  .serve-ball {
     animation: none !important;
   }
   .court-photo-card,

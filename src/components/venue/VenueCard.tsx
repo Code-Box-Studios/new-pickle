@@ -64,7 +64,7 @@ export function VenueCard({
             </Badge>
           </div>
 
-          <div className="p-5">
+          <div className="venue-card-details p-5">
             <div className="flex items-start justify-between gap-3">
               <h3 className="min-w-0 text-lg font-semibold leading-snug tracking-tight text-ink">
                 {venue.name}
@@ -112,11 +112,13 @@ export function VenueCard({
                   View venue details
                 </span>
               )}
-              <ArrowUpRight
-                className="motion-arrow size-4 text-brand-700"
-                data-direction="up-right"
-                aria-hidden
-              />
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-secondary text-brand-700">
+                <ArrowUpRight
+                  className="motion-arrow size-4"
+                  data-direction="up-right"
+                  aria-hidden
+                />
+              </span>
             </div>
 
             {nextSlots && nextSlots.length > 0 && (

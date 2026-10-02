@@ -11,12 +11,13 @@ const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 export interface SessionUser {
   id: string;
-  email: string;
+  email: string | null;
+  mobile?: string | null;
   role: Role;
 }
 
 export async function signSession(u: SessionUser): Promise<string> {
-  return new SignJWT({ email: u.email, role: u.role })
+  return new SignJWT({ email: u.email, mobile: u.mobile, role: u.role })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(u.id)
     .setIssuedAt()
@@ -30,7 +31,8 @@ export async function verifySession(token: string): Promise<SessionUser | null> 
     if (!payload.sub) return null;
     return {
       id: String(payload.sub),
-      email: String(payload.email),
+      email: typeof payload.email === "string" ? payload.email : null,
+      mobile: typeof payload.mobile === "string" ? payload.mobile : null,
       role: payload.role as Role,
     };
   } catch {

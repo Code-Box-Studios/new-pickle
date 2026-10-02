@@ -7,8 +7,8 @@ const emails = [
   "cms-admin-test@rallypoint.test",
   "cms-owner-test@rallypoint.test",
 ];
-let admin: { id: string; email: string; role: "ADMIN" };
-let owner: { id: string; email: string; role: "OWNER" };
+  let admin: { id: string; email: string | null; role: "ADMIN" };
+  let owner: { id: string; email: string | null; role: "OWNER" };
 beforeAll(async () => {
   await prisma.user.deleteMany({ where: { email: { in: emails } } });
   const a = await prisma.user.create({

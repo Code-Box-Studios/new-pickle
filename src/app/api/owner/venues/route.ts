@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     const res = NextResponse.json({ id: venue.id });
     if (promoted) {
-      const jwt = await signSession({ id: session.id, email: session.email, role });
+    const jwt = await signSession({ ...session, role });
       res.cookies.set(sessionCookie(jwt));
     }
     return res;

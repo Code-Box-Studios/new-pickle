@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       priceCents: match.priceCents,
       userId: session.id,
       idempotencyKey,
-      customer: { email: session.email },
+      customer: { email: session.email, mobile: session.mobile },
     });
 
     return NextResponse.json({

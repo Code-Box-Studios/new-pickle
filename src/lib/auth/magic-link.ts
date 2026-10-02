@@ -73,7 +73,7 @@ export async function consumeMagicToken(raw: string): Promise<SessionUser | null
   if (burned.count === 0) return null;
 
   // Dev-only: the link has now been used, so remove it from the login banner.
-  forgetMagicLink(rec.user.email);
+  if (rec.user.email) forgetMagicLink(rec.user.email);
 
   return { id: rec.user.id, email: rec.user.email, role: rec.user.role };
 }

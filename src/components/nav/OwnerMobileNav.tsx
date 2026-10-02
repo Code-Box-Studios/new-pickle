@@ -33,7 +33,7 @@ export function OwnerMobileNav({
   session,
   activeVenueId,
 }: {
-  session: { email: string; role?: string };
+  session: { email: string | null; mobile?: string | null; role?: string };
   activeVenueId?: string;
 }) {
   const pathname = usePathname();
@@ -155,7 +155,7 @@ export function OwnerMobileNav({
         </nav>
         <div className="mt-5 border-t border-line pt-4">
           <p className="break-all px-1 text-xs text-muted-foreground">
-            {session.email}
+            {session.email ?? session.mobile ?? "Your account"}
           </p>
           <form action="/api/auth/logout" method="post" className="mt-2">
             <Button

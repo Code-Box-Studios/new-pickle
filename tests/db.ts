@@ -16,6 +16,7 @@ export async function resetDb(): Promise<void> {
     "favorites",
     "notifications",
     "magic_link_tokens",
+    "phone_challenges",
     "venue_staff",
     "venue_verifications",
     "sentry_connections",

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SelectField, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { CourtPattern, PickleballIcon } from "@/components/ui/pickleball";
 import { DURATIONS, TIME_PRESETS } from "@/lib/search-params";
 
 export function SearchBar({
@@ -16,12 +17,14 @@ export function SearchBar({
   defaultDate,
   defaultTime = "any",
   defaultDuration = "60",
+  heading,
 }: {
   cities: string[];
   defaultCity: string;
   defaultDate: string;
   defaultTime?: string;
   defaultDuration?: string;
+  heading?: string;
 }) {
   const router = useRouter();
   const [city, setCity] = useState(defaultCity);
@@ -37,11 +40,20 @@ export function SearchBar({
   }
 
   return (
-    <Card className="search-panel relative p-4 sm:p-5 lg:p-6">
+    <Card className="search-panel relative overflow-hidden p-4 sm:p-5 lg:p-6">
+      {heading && (
+        <div className="relative mb-5 flex items-center gap-3 border-b border-border/70 pb-4">
+          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-secondary text-brand-700">
+            <PickleballIcon className="size-5" />
+          </span>
+          <h2 className="text-base font-semibold tracking-tight text-ink">{heading}</h2>
+          <CourtPattern className="pointer-events-none absolute -right-5 -top-8 hidden w-40 rotate-[-20deg] text-brand-700 opacity-[0.08] sm:block" />
+        </div>
+      )}
       <form
         onSubmit={submit}
         aria-label="Find available courts"
-        className="grid grid-cols-2 gap-x-4 gap-y-5 lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto] lg:items-end lg:gap-5"
+        className="relative grid grid-cols-2 gap-x-4 gap-y-5 lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto] lg:items-end lg:gap-5"
       >
         <Label className="col-span-2 block min-w-0 sm:col-span-1">
           <span className="mb-2 flex items-center gap-2 text-xs font-medium text-ink-soft">

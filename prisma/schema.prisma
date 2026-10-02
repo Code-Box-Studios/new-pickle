@@ -70,7 +70,8 @@ enum BackendType {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
+  email     String?  @unique
+  verifiedMobile String? @unique
   name      String?
   mobile    String?
   role      Role     @default(CUSTOMER)
@@ -100,6 +101,23 @@ model MagicLinkToken {
 
   @@index([userId])
   @@map("magic_link_tokens")
+}
+
+model PhoneChallenge {
+  id          String    @id
+  phone       String
+  clientKey   String?
+  provider    String
+  providerSid String?
+  codeHash    String?
+  attempts    Int       @default(0)
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([phone, createdAt])
+  @@index([clientKey, createdAt])
+  @@map("phone_challenges")
 }
 
 model Venue {

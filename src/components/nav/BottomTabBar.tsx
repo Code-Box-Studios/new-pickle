@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { NavigationLink as Link } from "@/components/nav/NavigationLink";
 import { usePathname } from "next/navigation";
 import { CalendarCheck, Home, Search, User } from "lucide-react";
 import { cn } from "@/lib/cn";
