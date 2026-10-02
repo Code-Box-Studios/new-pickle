@@ -1,8 +1,16 @@
 import { Button } from "@/components/ui/button";
+import { PaddleIcon } from "@/components/ui/pickleball";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MapPin, ShieldCheck, Star } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Clock3,
+  MapPin,
+  ShieldCheck,
+  Star,
+} from "lucide-react";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { venueAvailability } from "@/lib/availability/engine";
@@ -139,10 +147,15 @@ export default async function VenuePage({
     }
   }
 
-  // Next 7 days for the date chips.
+  // Keep later calendar selections visible in the seven-day rail.
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const railStart = new Date(today);
+  if (date.getTime() > today.getTime() + 6 * 86_400_000) {
+    railStart.setTime(date.getTime() - 3 * 86_400_000);
+  }
   const dayChips = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setUTCHours(0, 0, 0, 0);
+    const d = new Date(railStart);
     d.setUTCDate(d.getUTCDate() + i);
     return {
       iso: isoDate(d),
@@ -159,144 +172,211 @@ export default async function VenuePage({
   );
 
   return (
-    <div className="mx-auto max-w-7xl pb-44 md:pb-28">
-      {/* Preview banner */}
-      {!live && (
-        <div className="mx-4 mb-5 mt-5 rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900 md:mx-6 lg:mx-8">
-          Preview — this venue isn&apos;t live yet. Only you and admins can see
-          this page.
-        </div>
-      )}
-      {live && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(venueJsonLd(venue)),
-          }}
-        />
-      )}
+    <div className="bg-surface-soft pb-56 pt-3 md:pb-36">
+      <div className="page-shell">
+        <Button
+          asChild
+          variant="ghost"
+          className="mb-4 gap-2 px-0 text-sm text-muted-foreground hover:bg-transparent hover:text-brand-700"
+        >
+          <Link
+            href={`/search?city=${encodeURIComponent(venue.city)}&date=${dateStr}&duration=${duration}`}
+          >
+            <ArrowLeft className="size-4" aria-hidden /> Back to courts
+          </Link>
+        </Button>
+        {!live && (
+          <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900">
+            Preview — this venue isn&apos;t live yet. Only you and admins can
+            see this page.
+          </div>
+        )}
+        {live && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(venueJsonLd(venue)),
+            }}
+          />
+        )}
 
-      {/* Two-column layout: left = venue info, right = booking schedule */}
-      <div className="md:flex md:items-start md:gap-0 md:px-6 md:pt-8 lg:px-8 lg:pt-10">
-        {/* ── LEFT: venue info ─────────────────────────────────── */}
-        <div className="md:sticky md:top-24 md:max-h-[calc(100dvh-7rem)] md:w-[320px] md:shrink-0 md:overflow-y-auto md:border-r md:border-line md:pr-6 md:[scrollbar-width:none] lg:pr-7">
-          {/* Gallery — full-bleed on mobile, contained on md+ */}
-          <Gallery photos={venue.photos} name={venue.name} />
-
-          {/* Hero */}
-          <div className="px-4 pt-6 md:px-0">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
-              <h1 className="w-full break-words text-[28px] font-medium leading-tight tracking-tight text-ink">
+        <div className="grid items-start gap-6 lg:grid-cols-[320px_minmax(0,1fr)] xl:grid-cols-[340px_minmax(0,1fr)] xl:gap-8">
+          <Card className="min-w-0 overflow-hidden p-4 lg:col-start-1 lg:row-start-1">
+            <Gallery photos={venue.photos} name={venue.name} />
+            <div className="px-1 pb-1 pt-5">
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                <Badge tone="brand" className="gap-1.5 px-2.5 py-1 text-xs">
+                  <ShieldCheck className="size-3.5" aria-hidden />
+                  {live ? "Verified venue" : "Venue preview"}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  {courts.length} {courts.length === 1 ? "court" : "courts"}
+                </span>
+              </div>
+              <h1 className="break-words text-[28px] font-medium leading-tight tracking-tight text-ink">
                 {venue.name}
               </h1>
-              <Badge tone="brand" className="gap-1.5 px-2.5 py-1 text-xs">
-                <ShieldCheck className="size-3.5" aria-hidden /> Verified
-              </Badge>
-            </div>
-            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1 text-ink-soft">
+              <p className="mt-3 flex items-start gap-1.5 text-sm leading-relaxed text-muted-foreground">
+                <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden />
+                {venue.barangay ? `${venue.barangay}, ` : ""}
+                {venue.city}
+              </p>
+              <a
+                href="#venue-reviews"
+                className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-lg text-sm text-ink-soft"
+              >
                 <Star
                   className="size-4 fill-brand-700 text-brand-700"
                   aria-hidden
                 />
                 <span className="font-semibold text-ink">
-                  {ratingSummary.avg.toFixed(1)}
+                  {ratingSummary.count
+                    ? ratingSummary.avg.toFixed(1)
+                    : "New venue"}
                 </span>
-                <span>({ratingSummary.count} reviews)</span>
-              </span>
-              {minPriceCents !== null && (
-                <span className="font-medium text-ink-soft">
-                  From <span className="text-ink">{pesos(minPriceCents)}</span>
-                  /hr
-                </span>
-              )}
-              <span className="flex w-full items-start gap-1.5 break-words leading-6">
-                <MapPin className="mt-1 size-4 shrink-0" aria-hidden />
-                {venue.barangay ? `${venue.barangay}, ` : ""}
-                {venue.city}
-              </span>
+                {ratingSummary.count > 0 && (
+                  <span className="text-muted-foreground">
+                    · {ratingSummary.count} reviews
+                  </span>
+                )}
+              </a>
+              <div className="mt-4 flex items-end justify-between gap-3 border-t border-border pt-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    Court rates from
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold tracking-tight text-ink">
+                    {minPriceCents === null
+                      ? "Coming soon"
+                      : pesos(minPriceCents)}
+                    {minPriceCents !== null && (
+                      <span className="ml-1 text-sm font-normal text-muted-foreground">
+                        / hour
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="icon"
+                  aria-label="Get directions"
+                >
+                  <a
+                    href={venueMapUrl(venue)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <MapPin className="size-4" aria-hidden />
+                  </a>
+                </Button>
+              </div>
+              <Button asChild className="mt-5 w-full gap-2 lg:hidden">
+                <a href="#book-court">
+                  See available times{" "}
+                  <ArrowRight className="size-4" aria-hidden />
+                </a>
+              </Button>
             </div>
-          </div>
+          </Card>
 
-          {/* Venue info sections */}
-          <div className="px-4 md:px-0">
-            <HomeTab venue={venue} hoursByDay={hoursByDay} />
-          </div>
-
-          {/* Reviews */}
-          {ratingSummary.count > 0 && (
-            <div className="px-4 pb-7 md:px-0">
-              <h2 className="section-title">Reviews</h2>
-              <ReviewsSection
-                ratingSummary={ratingSummary}
-                recentReviews={recentReviews}
-              />
+          <Card
+            id="book-court"
+            className="min-w-0 scroll-mt-28 p-4 sm:p-6 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+          >
+            <div className="mb-4 flex items-start gap-3 border-b border-border pb-4">
+              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary text-brand-700">
+                <PaddleIcon className="size-6" />
+              </span>
+              <div>
+                <h2 className="text-2xl font-medium tracking-tight text-ink sm:text-[28px]">
+                  Book your next game
+                </h2>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  A day, a court, a time. You&apos;re almost playing.
+                </p>
+              </div>
             </div>
-          )}
-        </div>
-
-        {/* ── RIGHT: booking schedule ───────────────────────────── */}
-        <div className="min-w-0 flex-1 border-t border-line pt-7 md:border-t-0 md:pl-6 md:pt-0 lg:pl-7">
-          <h2 className="mb-5 px-4 text-2xl font-medium tracking-tight text-ink md:px-0">
-            Book a court
-          </h2>
-          {/* DateRail — full-bleed on mobile (no outer px) */}
-          <div>
             <DateRail
               days={dayChips}
               slug={venue.slug}
               dateStr={dateStr}
               duration={duration}
+              minDate={isoDate(today)}
             />
-          </div>
-
-          <div className="px-4 md:px-0">
-            {/* Duration pills */}
-            <div
-              className="mt-4 flex flex-wrap gap-2"
-              role="group"
-              aria-label="Booking duration"
-            >
-              {DURATIONS.map((dur) => {
-                const active = dur.value === duration;
-                return (
-                  <Button
-                    key={dur.value}
-                    asChild
-                    variant="ghost"
-                    className={cn(
-                      "h-auto p-0",
-                      "inline-flex min-h-11 items-center justify-center rounded-xl border px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
-                      active
-                        ? "border-brand-300 bg-brand-50 text-brand-800"
-                        : "border-line bg-surface text-ink-soft hover:border-brand-300 hover:bg-mist",
-                    )}
-                  >
-                    <Link
-                      href={`/venues/${venue.slug}?date=${dateStr}&duration=${dur.value}`}
-                      scroll={false}
-                      aria-current={active ? "true" : undefined}
+            <div className="my-4 border-y border-border py-4">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="flex items-center gap-2 text-sm font-semibold text-ink">
+                  <span className="grid size-6 place-items-center rounded-full bg-secondary text-xs text-brand-700">
+                    2
+                  </span>{" "}
+                  Session length
+                </p>
+                <Clock3 className="size-4 text-muted-foreground" aria-hidden />
+              </div>
+              <div
+                className="grid grid-cols-3 gap-2"
+                role="group"
+                aria-label="Booking duration"
+              >
+                {DURATIONS.map((dur) => {
+                  const active = dur.value === duration;
+                  return (
+                    <Button
+                      key={dur.value}
+                      asChild
+                      variant={active ? "secondary" : "outline"}
+                      className={cn(
+                        "gap-1 px-2 text-sm",
+                        active &&
+                          "border-brand-700/40 bg-secondary text-brand-700 ring-1 ring-brand-700/10",
+                      )}
                     >
-                      {dur.label}
-                    </Link>
-                  </Button>
-                );
-              })}
+                      <Link
+                        href={`/venues/${venue.slug}?date=${dateStr}&duration=${dur.value}`}
+                        scroll={false}
+                        aria-current={active ? "true" : undefined}
+                      >
+                        {dur.label}
+                      </Link>
+                    </Button>
+                  );
+                })}
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                {longDateLabel(date)} · {Number(duration) / 60}{" "}
+                {duration === "60" ? "hour" : "hours"} of court time
+              </p>
             </div>
+            <CourtBooking
+              key={`${dateStr}:${duration}`}
+              courts={courts}
+              durationMinutes={durationMinutes}
+              isAuthed={!!session}
+              returnTo={`/venues/${venue.slug}?date=${dateStr}&duration=${duration}`}
+              selectedDateLabel={selectedDateLabel}
+            />
+          </Card>
 
-            <p className="mt-6 text-sm font-medium text-ink-soft">
-              {longDateLabel(parseIsoDate(dateStr))}
-            </p>
-
-            <div className="mt-4">
-              <CourtBooking
-                courts={courts}
-                durationMinutes={durationMinutes}
-                isAuthed={!!session}
-                returnTo={`/venues/${venue.slug}?date=${dateStr}&duration=${duration}`}
-                selectedDateLabel={selectedDateLabel}
-              />
-            </div>
+          <div className="min-w-0 space-y-6 lg:col-start-1 lg:row-start-2">
+            <Card className="p-5">
+              <HomeTab venue={venue} hoursByDay={hoursByDay} />
+            </Card>
+            <Card id="venue-reviews" className="scroll-mt-28 p-5">
+              <h2 className="text-lg font-semibold tracking-tight text-ink">
+                Player reviews
+              </h2>
+              {ratingSummary.count > 0 ? (
+                <ReviewsSection
+                  ratingSummary={ratingSummary}
+                  recentReviews={recentReviews}
+                />
+              ) : (
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  No reviews yet. Play here and share your experience.
+                </p>
+              )}
+            </Card>
           </div>
         </div>
       </div>
@@ -329,10 +409,12 @@ function HomeTab({
 }) {
   const mapUrl = venueMapUrl(venue);
   return (
-    <div className="space-y-6 py-7 [&>section]:border-b [&>section]:border-line [&>section]:pb-6 [&>section:last-child]:border-0 [&>section:last-child]:pb-0">
+    <div className="space-y-6 [&>section]:border-b [&>section]:border-line [&>section]:pb-6 [&>section:last-child]:border-0 [&>section:last-child]:pb-0">
       {venue.description && (
         <section>
-          <h2 className="section-title">About</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-ink">
+            About
+          </h2>
           <p className="mt-3 break-words text-sm leading-6 text-ink-soft">
             {venue.description}
           </p>
@@ -340,7 +422,9 @@ function HomeTab({
       )}
       {venue.amenities.length > 0 && (
         <section>
-          <h2 className="section-title">Amenities</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-ink">
+            Amenities
+          </h2>
           <div className="mt-3">
             <Amenities amenities={venue.amenities} />
           </div>
@@ -348,7 +432,9 @@ function HomeTab({
       )}
       {hoursByDay.size > 0 && (
         <section>
-          <h2 className="section-title">Operating hours</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-ink">
+            Operating hours
+          </h2>
           <ul className="mt-3 space-y-2 text-sm">
             {WEEKDAY_ORDER.map((wd) => {
               const h = hoursByDay.get(wd);
@@ -377,7 +463,9 @@ function HomeTab({
       )}
       {(venue.contactNumber || venue.website) && (
         <section>
-          <h2 className="section-title">Contact</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-ink">
+            Contact
+          </h2>
           <ul className="mt-3 space-y-2 text-sm text-ink-soft">
             {venue.contactNumber && (
               <li>
@@ -405,7 +493,9 @@ function HomeTab({
         </section>
       )}
       <section>
-        <h2 className="section-title">Location</h2>
+        <h2 className="text-lg font-semibold tracking-tight text-ink">
+          Location
+        </h2>
         <p className="mt-3 break-words text-sm leading-6 text-ink-soft">
           {venue.addressLine ? `${venue.addressLine}, ` : ""}
           {venue.barangay ? `${venue.barangay}, ` : ""}
@@ -422,7 +512,9 @@ function HomeTab({
       </section>
       {venue.houseRules && (
         <section>
-          <h2 className="section-title">House rules</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-ink">
+            House rules
+          </h2>
           <p className="mt-3 whitespace-pre-line break-words text-sm leading-6 text-ink-soft">
             {venue.houseRules}
           </p>

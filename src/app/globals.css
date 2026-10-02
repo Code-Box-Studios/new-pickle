@@ -167,8 +167,24 @@
   [data-slot="button"] {
     border-radius: 9999px;
   }
-  [data-slot="button"]:not(:disabled):not([aria-disabled="true"]):active {
-    transform: translateY(1px) scale(0.98);
+  .ui-button:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):active {
+    transform: translateY(1px) scale(0.97);
+  }
+  .button-primary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.32) 50%, transparent 70%);
+    transform: translateX(-125%);
+    opacity: 0;
+  }
+  .ui-button > svg:not(.animate-spin) {
+    transition: transform 200ms var(--ease-smooth);
+  }
+  .ui-button[role="combobox"]:active,
+  .ui-button[aria-haspopup="dialog"]:active {
+    transform: none;
   }
   [data-slot="input"],
   [data-slot="native-select"],
@@ -195,11 +211,14 @@
     transform-origin: left;
     animation: court-line-enter 900ms var(--ease-smooth) 250ms backwards;
   }
-  .brand-showcase-ball {
-    offset-path: path("M420 120C350 35 190 60 85 240C155 350 370 325 420 120Z");
-    offset-rotate: 0deg;
-    offset-distance: 0%;
-    animation: brand-rally-orbit 10s linear infinite;
+  .brand-showcase[data-rally-ready="true"] .brand-showcase-mark .brand-ball {
+    animation: brand-ball-rally 9s ease-in-out infinite;
+  }
+  .brand-showcase[data-rally-ready="true"] .brand-showcase-paddle {
+    animation: brand-paddle-left-rally 9s ease-in-out infinite;
+  }
+  .brand-showcase[data-rally-ready="true"] .brand-showcase-paddle-right {
+    animation: brand-paddle-right-rally 9s ease-in-out infinite;
   }
   .brand-showcase-mark {
     transform: rotate(-6deg);
@@ -437,8 +456,25 @@
   from { transform: scaleX(0); opacity: 0; }
   to { transform: scaleX(1); opacity: 1; }
 }
-@keyframes brand-rally-orbit {
-  to { offset-distance: 100%; }
+@keyframes brand-ball-rally {
+  0%, 12%, 86%, 100% { transform: translate(0, 0) rotate(0); }
+  22%, 77% { transform: translate(calc(var(--rally-left-x) * 0.55), calc(var(--rally-left-y) * 0.45 - 12px)) rotate(-80deg); }
+  30%, 66% { transform: translate(var(--rally-left-x), var(--rally-left-y)) rotate(-120deg); }
+  39%, 57% { transform: translate(var(--rally-mid-x), var(--rally-mid-y)) rotate(20deg); }
+  48% { transform: translate(var(--rally-right-x), var(--rally-right-y)) rotate(140deg); }
+}
+@keyframes button-sheen {
+  0% { transform: translateX(-125%); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateX(125%); opacity: 0; }
+}
+@keyframes brand-paddle-left-rally {
+  0%, 25%, 38%, 61%, 74%, 100% { transform: rotate(-4deg); }
+  30%, 66% { transform: translate(3px, -3px) rotate(8deg); }
+}
+@keyframes brand-paddle-right-rally {
+  0%, 43%, 56%, 100% { transform: rotate(6deg); }
+  48% { transform: translate(-3px, 3px) rotate(-8deg); }
 }
 @keyframes brand-mark-float {
   0%, 100% { transform: translateY(0) rotate(-6deg); }
@@ -561,13 +597,31 @@
   color: var(--destructive);
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .ui-button:is(.button-primary, .button-outline, .button-secondary, .button-outline-dark, .button-destructive):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):not([role="combobox"]):not([aria-haspopup="dialog"]):hover:not(:active) {
+    transform: translateY(-2px);
+  }
+  .button-primary:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):hover {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 6px 16px -6px rgb(0 104 74 / 0.28);
+  }
+  .button-primary:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):hover::before {
+    animation: button-sheen 700ms var(--ease-smooth) both;
+  }
+  .button-outline:not(:disabled):not([aria-disabled="true"]):hover {
+    box-shadow: 0 4px 12px -6px rgb(0 30 43 / 0.14);
+  }
+  .ui-button:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):hover > svg.lucide-arrow-right:not(.motion-arrow) {
+    transform: translateX(3px);
+  }
+  .ui-button:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):hover > svg.lucide-arrow-up-right:not(.motion-arrow) {
+    transform: translate(2px, -2px);
+  }
   .owner-cta:hover .owner-court-art {
     transform: rotate(-3deg) translateY(-3px);
   }
   .brand-link:hover .brand-ball {
     animation: logo-ball-tap 650ms var(--ease-smooth);
   }
-  .serve-button:hover .serve-ball {
+  .serve-button:not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):hover .serve-ball {
     animation: button-serve 650ms var(--ease-smooth);
   }
   .feature-card:hover {
@@ -625,7 +679,6 @@
   }
   .hero-accent::after,
   .brand-showcase *,
-  .brand-showcase-ball,
   .brand-showcase-mark,
   .brand-showcase-paddle,
   .rally-ball,
@@ -641,6 +694,11 @@
   .motion-arrow,
   .select-chevron,
   [data-slot="button"] {
+    transform: none !important;
+  }
+
+  .ui-button,
+  .ui-button > svg {
     transform: none !important;
   }
 

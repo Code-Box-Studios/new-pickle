@@ -4,24 +4,31 @@ import { Slot } from "radix-ui";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
+const primaryStyles =
+  "button-primary overflow-hidden border border-transparent bg-primary text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_2px_6px_-2px_rgb(0_104_74/0.18)] active:bg-primary-pressed";
+
+const destructiveStyles =
+  "button-destructive border border-transparent bg-destructive text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.2),0_2px_6px_-2px_rgb(180_35_24/0.16)] hover:bg-destructive/95 active:bg-destructive/90";
+
 export const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-out outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "ui-button relative isolate inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform,text-decoration-color] duration-200 active:duration-100 ease-[cubic-bezier(0.22,1,0.36,1)] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground active:bg-primary-pressed",
-        primary: "bg-primary text-primary-foreground active:bg-primary-pressed",
-        destructive: "bg-destructive text-white active:bg-destructive/90",
-        danger: "bg-destructive text-white active:bg-destructive/90",
+        default: primaryStyles,
+        primary: primaryStyles,
+        destructive: destructiveStyles,
+        danger: destructiveStyles,
         outline:
-          "border border-input bg-transparent text-foreground active:bg-secondary",
+          "button-outline border border-input bg-white/60 text-foreground shadow-[0_1px_2px_rgb(0_30_43/0.03)] hover:border-brand-700/40 hover:bg-secondary/50 active:bg-secondary",
         secondary:
-          "bg-secondary text-secondary-foreground active:bg-secondary/80",
-        ghost: "text-foreground active:bg-secondary",
-        link: "h-auto text-brand-700 underline-offset-4 active:underline",
-        onDark: "bg-primary text-primary-foreground active:bg-primary-pressed",
+          "button-secondary border border-brand-200/60 bg-secondary text-secondary-foreground hover:border-brand-700/25 hover:bg-secondary/80 active:bg-secondary/65",
+        ghost:
+          "button-ghost text-foreground hover:bg-secondary/60 active:bg-secondary",
+        link: "button-link h-auto text-brand-700 underline decoration-brand-700/25 underline-offset-4 hover:decoration-current active:text-brand-700/80",
+        onDark: `${primaryStyles} focus-visible:ring-offset-brand-950`,
         outlineOnDark:
-          "border border-white/35 bg-transparent text-white active:bg-white/10",
+          "button-outline-dark border border-white/35 bg-white/[0.025] text-white hover:border-white/60 hover:bg-white/[0.08] active:bg-white/15 focus-visible:ring-offset-brand-950",
       },
       size: {
         default: "h-11 px-[22px] py-2.5",

@@ -36,10 +36,12 @@ export function MobileCourtPicker({
   courts,
   selected,
   onSelect,
+  onCourtChange,
 }: {
   courts: CourtDTO[];
   selected: Selection;
   onSelect: (court: CourtDTO, slot: SlotDTO) => void;
+  onCourtChange?: () => void;
 }) {
   const defaultCourt =
     courts.find((c) => c.slots.some((s) => s.available)) ?? courts[0];
@@ -66,11 +68,14 @@ export function MobileCourtPicker({
               key={c.id}
               type="button"
               aria-pressed={isActive}
-              onClick={() => setActiveId(c.id)}
+              onClick={() => {
+                if (c.id !== activeId) onCourtChange?.();
+                setActiveId(c.id);
+              }}
               className={cn(
                 "min-h-11 shrink-0 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
                 isActive
-                  ? "border-brand-700 bg-brand-700 text-white shadow-sm"
+                  ? "border-brand-700 bg-brand-700 text-white shadow-sm hover:bg-brand-700"
                   : "border-line bg-surface text-ink-soft hover:border-brand-300 hover:bg-mist",
               )}
             >
@@ -82,7 +87,7 @@ export function MobileCourtPicker({
                     isActive ? "text-white/80" : "text-muted-foreground",
                   )}
                 >
-                  {closed ? "Closed" : "Full"}
+                  {closed ? "No times" : "Full"}
                 </span>
               )}
             </Button>
@@ -90,10 +95,22 @@ export function MobileCourtPicker({
         })}
       </div>
 
+      {activeCourt && (
+        <div className="flex items-center justify-between gap-3 rounded-xl bg-surface px-3 py-3 text-xs text-muted-foreground">
+          <span>
+            {activeCourt.indoor ? "Indoor" : "Outdoor"}
+            {activeCourt.covered ? " · Covered" : ""}
+          </span>
+          <span className="font-medium text-brand-700">
+            {pesos(activeCourt.priceCents)} / hour
+          </span>
+        </div>
+      )}
+
       {/* Slot bands */}
       {activeCourt?.slots.length === 0 ? (
         <p className="rounded-xl border border-line bg-canvas px-4 py-5 text-sm text-muted-foreground">
-          Closed on this day.
+          No start times in this period. Try another day or time of day.
         </p>
       ) : activeCourt?.slots.every((s) => !s.available) ? (
         <p className="rounded-xl border border-line bg-canvas px-4 py-5 text-sm text-muted-foreground">
@@ -106,7 +123,7 @@ export function MobileCourtPicker({
               <p className="mb-3 text-xs font-semibold tracking-wide text-muted-foreground">
                 {band.label}
               </p>
-              <div className="grid grid-cols-3 gap-2 min-[420px]:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 min-[380px]:grid-cols-3 sm:grid-cols-4">
                 {band.slots.map((slot) => {
                   const isSel =
                     selected?.courtId === activeId &&
@@ -121,15 +138,23 @@ export function MobileCourtPicker({
                       aria-label={`${activeCourt?.name}, ${timeLabel(new Date(slot.startsAt))}, ${slot.available ? pesos(slot.priceCents) : "unavailable"}`}
                       onClick={() => activeCourt && onSelect(activeCourt, slot)}
                       className={cn(
-                        "flex h-12 items-center justify-center rounded-full border px-2 text-sm font-semibold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
+                        "flex h-16 flex-col items-center justify-center gap-1 rounded-xl border px-2 text-[13px] font-semibold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
                         !slot.available
-                          ? "cursor-not-allowed border-transparent bg-mist text-muted-foreground/60 line-through"
+                          ? "cursor-not-allowed border-transparent bg-mist text-muted-foreground/60"
                           : isSel
-                            ? "border-brand-700 bg-brand-700 text-white shadow-sm"
-                            : "border-brand-100 bg-brand-50 text-brand-800 hover:border-brand-300 hover:bg-brand-100",
+                            ? "border-brand-700 bg-brand-700 text-white shadow-sm hover:bg-brand-700"
+                            : "border-brand-200/60 bg-brand-50/60 text-brand-800 hover:border-brand-700/40 hover:bg-secondary",
                       )}
                     >
                       {timeLabel(new Date(slot.startsAt))}
+                      <span
+                        className={cn(
+                          "text-[11px] font-normal",
+                          isSel ? "text-white/80" : "text-muted-foreground",
+                        )}
+                      >
+                        {slot.available ? pesos(slot.priceCents) : "Booked"}
+                      </span>
                     </Button>
                   );
                 })}

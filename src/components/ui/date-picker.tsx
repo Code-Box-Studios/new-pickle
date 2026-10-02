@@ -5,7 +5,11 @@ import { format, isValid, parse } from "date-fns";
 import { CalendarDays, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/cn";
 
 export function DatePicker({
@@ -15,6 +19,7 @@ export function DatePicker({
   onValueChange,
   className,
   disabled,
+  minDate,
   ...aria
 }: AriaAttributes & {
   id?: string;
@@ -23,16 +28,22 @@ export function DatePicker({
   onValueChange: (value: string) => void;
   className?: string;
   disabled?: boolean;
+  minDate?: string;
 }) {
   const generatedId = useId();
   const [open, setOpen] = useState(false);
   // Calendar dates are local civil days; UTC conversion can shift a chosen day.
   const parsed = parse(value, "yyyy-MM-dd", new Date());
   const selected = isValid(parsed) ? parsed : undefined;
+  const minimum = minDate
+    ? parse(minDate, "yyyy-MM-dd", new Date())
+    : undefined;
 
   return (
     <>
-      {name && <input type="hidden" name={name} value={value} disabled={disabled} />}
+      {name && (
+        <input type="hidden" name={name} value={value} disabled={disabled} />
+      )}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -41,21 +52,35 @@ export function DatePicker({
             type="button"
             variant="outline"
             disabled={disabled}
-            className={cn("w-full min-w-0 justify-between rounded-md bg-background px-3 text-base font-normal", className)}
+            className={cn(
+              "w-full min-w-0 justify-between rounded-md bg-background px-3 text-base font-normal",
+              className,
+            )}
           >
             <span className="flex min-w-0 items-center gap-2.5">
               <CalendarDays className="size-4 text-brand-700" aria-hidden />
-              <span className="truncate">{selected ? format(selected, "MMM d, yyyy") : "Choose a date"}</span>
+              <span className="truncate">
+                {selected ? format(selected, "MMM d, yyyy") : "Choose a date"}
+              </span>
             </span>
             <ChevronDown className="size-4 text-muted-foreground" aria-hidden />
           </Button>
         </PopoverTrigger>
-        <PopoverContent align="start" sideOffset={8} collisionPadding={12} className="max-h-(--radix-popover-content-available-height) w-80 overflow-y-auto overscroll-contain p-0" aria-label="Choose a date">
+        <PopoverContent
+          align="start"
+          sideOffset={8}
+          collisionPadding={12}
+          className="max-h-(--radix-popover-content-available-height) w-80 overflow-y-auto overscroll-contain p-0"
+          aria-label="Choose a date"
+        >
           <Calendar
             mode="single"
             required
             selected={selected}
             defaultMonth={selected}
+            disabled={
+              minimum && isValid(minimum) ? { before: minimum } : undefined
+            }
             autoFocus
             onSelect={(day) => {
               if (!day) return;

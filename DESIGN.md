@@ -294,18 +294,42 @@ through search, discovery, booking steps, the owner banner, and the footer.
 The decorative rally follows its section's scroll timeline where supported;
 other browsers get one short entrance. The hero wordmark uses a perforated ball
 for its “o”, a slanted display treatment, a soft mint sheen, and a rally swoosh.
-The brand panel has continuous ball-orbit, paddle, logo, and atmospheric motion.
+The logo's white ball leaves its mark, rallies between the paddles, and returns
+to its place in a nine-second loop. Responsive SVG coordinates keep its contact
+points aligned with the paddles. Paddle returns accompany the ball; logo and
+atmospheric motion remain gentle.
 Its pause control stops all motion; animation also pauses offscreen and in
 background tabs. Reduced-motion preferences render a still composition.
 Header and footer logo motion remains brief and tied to interaction.
-The sticky header frames its navigation in a floating white panel with a light
-border and restrained shadow. On the homepage its transparent surround overlays
-the hero, with extra hero padding to keep content clear of the bar. Active links
-use dark teal pills with green icons.
+The sticky header is transparent at the top of Home, sign-in, and venue onboarding,
+with white text over the dark intro. After 16px of scroll its white panel, light
+border, and restrained shadow fade in over 300ms, and text switches to dark teal.
+White-content pages use the white panel throughout. The transparent surround
+overlays each dark intro, with extra padding to keep content clear of the bar.
+Active links use green icons and a translucent pill at the hero top, switching
+to dark teal pills on white.
 Mobile navigation opens in an inset, rounded shadcn Sheet with a teal brand area,
 large navigation targets, and a scrollable link region for shorter screens.
 Home links explicitly return to the top, including repeat activations. Search
 anchors retain their smooth scroll and the sticky header offset.
+
+Shared shadcn buttons keep pill silhouettes and consistent touch targets.
+Primary actions have a fine highlight rim, secondary actions use soft mint,
+and outlined actions use quieter borders. Ghost and link actions remain light.
+Interaction motion uses a brief light sweep, directional arrows, and restrained
+elevation. Press feedback compresses to 97% over 100ms; other transitions use
+200ms easing. Disabled and loading actions suppress motion, and reduced-motion
+preferences keep controls still. City and date triggers stay in place.
+
+Venue booking uses a soft canvas with bordered white panels. The gallery and
+venue overview sit beside the booking panel on desktop; on smaller screens,
+booking follows the overview and precedes long venue details. Three numbered
+controls guide day, duration, and start-time selection. The calendar extends
+beyond the seven-day rail, and time-of-day tabs narrow the schedule. Slots show
+session totals, with clear selected and unavailable states. A floating summary
+shows the chosen court, date, full time range, and total; it sits above phone
+navigation. Changing the day or duration clears the old choice. Photos open
+in a shadcn Dialog with keyboard navigation and previous/next controls.
 
 ## Do's and Don'ts
 

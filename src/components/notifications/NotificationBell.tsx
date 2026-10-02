@@ -18,7 +18,7 @@ interface NItem {
   createdAt: string;
 }
 
-export function NotificationBell() {
+export function NotificationBell({ inverse = false }: { inverse?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
@@ -90,11 +90,19 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           type="button"
-          className="relative grid size-11 place-items-center rounded-xl transition-colors hover:bg-mist"
+          className={cn(
+            "relative grid size-11 place-items-center rounded-xl transition-colors",
+            inverse
+              ? "text-white/80 hover:bg-white/10 active:bg-white/10"
+              : "hover:bg-mist",
+          )}
           aria-label={`Notifications${unread ? ` (${unread} unread)` : ""}`}
         >
           <Bell
-            className="size-5 text-ink-soft"
+            className={cn(
+              "size-5 transition-colors",
+              inverse ? "text-white/80" : "text-ink-soft",
+            )}
             strokeWidth={1.8}
             aria-hidden
           />

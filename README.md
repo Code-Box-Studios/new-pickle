@@ -27,11 +27,25 @@ semantic theme and reduced-motion rules live in `src/app/globals.css`.
 The homepage hero features Pikol's own paddle-and-ball logo and decorative
 brand illustration, independent of venue listings. Venues appear in the separate
 **Popular venues** section. Its custom wordmark uses a pickleball for the “o”,
-with continuous rally, paddle, and glow animations. The panel includes a pause
-button; motion also pauses offscreen and in background tabs. Reduced-motion
-preferences show a still composition. The floating white header sits over the
-hero background, with dark teal active navigation, green search actions, and a
-branded mobile drawer. It has no tagline; the footer credits **Code Box Studios**.
+with the logo's white ball rallying between the paddles, returning to the logo,
+and repeating. Paddle returns and soft glow accompany the loop. The panel includes
+a pause button; motion also pauses offscreen and in background tabs. Reduced-motion
+preferences show a still composition. On Home, sign-in, and venue onboarding,
+the header is transparent over the dark intro, then fades into a floating white
+panel as you scroll. White-content pages keep the white panel. Green search
+actions and a branded mobile drawer remain available. It has no tagline; the
+footer credits **Code Box Studios**.
+
+Shared shadcn buttons use green primary pills, mint secondary actions, refined
+outlines, and quiet ghost/link variants. A light sweep, subtle lift, directional
+arrows, and quick press feedback add motion; disabled and loading actions stay
+still, and reduced-motion preferences remove decorative movement.
+
+Venue pages place booking ahead of long venue details on phones. Players can
+browse photos in a shadcn viewer, choose any future day with the calendar,
+filter start times by morning/afternoon/evening, and compare session totals.
+The floating summary shows the full time range and can be cleared. Changing
+the day or duration clears the previous slot so the summary stays accurate.
 
 Date fields use the shared shadcn **Calendar + Popover** picker, including owner
 rescheduling. They display readable dates and submit `YYYY-MM-DD` civil dates

@@ -41,7 +41,7 @@ export default async function HomePage() {
   return (
     <>
       <section className="hero-band relative overflow-hidden text-white">
-        <div className="page-shell relative pb-24 pt-[136px] sm:pb-28 sm:pt-[168px] lg:pb-32 lg:pt-48">
+        <div className="page-shell relative pb-24 pt-28 sm:pb-28 sm:pt-32 lg:pb-28 lg:pt-36">
           <div className="grid items-center gap-10 lg:grid-cols-[1.12fr_1fr] lg:gap-16">
             <div className="max-w-xl">
               <Badge

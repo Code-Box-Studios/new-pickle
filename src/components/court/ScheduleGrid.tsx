@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Check, Clock3, Moon, Sun, Sunset } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { pesos, timeLabel } from "@/lib/format";
 import type { CourtDTO, SlotDTO } from "@/components/court/CourtBooking";
@@ -59,11 +60,11 @@ export function ScheduleGrid({
     courts.map((c) => [c.id, new Map(c.slots.map((s) => [s.startsAt, s]))]),
   );
 
-  const gridCols = `72px repeat(${courts.length}, minmax(100px, 1fr))`;
+  const gridCols = `64px repeat(${courts.length}, minmax(140px, 1fr))`;
 
   return (
     <Card
-      className="overflow-x-auto rounded-lg border border-line bg-surface"
+      className="overflow-x-auto rounded-xl border border-line bg-white"
       role="group"
       aria-label="Court times and prices"
     >
@@ -72,14 +73,16 @@ export function ScheduleGrid({
         className="grid border-b border-line bg-canvas"
         style={{ gridTemplateColumns: gridCols }}
       >
-        <div className="p-3" /> {/* time column */}
+        <div className="grid place-items-center p-3 text-muted-foreground">
+          <Clock3 className="size-4" aria-label="Start time" />
+        </div>
         {courts.map((c) => {
           const closed = c.slots.length === 0;
           const full = !closed && c.slots.every((s) => !s.available);
           return (
             <div
               key={c.id}
-              className="border-l border-line px-3 py-4 text-center"
+              className="border-l border-line bg-surface-soft px-3 py-4 text-center"
             >
               <p className="text-sm font-semibold text-ink">{c.name}</p>
               <p className="mt-1 text-xs text-muted-foreground">
@@ -97,7 +100,7 @@ export function ScheduleGrid({
                       : "bg-amber-50 text-amber-700",
                   )}
                 >
-                  {closed ? "Closed" : "Full"}
+                  {closed ? "No times" : "Full"}
                 </span>
               )}
             </div>
@@ -110,13 +113,20 @@ export function ScheduleGrid({
         <div key={band.label}>
           {/* Band label row */}
           <div
-            className="grid border-b border-line bg-mist/60"
+            className="grid border-b border-line bg-surface"
             style={{ gridTemplateColumns: gridCols }}
           >
             <div
-              className="px-4 py-2.5 text-xs font-semibold tracking-wide text-brand-700"
+              className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-brand-700"
               style={{ gridColumn: `1 / span ${courts.length + 1}` }}
             >
+              {band.label === "Morning" ? (
+                <Sun className="size-3.5" aria-hidden />
+              ) : band.label === "Afternoon" ? (
+                <Sunset className="size-3.5" aria-hidden />
+              ) : (
+                <Moon className="size-3.5" aria-hidden />
+              )}
               {band.label}
             </div>
           </div>
@@ -155,15 +165,16 @@ export function ScheduleGrid({
                           aria-label={`${c.name}, ${label}, ${slot.available ? pesos(slot.priceCents) : "unavailable"}`}
                           onClick={() => onSelect(c, slot)}
                           className={cn(
-                            "h-11 w-full rounded-xl border text-sm font-semibold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
+                            "h-12 w-full gap-2 rounded-xl border text-sm font-semibold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
                             !slot.available
                               ? "cursor-not-allowed border-transparent bg-canvas text-muted-foreground/60"
                               : isSel
-                                ? "border-brand-700 bg-brand-700 text-white shadow-sm"
-                                : "border-brand-100 bg-brand-50 text-brand-800 hover:border-brand-300 hover:bg-brand-100",
+                                ? "border-brand-700 bg-brand-700 text-white shadow-sm hover:bg-brand-700"
+                                : "border-brand-200/60 bg-brand-50/60 text-brand-800 hover:border-brand-700/40 hover:bg-secondary",
                           )}
                         >
-                          {slot.available ? pesos(slot.priceCents) : "—"}
+                          {isSel && <Check className="size-4" aria-hidden />}
+                          {slot.available ? pesos(slot.priceCents) : "Booked"}
                         </Button>
                       ) : (
                         <div

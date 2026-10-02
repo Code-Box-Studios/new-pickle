@@ -36,7 +36,7 @@ export default async function ListYourVenuePage() {
   return (
     <>
       <section className="hero-band text-white">
-        <div className="page-shell py-16 text-center lg:py-24">
+        <div className="page-shell pb-16 pt-[152px] text-center lg:pb-24 lg:pt-48">
           <div className="motion-enter mx-auto max-w-4xl">
             <Badge
               variant="outline"
