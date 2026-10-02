@@ -4,6 +4,7 @@ import { emailSender } from "@/lib/email";
 import { forgetMagicLink } from "@/lib/email/dev-sender";
 import { ValidationError } from "@/lib/booking/errors";
 import type { SessionUser } from "./session";
+import { safeNextPath } from "./redirect";
 
 const TTL_MINUTES = 15;
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -27,7 +28,7 @@ export function resolveMagicLinkBase(origin?: string): string {
 /** Create a single-use, short-TTL token (stored hashed) and email the link. */
 export async function requestMagicLink(
   emailRaw: string,
-  opts?: { origin?: string },
+  opts?: { origin?: string; next?: unknown },
 ): Promise<void> {
   const email = emailRaw.trim().toLowerCase();
   if (!EMAIL_RE.test(email)) throw new ValidationError("Enter a valid email address");
@@ -48,7 +49,11 @@ export async function requestMagicLink(
   });
 
   const base = resolveMagicLinkBase(opts?.origin);
-  await emailSender.sendMagicLink(email, `${base}/auth/verify?token=${raw}`);
+  const link = new URL("/auth/verify", base);
+  link.searchParams.set("token", raw);
+  const next = safeNextPath(opts?.next);
+  if (next) link.searchParams.set("next", next);
+  await emailSender.sendMagicLink(email, link.toString());
 }
 
 /** Validate + burn a token, returning the session it authorizes (or null). */

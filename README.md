@@ -15,7 +15,7 @@ for the plan.
 ## Stack
 
 Next.js 16 (App Router) · TypeScript · Prisma · PostgreSQL 16 · Tailwind CSS 4 ·
-shadcn/ui (Radix) · `jose` (sessions) · Vitest.
+shadcn/ui (Radix) · Payload CMS · `jose` (sessions) · Vitest.
 
 ## Design
 
@@ -25,7 +25,7 @@ semantic theme and reduced-motion rules live in `src/app/globals.css`.
 
 ## Prerequisites
 
-- Node 20+ (developed on 24)
+- Node 20.9+ (developed on 24)
 - Docker Desktop (for PostgreSQL)
 
 ## Setup
@@ -37,12 +37,18 @@ docker compose up -d            # Postgres 16 on host port 15432
 npm run db:deploy               # apply migrations (incl. the EXCLUDE constraint)
 npm run db:generate             # generate the Prisma client
 npm run db:seed                 # 5 Davao venues + demo accounts
+npm run cms:migrate             # Payload tables in the separate cms schema
+npm run cms:seed                # current marketing copy; preserves saved edits
 npm run dev                     # http://localhost:3000
 ```
 
 > **Postgres runs on host port `15432`** (5432/5433 are used by other local
 > Postgres instances on this machine). This avoids the Windows-reserved port
 > range that can block `55432`. The connection string lives in `.env`.
+
+Set `PAYLOAD_SECRET` in `.env` to a random secret before running CMS commands.
+Generate one with `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`.
+Keep this value private and stable across deployments.
 
 ## Signing in (dev)
 
@@ -60,6 +66,36 @@ Seeded accounts:
 | Admin    | `admin@rallypoint.test`  |
 
 The owner owns all seeded venues (so the confirm flow works from any booking).
+
+## Editing website content
+
+Open **[/cms](http://localhost:3000/cms)** and sign in with an existing RallyPoint
+admin account. In development use `admin@rallypoint.test` and open the magic link
+from the banner. **Edit website** links also appear in the admin navigation.
+
+- **Homepage:** hero text, links, venue-section copy, how-it-works steps, and the
+  venue-owner call to action.
+- **Header & footer:** navigation labels, tagline, footer links, and the
+  **Powered by Code Box Studios** credit.
+- **Venue landing page:** headline, description, button labels, and benefits.
+
+Choose **Save Draft** to keep changes private. Choose **Publish changes**, then
+refresh the website to see them. The editor retains the last 30 versions.
+Court availability, venue photos, bookings, pricing, and payments still use the
+existing venue management workflows.
+
+Payload uses Postgres schema `cms`; Prisma owns `public`. `CMS_DATABASE_URL` is
+optional if you prefer a separate CMS database. Both databases need migrations.
+Production setup runs `npm run db:deploy`, `npm run cms:migrate`, and
+`npm run cms:seed` **before** starting the app. Seeding only creates missing
+content and can be repeated safely. Public pages use published content; if CMS
+configuration is absent or unavailable they show the built-in copy and log
+load failures. Public reads have a two-second deadline and exclude unpublished
+content. The CMS itself requires a working database and secret.
+
+After changing CMS fields, run `npm run cms:types`, `npm run cms:importmap`, and
+`npm run cms:migrate:create -- --name describe-the-change`. Review and commit
+the generated migration, then apply it with `npm run cms:migrate`.
 
 ## The core journey
 
@@ -91,19 +127,26 @@ Covers the state machine, concurrent-hold races (exactly one wins), idempotent
 retries, hold expiry, occupancy, availability, magic-link auth, storage, and
 authorization (owner cannot confirm another venue's booking; cross-user booking
 reads denied).
+CMS tests also cover private drafts, published content, anonymous access,
+admin-role revocation, repeat seeding, and safe login return paths. The suite
+applies both Prisma and CMS migrations to `TEST_DATABASE_URL`.
 
 ## Scripts
 
 | Script              | What it does                              |
 | ------------------- | ----------------------------------------- |
 | `npm run dev`       | Dev server                                |
-| `npm run build`     | Production build                          |
+| `npm run build`     | Production build and standalone assets    |
 | `npm run typecheck` | `tsc --noEmit`                            |
 | `npm run lint`      | ESLint                                    |
 | `npm test`          | Vitest suite                              |
 | `npm run db:deploy` | Apply committed migrations (**use this**) |
 | `npm run db:seed`   | Seed demo data                            |
 | `npm run db:studio` | Prisma Studio                             |
+| `npm run cms:migrate` | Apply committed CMS migrations          |
+| `npm run cms:seed` | Create missing marketing content           |
+| `npm run cms:types` | Generate Payload TypeScript types         |
+| `npm run cms:importmap` | Generate editor component imports     |
 
 > Apply migrations with **`db:deploy`**, not `prisma migrate dev` — the
 > `bookings.period` generated column + EXCLUDE constraint make `migrate dev`

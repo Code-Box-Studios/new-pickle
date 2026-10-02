@@ -20,7 +20,7 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
       const res = await fetch("/api/auth/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, next: nextPath }),
       });
       const data = await res.json();
       if (!res.ok) {

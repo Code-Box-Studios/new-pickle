@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
-import { ArrowUpRight, Building2, LogOut } from "lucide-react";
+import { ArrowUpRight, Building2, LogOut, FilePenLine } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
 
 export default async function AdminLayout({
@@ -49,6 +49,16 @@ export default async function AdminLayout({
               Venues
             </Link>
           </Button>
+          <Button
+            asChild
+            variant="ghost"
+            className="mt-2 min-h-12 w-full justify-start gap-3 px-4 text-white/75"
+          >
+            <Link href="/cms">
+              <FilePenLine className="size-5" aria-hidden />
+              Edit website
+            </Link>
+          </Button>
         </nav>
         <div className="border-t border-white/10 px-6 py-5">
           <p className="truncate text-xs text-white/65">{session.email}</p>
@@ -77,6 +87,11 @@ export default async function AdminLayout({
             </span>
           </Link>
           <div className="flex items-center gap-1 sm:gap-3">
+            <Button asChild variant="ghost" size="icon">
+              <Link href="/cms" aria-label="Edit website">
+                <FilePenLine aria-hidden />
+              </Link>
+            </Button>
             <Button
               asChild
               variant="ghost"

@@ -1,7 +1,8 @@
-import type { NextConfig } from "next";
+import { withPayload } from "@payloadcms/next/withPayload";
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   devIndicators: false,
+  agentRules: false,
   output: "standalone",
   serverExternalPackages: ["@prisma/client"],
   experimental: {
@@ -15,4 +16,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPayload(nextConfig);

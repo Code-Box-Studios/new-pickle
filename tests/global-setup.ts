@@ -15,4 +15,8 @@ export default function setup() {
     stdio: "inherit",
     env: { ...process.env, DATABASE_URL: url },
   });
+  execSync("npm run cms:migrate", {
+    stdio: "inherit",
+    env: { ...process.env, DATABASE_URL: url, CMS_DATABASE_URL: url },
+  });
 }

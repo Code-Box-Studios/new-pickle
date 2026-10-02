@@ -1,0 +1,73 @@
+:root {
+  --font-body:
+    "Euclid Circular A", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+.cms-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #001e2b;
+  font-size: 24px;
+  font-weight: 500;
+}
+.cms-brand small {
+  display: block;
+  font-size: 12px;
+  color: #5c6c75;
+  margin-top: 4px;
+}
+.cms-brand-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #00ed64;
+  color: #001e2b;
+  font-weight: 600;
+}
+.cms-intro {
+  padding: 32px;
+  margin-bottom: 32px;
+  border-radius: 12px;
+  background: #001e2b;
+  color: white;
+}
+.cms-intro h1 {
+  color: white;
+  font-weight: 500;
+  margin: 8px 0 16px;
+}
+.cms-intro p {
+  color: #b8cbd1;
+}
+.cms-intro .cms-eyebrow {
+  color: #b9f5cf;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.cms-intro a {
+  display: inline-flex;
+  margin-top: 8px;
+  padding: 12px 20px;
+  border-radius: 9999px;
+  background: #00ed64;
+  color: #001e2b;
+  text-decoration: none;
+  font-weight: 600;
+}
+.cms-logout {
+  padding: 10px 18px;
+  border-radius: 9999px;
+  border: 1px solid #c1ced4;
+  background: transparent;
+  color: #001e2b;
+  cursor: pointer;
+}
+.cms-logout:focus-visible,
+.cms-intro a:focus-visible {
+  outline: 2px solid #008b49;
+  outline-offset: 3px;
+}

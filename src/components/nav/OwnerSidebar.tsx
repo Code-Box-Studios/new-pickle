@@ -10,6 +10,7 @@ import {
   Star,
   Building2,
   LogOut,
+  FilePenLine,
 } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { Brand } from "@/components/ui/brand";
@@ -27,7 +28,7 @@ export function OwnerSidebar({
   session,
   activeVenueId,
 }: {
-  session: { email: string };
+  session: { email: string; role?: string };
   activeVenueId?: string;
 }) {
   const pathname = usePathname();
@@ -51,13 +52,18 @@ export function OwnerSidebar({
         <p className="mb-4 px-3 text-[10px] font-medium uppercase tracking-[1.5px] text-white/40">
           Workspace
         </p>
-        {NAV.map((item) => {
+        {[
+          ...NAV,
+          ...(session.role === "ADMIN"
+            ? [{ href: "/cms", label: "Edit website", icon: FilePenLine }]
+            : []),
+        ].map((item) => {
           const Icon = item.icon;
           const active = item.exact
             ? pathname === item.href
             : pathname.startsWith(item.href);
           const href =
-            activeVenueId && item.href !== "/owner"
+            activeVenueId && item.href !== "/owner" && item.href !== "/cms"
               ? `${item.href}?venue=${activeVenueId}`
               : item.href;
           return (

@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   Search,
+  FilePenLine,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Brand } from "@/components/ui/brand";
@@ -25,14 +26,27 @@ import {
 } from "@/components/ui/sheet";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { cn } from "@/lib/cn";
+import { siteDefaults, type SiteContent } from "@/cms/defaults";
 
-const NAV = [
+const BASE_NAV = [
   { href: "/", label: "Home", icon: Home },
   { href: "/search", label: "Explore", icon: Search },
   { href: "/bookings", label: "My bookings", icon: CalendarCheck },
 ];
 
-export function SiteHeader({ session }: { session: SessionUser | null }) {
+export function SiteHeader({
+  session,
+  content = siteDefaults,
+}: {
+  session: SessionUser | null;
+  content?: SiteContent;
+}) {
+  const NAV = BASE_NAV.map((item, index) => ({
+    ...item,
+    label: [content.homeLabel, content.exploreLabel, content.bookingsLabel][
+      index
+    ],
+  }));
   const pathname = usePathname();
   const active = (href: string) =>
     href === "/" ? pathname === href : pathname.startsWith(href);
@@ -46,7 +60,7 @@ export function SiteHeader({ session }: { session: SessionUser | null }) {
         >
           <Brand className="text-lg sm:text-[22px] [&>span]:shadow-[0_4px_16px_-6px_rgb(0_237_100/0.5)]" />
           <span className="mt-0.5 hidden pl-[46px] text-[10px] font-medium tracking-wide text-muted-foreground xl:block">
-            Pickleball, made simple.
+            {content.headerTagline}
           </span>
         </Link>
         <nav
@@ -59,7 +73,7 @@ export function SiteHeader({ session }: { session: SessionUser | null }) {
               asChild
               variant="ghost"
               className={cn(
-                "h-10 gap-2 px-4 text-[13px] font-medium",
+                "h-10 max-w-40 gap-2 px-4 text-[13px] font-medium",
                 active(item.href)
                   ? "bg-white text-brand-700 shadow-[0_1px_4px_rgb(0_30_43/0.08)] ring-1 ring-border/60"
                   : "text-ink-soft",
@@ -70,7 +84,7 @@ export function SiteHeader({ session }: { session: SessionUser | null }) {
                 aria-current={active(item.href) ? "page" : undefined}
               >
                 <item.icon className="size-3.5" strokeWidth={1.8} aria-hidden />
-                {item.label}
+                <span className="truncate">{item.label}</span>
               </Link>
             </Button>
           ))}
@@ -81,9 +95,15 @@ export function SiteHeader({ session }: { session: SessionUser | null }) {
             variant="ghost"
             className="hidden gap-1.5 px-3 text-[13px] font-medium text-muted-foreground xl:inline-flex"
           >
-            <Link href="/list-your-venue">
-              <Building2 className="size-4" aria-hidden />
-              For venues
+            <Link
+              href={session?.role === "ADMIN" ? "/cms" : "/list-your-venue"}
+            >
+              {session?.role === "ADMIN" ? (
+                <FilePenLine className="size-4" aria-hidden />
+              ) : (
+                <Building2 className="size-4" aria-hidden />
+              )}
+              {session?.role === "ADMIN" ? "Edit website" : content.venueLabel}
             </Link>
           </Button>
           {session ? (
@@ -116,17 +136,19 @@ export function SiteHeader({ session }: { session: SessionUser | null }) {
               size="sm"
               className="hidden px-3 text-[13px] text-ink-soft sm:inline-flex"
             >
-              <Link href="/login">Sign in</Link>
+              <Link href="/login">{content.signInLabel}</Link>
             </Button>
           )}
           <Button
             asChild
-            className="motion-trigger size-11 p-0 sm:w-auto sm:gap-2 sm:px-5 lg:h-12"
-            aria-label="Find courts"
+            className="motion-trigger size-11 p-0 sm:w-auto sm:max-w-44 sm:gap-2 sm:px-5 lg:h-12"
+            aria-label={content.searchLabel}
           >
             <Link href="/search">
               <Search className="size-4 sm:hidden" aria-hidden />
-              <span className="hidden sm:inline">Find courts</span>
+              <span className="hidden truncate sm:inline">
+                {content.searchLabel}
+              </span>
               <ArrowUpRight
                 className="motion-arrow hidden size-4 sm:block"
                 data-direction="up-right"
@@ -160,9 +182,18 @@ export function SiteHeader({ session }: { session: SessionUser | null }) {
               >
                 {[
                   ...NAV,
+                  ...(session?.role === "ADMIN"
+                    ? [
+                        {
+                          href: "/cms",
+                          label: "Edit website",
+                          icon: FilePenLine,
+                        },
+                      ]
+                    : []),
                   {
                     href: "/list-your-venue",
-                    label: "List your venue",
+                    label: content.venueLabel,
                     icon: Building2,
                   },
                 ].map((item) => (
@@ -184,7 +215,7 @@ export function SiteHeader({ session }: { session: SessionUser | null }) {
                           strokeWidth={1.8}
                           aria-hidden
                         />
-                        {item.label}
+                        <span className="truncate">{item.label}</span>
                       </Link>
                     </Button>
                   </SheetClose>
@@ -209,7 +240,7 @@ export function SiteHeader({ session }: { session: SessionUser | null }) {
                   <SheetClose asChild>
                     <Button asChild block>
                       <Link href="/login">
-                        Sign in <ArrowUpRight aria-hidden />
+                        {content.signInLabel} <ArrowUpRight aria-hidden />
                       </Link>
                     </Button>
                   </SheetClose>

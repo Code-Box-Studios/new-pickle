@@ -12,6 +12,7 @@ import {
   Star,
   Building2,
   LogOut,
+  FilePenLine,
   ChevronRight,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -32,14 +33,20 @@ export function OwnerMobileNav({
   session,
   activeVenueId,
 }: {
-  session: { email: string };
+  session: { email: string; role?: string };
   activeVenueId?: string;
 }) {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
-  const moreActive = MORE_ITEMS.some((item) => pathname.startsWith(item.href));
+  const moreItems = [
+    ...MORE_ITEMS,
+    ...(session.role === "ADMIN"
+      ? [{ href: "/cms", label: "Edit website", icon: FilePenLine }]
+      : []),
+  ];
+  const moreActive = moreItems.some((item) => pathname.startsWith(item.href));
   const venueHref = (href: string) =>
-    activeVenueId ? `${href}?venue=${activeVenueId}` : href;
+    activeVenueId && href !== "/cms" ? `${href}?venue=${activeVenueId}` : href;
 
   return (
     <Dialog open={moreOpen} onOpenChange={setMoreOpen}>
@@ -113,7 +120,7 @@ export function OwnerMobileNav({
       </nav>
       <DialogContent title="More">
         <nav aria-label="More owner navigation" className="space-y-2">
-          {MORE_ITEMS.map((item) => {
+          {moreItems.map((item) => {
             const Icon = item.icon;
             const active = pathname.startsWith(item.href);
             return (
