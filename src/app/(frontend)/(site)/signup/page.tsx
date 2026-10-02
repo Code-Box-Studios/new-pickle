@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth/session";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { safeNextPath } from "@/lib/auth/redirect";
+import { getSession } from "@/lib/auth/session";
 
-export const metadata: Metadata = { title: "Sign in" };
+export const metadata: Metadata = { title: "Create account" };
 
-export default async function LoginPage({
+export default async function SignUpPage({
   searchParams,
 }: {
   searchParams: Promise<{ next?: string }>;
@@ -18,7 +18,7 @@ export default async function LoginPage({
 
   return (
     <AuthShell>
-      <LoginForm nextPath={safeNextPath(sp.next)} />
+      <LoginForm mode="signup" nextPath={safeNextPath(sp.next)} />
     </AuthShell>
   );
 }

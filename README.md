@@ -30,7 +30,7 @@ brand illustration, independent of venue listings. Venues appear in the separate
 with the logo's white ball rallying between the paddles, returning to the logo,
 and repeating. Paddle returns and soft glow accompany the loop. The panel includes
 a pause button; motion also pauses offscreen and in background tabs. Reduced-motion
-preferences show a still composition. On Home, sign-in, and venue onboarding,
+preferences show a still composition. On Home, sign-in, sign-up, and venue onboarding,
 the header is transparent over the dark intro, then fades into a floating white
 panel as you scroll. White-content pages keep the white panel. Green search
 actions and a branded mobile drawer remain available. It has no tagline; the
@@ -99,11 +99,20 @@ Set `PAYLOAD_SECRET` in `.env` to a random secret before running CMS commands.
 Generate one with `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`.
 Keep this value private and stable across deployments.
 
-## Signing in (dev)
+## Sign-in and account creation
+
+`/login` and `/signup` share a responsive Pikol layout, with a branded introduction
+on desktop and a focused form on phones. Both offer **Email** and **Phone number**
+tabs with passwordless verification. Links between the pages preserve the booking
+destination. Verification screens explain the next step and let players correct
+their email address or phone number. New players use the same verified auth flows;
+there is no separate password or registration endpoint.
+
+### Development
 
 Auth is passwordless magic-link. In development there's **no SMTP** — instead a
 yellow banner appears at the top of the app with the latest sign-in link (also
-printed to the server console). Request a link from `/login`, then click the
+printed to the server console). Request a link from `/login` or `/signup`, then click the
 banner.
 
 Seeded accounts:

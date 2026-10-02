@@ -401,6 +401,9 @@
   .motion-enter {
     animation: content-enter 700ms var(--ease-smooth) backwards;
   }
+  .auth-method-panel[data-state="active"] {
+    animation: content-enter 240ms var(--ease-smooth);
+  }
   .motion-delay-1 {
     animation-delay: 60ms;
   }
@@ -673,6 +676,7 @@
 
   .page-enter,
   .motion-enter,
+  .auth-method-panel,
   .stagger-enter > *,
   .reveal-section {
     animation: none !important;

@@ -24,7 +24,7 @@ export function BottomTabBar() {
         {TABS.map((t) => {
           const active = t.exact
             ? pathname === t.href
-            : pathname.startsWith(t.href);
+            : pathname.startsWith(t.href) || (t.href === "/login" && pathname === "/signup");
           const Icon = t.icon;
           return (
             <li key={t.href} className="flex-1">

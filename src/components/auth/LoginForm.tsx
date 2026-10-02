@@ -1,36 +1,67 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, MailCheck, ArrowRight, Smartphone } from "lucide-react";
+import Link from "next/link";
+import { Mail, MailCheck, ArrowRight, Smartphone, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Field } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PhoneLoginForm } from "./PhoneLoginForm";
-import { BrandMark } from "@/components/ui/brand";
+import { Brand } from "@/components/ui/brand";
 
-export function LoginForm({ nextPath }: { nextPath?: string }) {
+export type AuthMode = "login" | "signup";
+
+export function LoginForm({
+  nextPath,
+  mode = "login",
+}: {
+  nextPath?: string;
+  mode?: AuthMode;
+}) {
+  const signup = mode === "signup";
+  const counterpart = signup ? "/login" : "/signup";
+  const counterpartHref = nextPath
+    ? `${counterpart}?next=${encodeURIComponent(nextPath)}`
+    : counterpart;
+
   return (
     <div>
-      <div className="mb-7 text-center">
-        <BrandMark className="mx-auto mb-5 size-14" />
-        <p className="eyebrow mb-2">Welcome to Pikol</p>
-        <h1 className="text-3xl font-medium tracking-tight text-ink">Sign in</h1>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">Your next game is one sign-in away.</p>
+      <div className="mb-7">
+        <div className="mb-7 flex items-center justify-between gap-4">
+          <Brand className="gap-2 text-lg [&_svg]:size-9" />
+          <span className="text-[10px] font-semibold tracking-[0.12em] text-brand-700">LET&apos;S PLAY</span>
+        </div>
+        <h1 className="text-[30px] font-medium leading-tight tracking-[-1px] text-ink sm:text-[34px]">
+          {signup ? "Create your account" : "Welcome back"}
+        </h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          {signup ? "Find your court and keep every booking in one place." : "Sign in to keep your plans together and get back to the game."}
+        </p>
       </div>
       <Tabs defaultValue="email" className="gap-6">
-        <TabsList className="h-12 w-full rounded-full p-1" aria-label="Sign-in method">
-          <TabsTrigger value="email" className="min-h-10 rounded-full"><Mail className="size-4" aria-hidden />Email</TabsTrigger>
-          <TabsTrigger value="phone" className="min-h-10 rounded-full"><Smartphone className="size-4" aria-hidden />Phone number</TabsTrigger>
+        <TabsList className="w-full rounded-full border border-line/70 bg-mist p-1 group-data-[orientation=horizontal]/tabs:h-auto" aria-label={signup ? "Account creation method" : "Sign-in method"}>
+          <TabsTrigger value="email" className="h-11 rounded-full px-3 text-ink-soft data-[state=active]:border-line data-[state=active]:text-brand-700"><Mail className="size-4" aria-hidden />Email</TabsTrigger>
+          <TabsTrigger value="phone" className="h-11 rounded-full px-3 text-ink-soft data-[state=active]:border-line data-[state=active]:text-brand-700"><Smartphone className="size-4" aria-hidden />Phone number</TabsTrigger>
         </TabsList>
-        <TabsContent value="email"><EmailLoginForm nextPath={nextPath} /></TabsContent>
-        <TabsContent value="phone"><PhoneLoginForm nextPath={nextPath} /></TabsContent>
+        <TabsContent value="email" className="auth-method-panel"><EmailLoginForm nextPath={nextPath} mode={mode} /></TabsContent>
+        <TabsContent value="phone" className="auth-method-panel"><PhoneLoginForm nextPath={nextPath} mode={mode} /></TabsContent>
       </Tabs>
+      <p className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+        <ShieldCheck className="size-3.5 shrink-0 text-brand-700" aria-hidden /> No password to remember
+      </p>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-1 border-t border-line pt-4 text-sm text-muted-foreground">
+        <span>{signup ? "Already on Pikol?" : "New to Pikol?"}</span>
+        <Button asChild variant="link" className="min-h-11 px-2 font-semibold">
+          <Link href={counterpartHref}>{signup ? "Sign in" : "Create an account"}</Link>
+        </Button>
+      </div>
     </div>
   );
 }
 
-function EmailLoginForm({ nextPath }: { nextPath?: string }) {
+function EmailLoginForm({ nextPath, mode }: { nextPath?: string; mode: AuthMode }) {
   const [email, setEmail] = useState("");
+  const [editingEmail, setEditingEmail] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
     "idle",
   );
@@ -61,35 +92,32 @@ function EmailLoginForm({ nextPath }: { nextPath?: string }) {
 
   if (status === "sent") {
     return (
-      <div className="text-center" role="status" aria-live="polite">
-        <div className="mx-auto mb-6 grid size-16 place-items-center rounded-lg bg-mist text-brand-700">
-          <MailCheck className="size-7" aria-hidden />
+      <div className="space-y-5">
+        <div className="rounded-lg border border-brand-700/10 bg-brand-50 p-5" role="status" aria-live="polite">
+          <span className="mb-4 grid size-11 place-items-center rounded-full bg-white text-brand-700 shadow-card">
+            <MailCheck className="size-5" aria-hidden />
+          </span>
+          <h2 className="text-xl font-medium tracking-tight text-ink">Check your inbox</h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            We sent a {mode === "signup" ? "verification" : "sign-in"} link to
+          </p>
+          <p className="mt-1 break-words text-sm font-semibold text-ink">{email}</p>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Open it on this device to {mode === "signup" ? "finish joining Pikol" : "sign in"}. The link expires in 15 minutes.
+          </p>
         </div>
-        <h1 className="text-2xl font-medium tracking-tight text-ink">
-          Check your email
-        </h1>
-        <p className="mt-3 leading-relaxed text-muted-foreground">
-          We sent a sign-in link to{" "}
-          <strong className="break-words font-semibold text-ink">
-            {email}
-          </strong>
-          . Open it on this device to continue.
-        </p>
-        {process.env.NODE_ENV !== "production" && <p className="mt-6 rounded-xl bg-mist px-4 py-3 text-sm leading-relaxed text-muted-foreground">
-          In development, use the banner at the top to open the link instantly.
-        </p>}
+        <p className="text-center text-xs leading-relaxed text-muted-foreground">Can&apos;t find it? Check your spam or junk folder.</p>
+        <Button type="button" variant="outline" block onClick={() => { setEditingEmail(true); setStatus("idle"); setMessage(null); }}>
+          Use another email
+        </Button>
       </div>
     );
   }
 
   return (
-    <form onSubmit={submit} className="space-y-6">
-        <p className="text-center text-sm leading-relaxed text-muted-foreground">
-          We&apos;ll email you a magic link — no password needed.
-        </p>
-      {nextPath && <input type="hidden" value={nextPath} readOnly />}
+    <form onSubmit={submit} className="space-y-5">
       <Field
-        label="Email"
+        label="Email address"
         htmlFor="email"
         error={status === "error" ? (message ?? undefined) : undefined}
       >
@@ -98,6 +126,8 @@ function EmailLoginForm({ nextPath }: { nextPath?: string }) {
           type="email"
           inputMode="email"
           autoComplete="email"
+          autoFocus={editingEmail}
+          className="h-13 bg-canvas focus-visible:bg-white"
           aria-invalid={status === "error" || undefined}
           required
           placeholder="you@example.com"
@@ -105,6 +135,9 @@ function EmailLoginForm({ nextPath }: { nextPath?: string }) {
           onChange={(e) => setEmail(e.target.value)}
         />
       </Field>
+      <p className="text-sm leading-relaxed text-muted-foreground">
+        {mode === "signup" ? "We’ll email you a link to verify your address and get you started." : "We’ll email you a secure link. One tap and you’re in."}
+      </p>
       <Button
         type="submit"
         size="lg"
@@ -112,7 +145,7 @@ function EmailLoginForm({ nextPath }: { nextPath?: string }) {
         className="motion-trigger"
         loading={status === "sending"}
       >
-        Send magic link
+        Continue with email
         <ArrowRight
           className="motion-arrow size-4"
           data-direction="right"

@@ -301,7 +301,7 @@ atmospheric motion remain gentle.
 Its pause control stops all motion; animation also pauses offscreen and in
 background tabs. Reduced-motion preferences render a still composition.
 Header and footer logo motion remains brief and tied to interaction.
-The sticky header is transparent at the top of Home, sign-in, and venue onboarding,
+The sticky header is transparent at the top of Home, sign-in, sign-up, and venue onboarding,
 with white text over the dark intro. After 16px of scroll its white panel, light
 border, and restrained shadow fade in over 300ms, and text switches to dark teal.
 White-content pages use the white panel throughout. The transparent surround
@@ -330,6 +330,15 @@ session totals, with clear selected and unavailable states. A floating summary
 shows the chosen court, date, full time range, and total; it sits above phone
 navigation. Changing the day or duration clears the old choice. Photos open
 in a shadcn Dialog with keyboard navigation and previous/next controls.
+
+Sign-in and sign-up share a dark intro with a white {rounded.lg} form card.
+Desktop pairs the form with Pikol's paddle-and-ball illustration and three short
+benefits; smaller screens prioritize the form. Email and phone methods use
+shadcn pill tabs with 44px targets, 52px inputs, and green primary actions.
+Verification states use quiet mint panels, a readable six-digit code field,
+and actions to correct an address or number. Switching methods fades in for
+240ms; page entrances are brief, and reduced-motion preferences keep them still.
+Links between sign-in and account creation retain the player's return path.
 
 ## Do's and Don'ts
 
