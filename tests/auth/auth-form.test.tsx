@@ -13,6 +13,12 @@ function respond(body: unknown, status = 200) {
 }
 
 describe("Pikol sign-in and account creation", () => {
+  it.each(["login", "signup"] as const)("explains that %s is coming soon in preview", mode => {
+    render(<LoginForm mode={mode} preview />);
+    expect(screen.getByRole("heading", { name: "Accounts are coming soon" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Continue with email" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Explore Pikol/ })).toHaveAttribute("href", "/search");
+  });
   it("keeps the booking destination when opening account creation", () => {
     render(<LoginForm nextPath="/book/ABC?step=details" />);
     expect(screen.getByRole("link", { name: "Create an account" })).toHaveAttribute(

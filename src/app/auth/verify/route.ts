@@ -3,12 +3,14 @@ import { resolveMagicLinkBase } from "@/lib/auth/magic-link";
 import { resolveSupabaseUser } from "@/lib/auth/supabase-user";
 import { safeNextPath } from "@/lib/auth/redirect";
 import { createSupabaseRequestClient } from "@/lib/supabase/request";
+import { isPreviewMode } from "@/lib/deployment";
 
 export async function GET(req: NextRequest) {
   const base = resolveMagicLinkBase(req.nextUrl.origin);
   const tokenHash = req.nextUrl.searchParams.get("token_hash");
   const type = req.nextUrl.searchParams.get("type");
   const failure = (error: string) => NextResponse.redirect(new URL(`/login?error=${error}`, base), { headers: { "Cache-Control": "private, no-store", "Referrer-Policy": "no-referrer" } });
+  if (isPreviewMode()) return failure("unavailable");
   if (!tokenHash || type !== "email") return failure("missing");
   try {
     const client = createSupabaseRequestClient(req);

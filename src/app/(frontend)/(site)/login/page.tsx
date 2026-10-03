@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth/session";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { safeNextPath } from "@/lib/auth/redirect";
+import { isPreviewMode } from "@/lib/deployment";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -18,7 +19,7 @@ export default async function LoginPage({
 
   return (
     <AuthShell>
-      <LoginForm nextPath={safeNextPath(sp.next)} authError={sp.error === "missing" || sp.error === "invalid" ? sp.error : undefined} />
+      <LoginForm preview={isPreviewMode()} nextPath={safeNextPath(sp.next)} authError={sp.error === "missing" || sp.error === "invalid" ? sp.error : undefined} />
     </AuthShell>
   );
 }

@@ -34,6 +34,7 @@ import { venueMapUrl } from "@/lib/location/maps";
 import { venueRatingSummary, listVenueReviews } from "@/lib/review";
 import { Stars } from "@/components/review/Stars";
 import { cn } from "@/lib/cn";
+import { isPreviewMode } from "@/lib/deployment";
 
 const WEEKDAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
 
@@ -46,6 +47,7 @@ function minuteLabel(min: number): string {
 }
 
 async function loadVenue(slug: string) {
+  if (isPreviewMode()) return null;
   // Load regardless of publish state; the caller gates who may view a
   // non-live venue (owner/admin preview only).
   return prisma.venue.findFirst({

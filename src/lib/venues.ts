@@ -1,9 +1,10 @@
 import prisma from "@/lib/prisma";
 import type { VenueCardData } from "@/components/venue/VenueCard";
 import { PHILIPPINE_CITIES, type CityOption } from "@/lib/cities";
+import { isPreviewMode } from "@/lib/deployment";
 
 export async function listCities(): Promise<CityOption[]> {
-  const rows = await prisma.venue.findMany({
+  const rows = isPreviewMode() ? [] : await prisma.venue.findMany({
     where: { isPublished: true, status: "APPROVED" },
     distinct: ["city"],
     select: { city: true },
@@ -17,6 +18,7 @@ export async function listCities(): Promise<CityOption[]> {
 }
 
 export async function featuredVenues(limit = 6): Promise<VenueCardData[]> {
+  if (isPreviewMode()) return [];
   const venues = await prisma.venue.findMany({
     where: { isPublished: true, status: "APPROVED" },
     include: { courts: { where: { active: true } } },

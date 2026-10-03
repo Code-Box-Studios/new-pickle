@@ -5,10 +5,12 @@ import { safeNextPath } from "@/lib/auth/redirect";
 import { errorResponse } from "@/lib/http";
 import { ValidationError } from "@/lib/booking/errors";
 import { assertPhoneOrigin } from "@/lib/auth/phone-origin";
+import { assertFullAppEnabled } from "@/lib/deployment";
 
 export async function POST(req: NextRequest) {
   try {
     assertPhoneOrigin(req);
+    assertFullAppEnabled();
     const body = await req.json() as { challengeId?: unknown; code?: unknown; next?: unknown };
     if (typeof body.challengeId !== "string" || typeof body.code !== "string") throw new ValidationError("Enter the six-digit code.");
     const client = createSupabaseRequestClient(req);

@@ -2,6 +2,7 @@ import { AppError, ValidationError } from "@/lib/booking/errors";
 import { createSupabaseAuthClient } from "@/lib/supabase/server";
 import { throwAuthProviderError } from "./provider-error";
 import { safeNextPath } from "./redirect";
+import { assertFullAppEnabled } from "@/lib/deployment";
 
 export function resolveMagicLinkBase(origin?: string): string {
   if (process.env.NODE_ENV === "production") {
@@ -12,6 +13,7 @@ export function resolveMagicLinkBase(origin?: string): string {
 }
 
 export async function requestMagicLink(emailRaw: string, opts?: { origin?: string; next?: unknown }): Promise<void> {
+  assertFullAppEnabled();
   const email = emailRaw.trim().toLowerCase();
   if (email.length > 254 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new ValidationError("Enter a valid email address");
   const redirect = new URL("/auth/verify", resolveMagicLinkBase(opts?.origin));

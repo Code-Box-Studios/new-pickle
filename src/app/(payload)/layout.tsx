@@ -5,12 +5,14 @@ import type { ServerFunctionClient } from "payload";
 import config from "@payload-config";
 import { resolveCmsAdmin } from "@/cms/auth";
 import { getSession } from "@/lib/auth/session";
+import { assertFullAppEnabled } from "@/lib/deployment";
 import { importMap } from "./cms/importMap";
 import "@payloadcms/next/css";
 import "./custom.css";
 
 const serverFunction: ServerFunctionClient = async (args) => {
   "use server";
+  assertFullAppEnabled();
   return handleServerFunctions({ ...args, config, importMap });
 };
 export default async function Layout({

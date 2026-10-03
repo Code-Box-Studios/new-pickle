@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { isPreviewMode } from "@/lib/deployment";
 import { ChevronRight, Inbox } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { EmptyState } from "@/components/ui/states";
@@ -27,6 +29,7 @@ export default async function AdminVenuesPage({
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
+  if (isPreviewMode()) redirect("/login?next=/admin/venues");
   const sp = await searchParams;
   const filter = FILTERS.find((f) => f.value === sp.status) ?? FILTERS[0];
 

@@ -5,6 +5,22 @@ booking engine and overlap constraint; Payload retains the `cms` schema. The
 Next.js app still needs hosting. Supabase Auth is integrated through server
 routes with HttpOnly SSR cookies and Next.js 16 `proxy.ts` session refresh.
 
+## Temporary public preview
+
+To publish the website before private service credentials are available, set
+`APP_PREVIEW_MODE=true` in Vercel's Production environment, along with `APP_URL`,
+`NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. The
+Supabase packages and session helpers are already installed and integrated.
+
+This explicit mode uses the default website content and all 149 Philippine
+cities without a PostgreSQL connection. Accounts and court bookings display
+coming-soon states. Private pages redirect to sign-in; CMS operations, media
+reads, and authentication requests are unavailable. It does not send email/SMS,
+insert demo venues, or open database policies. This is a website preview.
+
+Complete the service configuration below, then set `APP_PREVIEW_MODE=false`
+and redeploy to enable the full app. Keep the flag false for local development.
+
 ## 1. Configure database connections
 
 In Supabase **Connect**, copy the PostgreSQL connection strings and supply your

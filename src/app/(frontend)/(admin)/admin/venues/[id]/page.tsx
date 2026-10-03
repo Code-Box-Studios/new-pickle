@@ -1,7 +1,8 @@
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { isPreviewMode } from "@/lib/deployment";
 import { ArrowLeft } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { Amenities } from "@/components/venue/Amenities";
@@ -29,6 +30,7 @@ export default async function AdminVenueReview({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  if (isPreviewMode()) redirect("/login?next=/admin/venues");
   const { id } = await params;
   const v = await prisma.venue.findUnique({
     where: { id },

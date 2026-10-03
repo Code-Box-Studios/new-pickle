@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { hasSupabaseConfig } from "@/lib/supabase/config";
 import { createSupabaseHeadersClient, createSupabaseServerClient } from "@/lib/supabase/server";
+import { isPreviewMode } from "@/lib/deployment";
 
 export interface SessionUser {
   id: string;
@@ -12,6 +13,7 @@ export interface SessionUser {
 }
 
 async function verifiedSession(client: Awaited<ReturnType<typeof createSupabaseServerClient>>): Promise<SessionUser | null> {
+  if (isPreviewMode()) return null;
   const { data, error } = await client.auth.getUser();
   if (error || !data.user) return null;
   const user = await prisma.user.findUnique({ where: { supabaseId: data.user.id } });

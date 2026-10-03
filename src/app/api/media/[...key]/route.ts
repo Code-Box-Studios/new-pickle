@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { venueMediaStorage } from "@/lib/storage";
 import { canViewVenueMedia, venueForMediaKey } from "@/lib/venue/media-access";
+import { isPreviewMode } from "@/lib/deployment";
 
 /**
  * Serve venue media. Live venues → public + cacheable. Unpublished venues →
@@ -12,6 +13,10 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ key: string[] }> },
 ) {
+  if (isPreviewMode()) return NextResponse.json(
+    { error: "This feature is coming soon.", code: "preview_unavailable" },
+    { status: 503, headers: { "Cache-Control": "no-store" } },
+  );
   const key = (await params).key.join("/");
   const venue = await venueForMediaKey(key);
   if (!venue) return new NextResponse("Not found", { status: 404 });

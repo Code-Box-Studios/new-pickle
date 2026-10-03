@@ -3,12 +3,13 @@ import { cache } from "react";
 import { getPayload, type GlobalSlug } from "payload";
 import { homeDefaults, siteDefaults, venueLandingDefaults } from "./defaults";
 import { loadPublishedContent } from "./published";
+import { isPreviewMode } from "@/lib/deployment";
 
 async function publishedContent<T extends object>(
   slug: GlobalSlug,
   fallback: T,
 ): Promise<T> {
-  if (!process.env.PAYLOAD_SECRET) return fallback;
+  if (isPreviewMode() || !process.env.PAYLOAD_SECRET) return fallback;
   return loadPublishedContent(async () => {
     const { default: config } = await import("@/payload.config");
     const payload = await getPayload({ config });

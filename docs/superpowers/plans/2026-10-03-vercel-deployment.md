@@ -13,6 +13,22 @@ integrated. No separate Render service is required for the current app.
 
 **Spec:** docs/deployment/supabase.md
 
+## Interim preview requested by the user
+
+The user requested publishing with the supplied public Supabase URL/key for now.
+Use explicit `APP_PREVIEW_MODE=true` for this interim deployment. Default site
+content and the national city catalog must load without PostgreSQL. Accounts,
+bookings, CMS operations, and media reads must not perform private database
+operations or send authentication messages in preview mode. Display clear
+coming-soon states; never insert fake venues or grant temporary user roles.
+Supabase SSR refresh remains integrated. Full production setup below stays
+pending until the private service connections are available.
+
+- [x] Add preview guards and coming-soon UI; verify regression tests fail first.
+- [x] Run the suite and a build without database environment variables.
+- [ ] Review and commit on main; set the production preview flag and publish.
+- [ ] Check public pages, protected routes, and unavailable API responses live.
+
 ## Global constraints
 
 - Preserve the user's ignore files and pnpm lockfile; use the npm lockfile for deployment.
@@ -70,7 +86,7 @@ integrated. No separate Render service is required for the current app.
   Supabase's security advisor reports no warnings or errors. Its informational
   notices about tables without policies are expected for backend-only access.
 - Public Supabase settings are in ignored `.env.local`. Hosted `DATABASE_URL`,
-  `DIRECT_URL`, and `SUPABASE_SECRET_KEY` are still required before publishing.
+  `DIRECT_URL`, and `SUPABASE_SECRET_KEY` are still required for the full app.
   `CMS_DATABASE_URL` can use `DIRECT_URL`.
 - CMS content seeding, Auth project configuration, production publishing, and
   live authenticated/upload checks remain pending. No demo accounts or venues
@@ -91,3 +107,22 @@ integrated. No separate Render service is required for the current app.
   tracing warnings. Reconfirmed that all ten hosted Prisma checksums match the
   committed migration files. No production runtime or private upload has been
   exercised while the required credentials are missing.
+- Confirmed the user's failed Git deployment was blocked by missing
+  `DATABASE_URL` during home-page prerendering, with Payload also attempting
+  its local fallback. The failure is unrelated to package installation.
+- Ruling: publish an explicit temporary preview using public Supabase settings
+  after the user said "just use this for now". This avoids inventing private
+  credentials; accounts, bookings, CMS, and uploads remain unavailable until
+  the full service configuration is completed.
+- Preview regression tests failed against the original public/CMS/auth paths,
+  then passed after adding explicit guards. A production build with empty
+  database and Storage credentials passed. The original two Prisma tracing
+  warnings remain; no database connection was needed for this build.
+- Final review found admin pages and the CMS not-found boundary could access
+  private services alongside redirecting layouts. Added guards at those entry
+  points. All three new regression cases failed first, then passed; normal CMS
+  not-found behavior remains covered with preview disabled. No deferred minors.
+- After the review fixes, all 317 tests across 76 files, TypeScript, and lint
+  passed. Vercel Production now has `APP_PREVIEW_MODE=true`. A dry source upload
+  excludes all environment files, private deployment state, upload contents,
+  tests, and local graph caches; only empty directory entries remain.

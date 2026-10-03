@@ -4,10 +4,12 @@ import { errorResponse } from "@/lib/http";
 import { ValidationError } from "@/lib/booking/errors";
 import { assertPhoneOrigin } from "@/lib/auth/phone-origin";
 import { phoneClientKey } from "@/lib/auth/phone-client";
+import { assertFullAppEnabled } from "@/lib/deployment";
 
 export async function POST(req: NextRequest) {
   try {
     assertPhoneOrigin(req);
+    assertFullAppEnabled();
     const body = await req.json() as { phone?: unknown };
     if (typeof body.phone !== "string") throw new ValidationError("Enter your mobile number.");
     return NextResponse.json(await requestPhoneCode(body.phone, phoneClientKey(req.headers)), { headers: { "Cache-Control": "no-store" } });

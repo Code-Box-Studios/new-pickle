@@ -9,6 +9,7 @@ import { cached } from "@/lib/availability/cache";
 import { resolveTimeWindow } from "@/lib/search-params";
 import { isoDate, longDateLabel, parseIsoDate } from "@/lib/format";
 import { DEFAULT_CITY } from "@/lib/cities";
+import { isPreviewMode } from "@/lib/deployment";
 
 export const metadata: Metadata = {
   title: "Search courts",
@@ -39,7 +40,8 @@ export default async function SearchPage({
   const durationMinutes = Number(duration) || 60;
 
   const key = `search:${city}:${dateStr}:${timePreset}:${durationMinutes}`;
-  const results = await cached(key, 45_000, () =>
+  const preview = isPreviewMode();
+  const results = preview ? [] : await cached(key, 45_000, () =>
     searchAvailability({ city, date, fromMinute: from, toMinute: to, durationMinutes }),
   );
   const withOpenings = results.filter((r) => r.nextSlots.length > 0).length;
@@ -59,16 +61,16 @@ export default async function SearchPage({
           Courts in {city}
         </h1>
         <p className="page-description mt-3">
-          {longDateLabel(date)} · {withOpenings} of {results.length} venue
-          {results.length === 1 ? "" : "s"} with openings
+          {preview ? `${longDateLabel(date)} · Court bookings open soon` :
+            `${longDateLabel(date)} · ${withOpenings} of ${results.length} venue${results.length === 1 ? "" : "s"} with openings`}
         </p>
       </div>
 
       {results.length === 0 ? (
         <EmptyState
           icon={<SearchX className="size-7" />}
-          title="No venues here yet"
-          description="We couldn't find venues in this area. Try another city."
+          title={preview ? "Your next game is coming soon" : "No venues here yet"}
+          description={preview ? "We're getting courts ready on Pikol. Check back soon to find your place to play." : "We couldn't find venues in this area. Try another city."}
         />
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">

@@ -15,10 +15,12 @@ export function LoginForm({
   nextPath,
   mode = "login",
   authError,
+  preview = false,
 }: {
   nextPath?: string;
   mode?: AuthMode;
   authError?: "missing" | "invalid";
+  preview?: boolean;
 }) {
   const signup = mode === "signup";
   const counterpart = signup ? "/login" : "/signup";
@@ -40,11 +42,22 @@ export function LoginForm({
           {signup ? "Find your court and keep every booking in one place." : "Sign in to keep your plans together and get back to the game."}
         </p>
       </div>
-      {authError && (
+      {authError && !preview && (
         <div role="alert" className="mb-5 rounded-lg border border-line bg-mist px-4 py-3 text-sm leading-relaxed text-ink-soft">
           That sign-in link is invalid or expired. Request a new link below to continue.
         </div>
       )}
+      {preview ? (
+        <div className="rounded-lg border border-brand-700/10 bg-brand-50 p-5" role="status">
+          <h2 className="text-xl font-medium tracking-tight text-ink">Accounts are coming soon</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Take a look around Pikol. Sign-ups and court bookings will open soon.
+          </p>
+          <Button asChild className="mt-5 w-full motion-trigger">
+            <Link href="/search">Explore Pikol <ArrowRight className="motion-arrow" aria-hidden /></Link>
+          </Button>
+        </div>
+      ) : (
       <Tabs defaultValue="email" className="gap-6">
         <TabsList className="w-full rounded-full border border-line/70 bg-mist p-1 group-data-[orientation=horizontal]/tabs:h-auto" aria-label={signup ? "Account creation method" : "Sign-in method"}>
           <TabsTrigger value="email" className="h-11 rounded-full px-3 text-ink-soft data-[state=active]:border-line data-[state=active]:text-brand-700"><Mail className="size-4" aria-hidden />Email</TabsTrigger>
@@ -53,9 +66,10 @@ export function LoginForm({
         <TabsContent value="email" className="auth-method-panel"><EmailLoginForm nextPath={nextPath} mode={mode} /></TabsContent>
         <TabsContent value="phone" className="auth-method-panel"><PhoneLoginForm nextPath={nextPath} mode={mode} /></TabsContent>
       </Tabs>
-      <p className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+      )}
+      {!preview && <p className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
         <ShieldCheck className="size-3.5 shrink-0 text-brand-700" aria-hidden /> No password to remember
-      </p>
+      </p>}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-x-1 border-t border-line pt-4 text-sm text-muted-foreground">
         <span>{signup ? "Already on Pikol?" : "New to Pikol?"}</span>
         <Button asChild variant="link" className="min-h-11 px-2 font-semibold">
