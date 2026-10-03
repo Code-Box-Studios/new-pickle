@@ -60,6 +60,27 @@ Application tables have RLS enabled with no browser policies. Pikol reads and
 writes through Prisma/Payload using the trusted database connection. Keep `cms`
 out of exposed Data API schemas; never add broad anonymous CRUD policies.
 
+### Dedicated production server login
+
+For an already migrated database, [`supabase/runtime-access.sql`](../../supabase/runtime-access.sql)
+creates the `pikol_server` role with access only to the application's `public`
+and `cms` tables. Its policies target that server role only; browser roles remain
+blocked. It cannot create databases, manage roles, or bypass RLS. Migration
+metadata is read-only. Run this setup once as the database administrator, then
+set a strong, generated login password through a private administration session.
+Never commit a password to a SQL migration or put it in a public environment variable.
+
+Use `pikol_server.PROJECT_REF` as the Supavisor username for the hosting provider's
+runtime connections. Keep an administrator connection separately for migrations;
+the restricted runtime `DIRECT_URL` does not have migration privileges. Revisit
+grants and policies when migrations introduce new tables.
+
+The production CMS connection uses `sslmode=verify-full` and
+`sslrootcert=supabase/prod-ca-2021.crt`. The public Supabase root CA is bundled
+through Next.js file tracing so serverless functions can validate the database
+certificate. When Supabase rotates its CA, download the replacement from
+Database Settings, update the bundled certificate, and redeploy.
+
 ### Existing application data
 
 Before changing connection strings, back up the old database and `uploads/`.

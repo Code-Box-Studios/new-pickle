@@ -11,6 +11,7 @@ uploads/
 graft/
 coverage/
 .vitest/
+.lavish/
 *.log
 *.tsbuildinfo
 

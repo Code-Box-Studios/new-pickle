@@ -4,6 +4,9 @@ const nextConfig = {
   devIndicators: false,
   agentRules: false,
   output: "standalone",
+  outputFileTracingIncludes: {
+    "/*": ["./supabase/prod-ca-2021.crt"],
+  },
   serverExternalPackages: ["@prisma/client"],
   experimental: {
     serverActions: { bodySizeLimit: "8mb" },
