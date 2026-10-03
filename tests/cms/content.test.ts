@@ -4,18 +4,25 @@ import config from "@/payload.config";
 import { homeDefaults } from "@/cms/defaults";
 import { seedContent } from "@/cms/seed";
 import prisma from "@/lib/prisma";
-import { signSession, SESSION_COOKIE } from "@/lib/auth/session";
 import { sql } from "@payloadcms/db-postgres";
 import { getHomeContent } from "@/cms/content";
 import { up as renameBrand, down as restoreBrand } from "@/cms/migrations/20261002_134500_pikol_brand";
 vi.mock("server-only", () => ({}));
 
+const identities = vi.hoisted(() => new Map<string, { id: string }>());
+vi.mock("@supabase/ssr", async importOriginal => {
+  const original = await importOriginal<typeof import("@supabase/ssr")>();
+  return { ...original, createServerClient: (_url: string, _key: string, options: { cookies: { getAll(): { name: string; value: string }[] } }) => ({ auth: { getUser: async () => ({ data: { user: identities.get(options.cookies.getAll().find(cookie => cookie.name === "pikol-test-session")?.value ?? "") ?? null }, error: null }) } }) };
+});
 let payload: Payload;
 beforeAll(async () => {
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.supabase.co");
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "sb_publishable_test");
   payload = await getPayload({ config });
 });
 afterAll(async () => {
   await payload?.destroy();
+  vi.unstubAllEnvs();
 });
 describe("published CMS content", () => {
   it("keeps drafts private until published", async () => {
@@ -113,11 +120,12 @@ describe("published CMS content", () => {
   });
   it("links an existing admin and denies access after their role is revoked", async () => {
     const admin = await prisma.user.create({
-      data: { email: "cms-strategy-test@rallypoint.test", role: "ADMIN" },
+      data: { email: "cms-strategy-test@rallypoint.test", role: "ADMIN", supabaseId: "verified-strategy-admin" },
     });
+    identities.set("verified-strategy-admin", { id: "verified-strategy-admin" });
     try {
       const headers = new Headers({
-        cookie: `${SESSION_COOKIE}=${await signSession(admin)}`,
+        cookie: "pikol-test-session=verified-strategy-admin",
       });
       const { user } = await payload.auth({ headers });
       expect(user?.collection).toBe("cms-users");

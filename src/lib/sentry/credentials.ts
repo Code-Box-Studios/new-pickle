@@ -1,8 +1,7 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { ValidationError } from "@/lib/booking/errors";
 
-// AES-256-GCM. The 32-byte key is derived from SENTRY_CRED_SECRET (dev fallback,
-// mirroring JWT_SECRET). Server-only; ciphertext is stored in
+// AES-256-GCM. The 32-byte key is derived from SENTRY_CRED_SECRET (development fallback). Server-only; ciphertext is stored in
 // SentryConnection.encryptedApiKey and never sent to the browser.
 function key(): Buffer {
   const secret = process.env.SENTRY_CRED_SECRET ?? "dev-sentry-secret-change-in-production";

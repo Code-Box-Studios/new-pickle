@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/auth/guards";
-import { signSession, sessionCookie } from "@/lib/auth/session";
 import { promoteToOwner } from "@/lib/auth/promote";
 import { uniqueVenueSlug } from "@/lib/venue/slug";
 import { errorResponse } from "@/lib/http";
 
-/** Create a DRAFT venue, promote the creator to OWNER, and re-issue the session. */
+/** Create a DRAFT venue, promote the creator to OWNER, and read the new role on subsequent requests. */
 export async function POST(req: NextRequest) {
   try {
     const session = await requireUser();
@@ -28,14 +27,8 @@ export async function POST(req: NextRequest) {
       select: { id: true },
     });
 
-    const { role, promoted } = await promoteToOwner(session.id);
-
-    const res = NextResponse.json({ id: venue.id });
-    if (promoted) {
-    const jwt = await signSession({ ...session, role });
-      res.cookies.set(sessionCookie(jwt));
-    }
-    return res;
+    await promoteToOwner(session.id);
+    return NextResponse.json({ id: venue.id });
   } catch (e) {
     return errorResponse(e);
   }

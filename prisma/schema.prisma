@@ -6,6 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -70,6 +71,7 @@ enum BackendType {
 
 model User {
   id        String   @id @default(cuid())
+  supabaseId String? @unique
   email     String?  @unique
   verifiedMobile String? @unique
   name      String?

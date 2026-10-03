@@ -32,7 +32,7 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString:
-        process.env.CMS_DATABASE_URL || process.env.DATABASE_URL,
+        process.env.CMS_DATABASE_URL || process.env.DIRECT_URL || process.env.DATABASE_URL,
       connectionTimeoutMillis: 1500,
       query_timeout: 1500,
       statement_timeout: 1500,

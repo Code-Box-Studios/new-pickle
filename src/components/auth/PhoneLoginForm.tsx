@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Field } from "@/components/ui/input";
 import type { AuthMode } from "./LoginForm";
 
-type Challenge = { id: string; phone: string; retryAfter: number; devCode?: string };
+type Challenge = { id: string; phone: string; retryAfter: number };
 
 export function PhoneLoginForm({ nextPath, mode = "login" }: { nextPath?: string; mode?: AuthMode }) {
   const [phone, setPhone] = useState("");
@@ -74,9 +74,6 @@ export function PhoneLoginForm({ nextPath, mode = "login" }: { nextPath?: string
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">Enter the six-digit code sent to <strong className="break-words font-medium text-ink">{challenge.phone}</strong>.</p>
           </div>
         </div>
-        {challenge.devCode && process.env.NODE_ENV !== "production" && (
-          <p role="status" className="rounded-lg bg-warning px-4 py-3 text-center text-sm text-warning-foreground">Development code: <strong className="font-mono tracking-widest">{challenge.devCode}</strong></p>
-        )}
         <Field label="Verification code" htmlFor="phone-code" error={error ?? undefined}>
           <Input id="phone-code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required autoFocus value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))} placeholder="000000" className="h-16 bg-canvas text-center font-mono text-2xl tracking-[0.35em] placeholder:text-muted-foreground/40" aria-invalid={!!error || undefined} />
         </Field>
@@ -85,7 +82,7 @@ export function PhoneLoginForm({ nextPath, mode = "login" }: { nextPath?: string
           <Button type="button" variant="ghost" className="min-h-11 px-2 text-xs sm:text-sm" disabled={loading} onClick={() => { setEditingPhone(true); setChallenge(null); setError(null); setCode(""); }}>Change number</Button>
           <Button type="button" variant="ghost" className="min-h-11 px-2 text-xs sm:text-sm" disabled={loading || cooldown > 0} onClick={requestCode}>{cooldown > 0 ? `Resend in ${cooldown}s` : "Resend code"}</Button>
         </div>
-        <p className="text-center text-xs text-muted-foreground">The code expires in 10 minutes.</p>
+        <p className="text-center text-xs text-muted-foreground">Codes can only be used once. Request a new code if yours expires.</p>
       </form>
     );
   }

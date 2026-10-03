@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "../globals.css";
 import { ToastProvider } from "@/components/ui/toast";
-import { MagicLinkBanner } from "@/components/dev/MagicLinkBanner";
 import { ShareToPhonePanel } from "@/components/dev/ShareToPhonePanel";
 import { InstallProvider } from "@/components/pwa/InstallProvider";
 
@@ -34,7 +33,6 @@ export default function RootLayout({
     <html lang="en" data-scroll-behavior="smooth">
       <body className="font-sans text-ink antialiased">
         <InstallProvider>
-          <MagicLinkBanner />
           <ToastProvider>{children}</ToastProvider>
           <ShareToPhonePanel />
         </InstallProvider>

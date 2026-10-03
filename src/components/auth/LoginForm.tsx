@@ -14,9 +14,11 @@ export type AuthMode = "login" | "signup";
 export function LoginForm({
   nextPath,
   mode = "login",
+  authError,
 }: {
   nextPath?: string;
   mode?: AuthMode;
+  authError?: "missing" | "invalid";
 }) {
   const signup = mode === "signup";
   const counterpart = signup ? "/login" : "/signup";
@@ -38,6 +40,11 @@ export function LoginForm({
           {signup ? "Find your court and keep every booking in one place." : "Sign in to keep your plans together and get back to the game."}
         </p>
       </div>
+      {authError && (
+        <div role="alert" className="mb-5 rounded-lg border border-line bg-mist px-4 py-3 text-sm leading-relaxed text-ink-soft">
+          That sign-in link is invalid or expired. Request a new link below to continue.
+        </div>
+      )}
       <Tabs defaultValue="email" className="gap-6">
         <TabsList className="w-full rounded-full border border-line/70 bg-mist p-1 group-data-[orientation=horizontal]/tabs:h-auto" aria-label={signup ? "Account creation method" : "Sign-in method"}>
           <TabsTrigger value="email" className="h-11 rounded-full px-3 text-ink-soft data-[state=active]:border-line data-[state=active]:text-brand-700"><Mail className="size-4" aria-hidden />Email</TabsTrigger>
@@ -103,7 +110,7 @@ function EmailLoginForm({ nextPath, mode }: { nextPath?: string; mode: AuthMode 
           </p>
           <p className="mt-1 break-words text-sm font-semibold text-ink">{email}</p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Open it on this device to {mode === "signup" ? "finish joining Pikol" : "sign in"}. The link expires in 15 minutes.
+            Open it to {mode === "signup" ? "finish joining Pikol" : "sign in"}. Each link can only be used once.
           </p>
         </div>
         <p className="text-center text-xs leading-relaxed text-muted-foreground">Can&apos;t find it? Check your spam or junk folder.</p>

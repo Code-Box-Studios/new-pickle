@@ -1,6 +1,6 @@
 /**
- * Payment-proof storage seam. Local filesystem in dev; a prod implementation
- * (S3/R2/etc.) plugs in via `storage/index.ts` with no caller changes.
+ * Payment-proof storage seam. Supabase private storage by default; explicit
+ * local filesystem storage is available for development and tests.
  *
  * Proofs are *evidence submitted by the customer*, never financial truth.
  */

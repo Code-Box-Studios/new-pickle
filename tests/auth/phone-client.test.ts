@@ -3,25 +3,20 @@ import { phoneClientKey } from "@/lib/auth/phone-client";
 
 afterEach(() => vi.unstubAllEnvs());
 
-describe("trusted SMS client address", () => {
-  it("rejects forged or missing proxy proof in production", () => {
-    vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("PHONE_AUTH_PROXY_SECRET", "a-private-proxy-secret");
-    for (const headers of [new Headers(), new Headers({ "x-real-ip": "1.2.3.4" }), new Headers({ "x-real-ip": "1.2.3.4", "x-rallypoint-proxy-secret": "forged" })]) {
-      expect(() => phoneClientKey(headers)).toThrow();
-    }
+describe("SMS request identity", () => {
+  it("does not let forged forwarding headers change the shared budget", () => {
+    vi.stubEnv("PHONE_AUTH_PROXY_SECRET", "private-proxy-proof");
+    const anonymous = phoneClientKey(new Headers());
+    expect(phoneClientKey(new Headers({ "x-real-ip": "203.0.113.1", "x-forwarded-for": "203.0.113.1" }))).toBe(anonymous);
+    expect(phoneClientKey(new Headers({ "x-real-ip": "203.0.113.2", "x-rallypoint-proxy-secret": "wrong" }))).toBe(anonymous);
+    expect(phoneClientKey(new Headers({ "x-real-ip": "not-an-ip", "x-rallypoint-proxy-secret": "private-proxy-proof" }))).toBe(anonymous);
   });
 
-  it("requires a valid proxy-supplied address and ignores forwarding chains", () => {
-    vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("PHONE_AUTH_PROXY_SECRET", "a-private-proxy-secret");
-    const base = { "x-rallypoint-proxy-secret": "a-private-proxy-secret", "x-real-ip": "1.2.3.4" };
-    expect(phoneClientKey(new Headers(base))).toBe(phoneClientKey(new Headers({ ...base, "x-forwarded-for": "99.99.99.99" })));
-    expect(() => phoneClientKey(new Headers({ ...base, "x-real-ip": "invalid" }))).toThrow();
-  });
-
-  it("does not let supplied headers create new development buckets", () => {
-    vi.stubEnv("NODE_ENV", "development");
-    expect(phoneClientKey(new Headers({ "x-real-ip": "1.2.3.4" }))).toBe(phoneClientKey(new Headers({ "x-real-ip": "5.6.7.8" })));
+  it("gives proven proxy addresses separate budgets without storing the raw IP", () => {
+    vi.stubEnv("PHONE_AUTH_PROXY_SECRET", "private-proxy-proof");
+    const key = (address: string) => phoneClientKey(new Headers({ "x-real-ip": address, "x-rallypoint-proxy-secret": "private-proxy-proof" }));
+    expect(key("203.0.113.1")).toMatch(/^[a-f0-9]{64}$/);
+    expect(key("203.0.113.1")).not.toBe(key("203.0.113.2"));
+    expect(key("203.0.113.1")).not.toBe(phoneClientKey(new Headers()));
   });
 });

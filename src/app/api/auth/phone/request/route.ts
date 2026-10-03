@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { requestPhoneCode } from "@/lib/auth/phone-code";
 import { errorResponse } from "@/lib/http";
 import { ValidationError } from "@/lib/booking/errors";
-import { phoneClientKey } from "@/lib/auth/phone-client";
 import { assertPhoneOrigin } from "@/lib/auth/phone-origin";
+import { phoneClientKey } from "@/lib/auth/phone-client";
 
 export async function POST(req: NextRequest) {
   try {

@@ -15,7 +15,7 @@ for the plan.
 ## Stack
 
 Next.js 16 (App Router) · TypeScript · Prisma · PostgreSQL 16 · Tailwind CSS 4 ·
-shadcn/ui (Radix) · Payload CMS · `jose` (sessions) · Vitest.
+shadcn/ui (Radix) · Payload CMS · Supabase Auth/Storage · Vitest.
 The city combobox uses `cmdk`; the calendar uses React DayPicker.
 
 ## Design
@@ -74,18 +74,29 @@ The demo seeds still contain five Davao venues. Selecting another city shows
 
 ## Prerequisites
 
-- Node 20.9+ (developed on 24)
-- Docker Desktop (for PostgreSQL)
+- Node 22+ (developed on 24; Supabase requires native WebSocket support)
+- Supabase project (PostgreSQL, Auth, Storage)
+- Docker Desktop for the isolated local test database
 
-## Setup
+## Supabase setup
+
+See [the Supabase deployment guide](docs/deployment/supabase.md) for database
+connections, migrations, email templates, SMTP, phone OTP, private uploads,
+existing-data transfer, and hosting. Use `DATABASE_URL` for Prisma runtime,
+`DIRECT_URL` for migrations, and a session/direct `CMS_DATABASE_URL` for Payload.
+Supabase Auth requires the project URL and publishable key. Uploads require a
+server-only secret key and the private `pikol-uploads` bucket.
+
+## Local development
+
 
 ```bash
 npm install
-cp .env.example .env            # already present; adjust if needed
+cp .env.example .env            # add real Supabase settings to .env.local
 docker compose up -d            # Postgres 16 on host port 15432
 npm run db:deploy               # apply migrations (incl. the EXCLUDE constraint)
 npm run db:generate             # generate the Prisma client
-npm run db:seed                 # 5 Davao venues + demo accounts
+npm run db:seed                 # optional LOCAL demo data only
 npm run cms:migrate             # Payload tables in the separate cms schema
 npm run cms:seed                # current marketing copy; preserves saved edits
 npm run dev                     # http://localhost:3000
@@ -108,39 +119,27 @@ destination. Verification screens explain the next step and let players correct
 their email address or phone number. New players use the same verified auth flows;
 there is no separate password or registration endpoint.
 
-### Development
+### Supabase authentication
 
-Auth is passwordless magic-link. In development there's **no SMTP** — instead a
-yellow banner appears at the top of the app with the latest sign-in link (also
-printed to the server console). Request a link from `/login` or `/signup`, then click the
-banner.
+Email magic links and six-digit Philippine phone OTPs are issued and verified
+by Supabase. Configure the **Magic Link** and **Confirm signup** email templates
+from `supabase/templates/magic-link.html`; Pikol's callback verifies the token
+hash and retains the booking return path. Set Site URL and redirect allowlists
+in Supabase. Custom SMTP is needed for real email recipients; phone sign-in
+requires enabling the Phone provider and configuring a paid SMS service in
+Supabase. Dashboard test phone numbers can be used during development.
 
-Seeded accounts:
+There are no application-issued JWT sessions, development magic-link banners,
+or displayed local SMS codes. Sessions use HttpOnly Supabase SSR cookies and
+Next.js 16 `proxy.ts` refresh. Supabase verifies the identity; current roles and
+active status are read from Pikol's `users` table. Existing user IDs and bookings
+are preserved when a verified Supabase identity is first linked. Booking contact
+numbers never act as verified login identities; conflicting accounts are not
+merged automatically. New users receive the `CUSTOMER` role.
 
-| Role     | Email                    |
-| -------- | ------------------------ |
-| Customer | `player@rallypoint.test` |
-| Owner    | `owner@rallypoint.test`  |
-| Admin    | `admin@rallypoint.test`  |
-
-The owner owns all seeded venues (so the confirm flow works from any booking).
-
-The **Phone number** tab also accepts Philippine mobile numbers (`09…` or
-`+639…`). In development it shows a local six-digit verification code on that
-screen. Codes expire after ten minutes, allow five attempts, and can only be
-used once. Resend is limited to one per minute and five per hour per number.
-Accounts are created only after verification. A booking contact number is not
-a verified login identity and does not grant access to an existing email account.
-
-For real SMS, set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and
-`TWILIO_VERIFY_SERVICE_SID` for a six-digit [Twilio Verify service](https://www.twilio.com/docs/verify/api/verification).
-Production refuses development codes and requires these credentials for phone
-sign-in. Set `PHONE_AUTH_PROXY_SECRET` to a private random secret shared with
-your reverse proxy. The proxy must overwrite `X-Real-IP` with the client address
-and add `X-RallyPoint-Proxy-Secret` with that secret. The application rejects
-production SMS requests without valid proxy proof; client-supplied forwarding
-headers cannot create arbitrary rate-limit buckets. Never expose the proxy
-secret to browser JavaScript.
+For CMS access, sign up with a working email and promote that verified Pikol
+user to `ADMIN` using the SQL in the deployment guide. Demo `.test` accounts
+cannot receive hosted email; use a local Supabase inbox or real addresses.
 
 ## Installing on a phone
 
@@ -167,8 +166,8 @@ Use one package manager consistently for your local `node_modules`.
 ## Editing website content
 
 Open **[/cms](http://localhost:3000/cms)** and sign in with an existing Pikol
-admin account. In development use `admin@rallypoint.test` and open the magic link
-from the banner. **Edit website** links also appear in the admin navigation.
+admin account authenticated through Supabase. Promote your verified email
+account to `ADMIN` as described in the deployment guide. **Edit website** links also appear in the admin navigation.
 
 - **Homepage:** hero text, links, venue-section copy, how-it-works steps, and the
   venue-owner call to action.
@@ -181,8 +180,8 @@ refresh the website to see them. The editor retains the last 30 versions.
 Court availability, venue photos, bookings, pricing, and payments still use the
 existing venue management workflows.
 
-Payload uses Postgres schema `cms`; Prisma owns `public`. `CMS_DATABASE_URL` is
-optional if you prefer a separate CMS database. Both databases need migrations.
+Payload uses Postgres schema `cms`; Prisma owns `public`. `CMS_DATABASE_URL` defaults to `DIRECT_URL`; both use a direct/session connection.
+Use a separate CMS database if desired. Both databases need migrations.
 Production setup runs `npm run db:deploy`, `npm run cms:migrate`, and
 `npm run cms:seed` **before** starting the app. Seeding only creates missing
 content and can be repeated safely. Public pages use published content; if CMS
@@ -226,11 +225,13 @@ npm test          # Vitest against the rallypoint_test database (auto-migrated)
 ```
 
 Covers the state machine, concurrent-hold races (exactly one wins), idempotent
-retries, hold expiry, occupancy, availability, magic-link auth, storage, and
+retries, hold expiry, occupancy, availability, Supabase email/phone auth, private storage, and
 authorization (owner cannot confirm another venue's booking; cross-user booking
 reads denied).
 CMS tests also cover private drafts, published content, anonymous access,
-admin-role revocation, repeat seeding, and safe login return paths. The suite
+admin-role revocation, repeat seeding, and safe login return paths. Auth tests
+verify provider-backed sessions, account binding, identity conflicts, refresh,
+logout, and RLS denial using controlled provider responses and local PostgreSQL. The suite
 applies both Prisma and CMS migrations to `TEST_DATABASE_URL`.
 UI tests also cover date selection with ISO form values, accented city search,
 and national city options when no venues are published.

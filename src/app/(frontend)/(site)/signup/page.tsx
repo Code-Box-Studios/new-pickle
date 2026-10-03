@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Create account" };
 export default async function SignUpPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; error?: string }>;
 }) {
   const sp = await searchParams;
   const session = await getSession();
@@ -18,7 +18,7 @@ export default async function SignUpPage({
 
   return (
     <AuthShell>
-      <LoginForm mode="signup" nextPath={safeNextPath(sp.next)} />
+      <LoginForm mode="signup" nextPath={safeNextPath(sp.next)} authError={sp.error === "missing" || sp.error === "invalid" ? sp.error : undefined} />
     </AuthShell>
   );
 }

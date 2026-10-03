@@ -1,7 +1,10 @@
-import { createHmac, randomInt, randomUUID, timingSafeEqual } from "node:crypto";
+import { randomUUID } from "node:crypto";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import prisma from "@/lib/prisma";
 import { AppError, ValidationError } from "@/lib/booking/errors";
-import { phoneProvider, startSmsVerification, checkSmsVerification } from "./phone-provider";
+import { createSupabaseAuthClient } from "@/lib/supabase/server";
+import { resolveSupabaseUser } from "./supabase-user";
+import { throwAuthProviderError } from "./provider-error";
 import type { SessionUser } from "./session";
 
 export function normalizePhone(raw: string): string {
@@ -14,20 +17,14 @@ export function normalizePhone(raw: string): string {
   return phone;
 }
 
-function codeHash(id: string, code: string) {
-  return createHmac("sha256", process.env.JWT_SECRET ?? "dev-secret-change-in-production")
-    .update(`${id}:${code}`).digest("hex");
-}
 
 export async function requestPhoneCode(raw: string, clientKey?: string) {
   const phone = normalizePhone(raw);
-  const provider = phoneProvider();
+  const supabase = createSupabaseAuthClient();
   const id = randomUUID();
-  const code = provider === "development" ? String(randomInt(100000, 1000000)) : null;
   const now = new Date();
   const since = new Date(now.getTime() - 60 * 60_000);
-  await prisma.$transaction(async (tx) => {
-    // Serialize send limits across processes and concurrent requests.
+  await prisma.$transaction(async tx => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`phone:${phone}`}))`;
     if (clientKey) await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`phone-client:${clientKey}`}))`;
     const recent = await tx.phoneChallenge.findFirst({ where: { phone }, orderBy: { createdAt: "desc" } });
@@ -36,38 +33,31 @@ export async function requestPhoneCode(raw: string, clientKey?: string) {
     const clientCount = clientKey ? await tx.phoneChallenge.count({ where: { clientKey, createdAt: { gte: since } } }) : 0;
     if (count >= 5 || clientCount >= 20) throw new AppError("Too many codes requested. Please try again later.", 429, "rate_limited");
     await tx.phoneChallenge.updateMany({ where: { phone, usedAt: null }, data: { usedAt: now } });
-    await tx.phoneChallenge.create({ data: { id, phone, clientKey, provider, codeHash: code ? codeHash(id, code) : null, expiresAt: new Date(now.getTime() + 10 * 60_000) } });
+    await tx.phoneChallenge.create({ data: { id, phone, clientKey, provider: "supabase", expiresAt: new Date(now.getTime() + 10 * 60_000) } });
   });
   try {
-    if (provider === "twilio") {
-      const providerSid = await startSmsVerification(phone);
-      await prisma.phoneChallenge.update({ where: { id }, data: { providerSid } });
-    }
+    const { error } = await supabase.auth.signInWithOtp({ phone, options: { shouldCreateUser: true } });
+    if (error) throwAuthProviderError(error, "phone");
   } catch (error) {
     await prisma.phoneChallenge.update({ where: { id }, data: { usedAt: new Date() } });
     throw error;
   }
-  return { id, phone, retryAfter: 60, ...(code ? { devCode: code } : {}) };
+  return { id, phone, retryAfter: 60 };
 }
 
-export async function consumePhoneCode(id: string, code: string): Promise<SessionUser | null> {
+export async function consumePhoneCode(id: string, code: string, supabase?: SupabaseClient): Promise<SessionUser | null> {
   if (!/^[0-9]{6}$/.test(code) || !/^[0-9a-f-]{36}$/i.test(id)) return null;
   const challenge = await prisma.phoneChallenge.findUnique({ where: { id } });
-  if (!challenge || challenge.usedAt || challenge.expiresAt <= new Date()) return null;
-  if (challenge.provider === "development" && process.env.NODE_ENV === "production") return null;
-  const attempt = await prisma.phoneChallenge.updateMany({
-    where: { id, usedAt: null, attempts: { lt: 5 }, expiresAt: { gt: new Date() } },
-    data: { attempts: { increment: 1 } },
-  });
+  if (!challenge || challenge.provider !== "supabase" || challenge.usedAt || challenge.expiresAt <= new Date()) return null;
+  const attempt = await prisma.phoneChallenge.updateMany({ where: { id, usedAt: null, attempts: { lt: 5 }, expiresAt: { gt: new Date() } }, data: { attempts: { increment: 1 } } });
   if (!attempt.count) return null;
-  const approved = challenge.provider === "twilio"
-    ? !!challenge.providerSid && await checkSmsVerification(challenge.providerSid, code)
-    : !!challenge.codeHash && timingSafeEqual(Buffer.from(challenge.codeHash, "hex"), Buffer.from(codeHash(id, code), "hex"));
-  if (!approved) return null;
-  return prisma.$transaction(async (tx) => {
-    const consumed = await tx.phoneChallenge.updateMany({ where: { id, usedAt: null, expiresAt: { gt: new Date() } }, data: { usedAt: new Date() } });
-    if (!consumed.count) return null;
-    const user = await tx.user.upsert({ where: { verifiedMobile: challenge.phone }, update: {}, create: { verifiedMobile: challenge.phone, mobile: challenge.phone, role: "CUSTOMER" } });
-    return user.isActive ? { id: user.id, email: user.email, mobile: user.verifiedMobile, role: user.role } : null;
-  });
+  const { data, error } = await (supabase ?? createSupabaseAuthClient()).auth.verifyOtp({ phone: challenge.phone, token: code, type: "sms" });
+  if (error) {
+    if (error.status === 429 || (error.status ?? 0) >= 500) throwAuthProviderError(error, "phone");
+    return null;
+  }
+  if (!data.user || !data.session || !data.user.phone_confirmed_at || `+${data.user.phone?.replace(/^\+/, "")}` !== challenge.phone) return null;
+  const consumed = await prisma.phoneChallenge.updateMany({ where: { id, usedAt: null, expiresAt: { gt: new Date() } }, data: { usedAt: new Date() } });
+  if (!consumed.count) return null;
+  return resolveSupabaseUser(data.user);
 }

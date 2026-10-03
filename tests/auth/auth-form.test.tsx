@@ -21,6 +21,12 @@ describe("Pikol sign-in and account creation", () => {
     );
   });
 
+  it("explains expired email links and lets players request a new one", () => {
+    render(<LoginForm authError="invalid" />);
+    expect(screen.getByRole("alert")).toHaveTextContent("expired");
+    expect(screen.getByRole("button", { name: "Continue with email" })).toBeEnabled();
+  });
+
   it("offers existing players a sign-in link from account creation", () => {
     render(<LoginForm mode="signup" nextPath="/bookings" />);
     expect(screen.getByRole("heading", { level: 1, name: "Create your account" })).toBeInTheDocument();

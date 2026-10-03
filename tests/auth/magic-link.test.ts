@@ -1,87 +1,44 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { prisma, resetDb } from "../db";
-import { requestMagicLink, consumeMagicToken, resolveMagicLinkBase } from "@/lib/auth/magic-link";
-import { lastMagicLinks } from "@/lib/email/dev-sender";
-import { ValidationError } from "@/lib/booking/errors";
+import { requestMagicLink, resolveMagicLinkBase } from "@/lib/auth/magic-link";
+vi.mock("server-only", () => ({}));
+beforeEach(async () => {
+  await resetDb();
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.supabase.co");
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "sb_publishable_test");
+});
+afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
-beforeEach(resetDb);
-
-function tokenFromLink(email: string): string {
-  const url = new URL(lastMagicLinks.get(email.toLowerCase())!);
-  return url.searchParams.get("token")!;
-}
-
-describe("magic-link auth", () => {
-  it("stores a hashed token and surfaces the link via the dev sender", async () => {
-    await requestMagicLink("Player@Example.com");
-    const tokens = await prisma.magicLinkToken.findMany();
-    expect(tokens).toHaveLength(1);
-    expect(tokens[0].tokenHash).toMatch(/^[a-f0-9]{64}$/); // sha256 hex, not the raw token
-    expect(lastMagicLinks.get("player@example.com")).toContain("/auth/verify?token=");
+describe("Supabase email sign-in", () => {
+  it("requests a provider link without creating an unverified application account", async () => {
+    const sent: { body?: Record<string, unknown> } = {};
+    vi.stubGlobal("fetch", vi.fn(async (_url, init) => {
+      sent.body = JSON.parse(init.body);
+      return new Response("{}", { status: 200 });
+    }));
+    await requestMagicLink(" Player@Example.com ", { origin: "http://localhost:3000", next: "/book/ABC" });
+    expect(await prisma.user.count()).toBe(0);
+    expect(await prisma.magicLinkToken.count()).toBe(0);
+    expect(sent.body).toMatchObject({ email: "player@example.com", create_user: true });
   });
-
-  it("creates the user on first request (lightweight accounts)", async () => {
-    await requestMagicLink("new@example.com");
-    const u = await prisma.user.findUnique({ where: { email: "new@example.com" } });
-    expect(u?.role).toBe("CUSTOMER");
+  it("rejects invalid addresses without contacting the provider", async () => {
+    await expect(requestMagicLink("nope")).rejects.toMatchObject({ httpStatus: 400 });
   });
-
-  it("consumes a valid token exactly once", async () => {
-    await requestMagicLink("p@e.com");
-    const raw = tokenFromLink("p@e.com");
-    const s = await consumeMagicToken(raw);
-    expect(s?.email).toBe("p@e.com");
-    expect(await consumeMagicToken(raw)).toBeNull(); // already used
+  it("surfaces throttling without claiming delivery succeeded", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ msg: "rate limited" }), { status: 429 })));
+    await expect(requestMagicLink("player@example.com")).rejects.toMatchObject({ httpStatus: 429 });
   });
-
-  it("clears the dev banner entry once its token is consumed", async () => {
-    await requestMagicLink("banner@e.com");
-    expect(lastMagicLinks.has("banner@e.com")).toBe(true);
-    await consumeMagicToken(tokenFromLink("banner@e.com"));
-    expect(lastMagicLinks.has("banner@e.com")).toBe(false); // banner should disappear after login
-  });
-
-  it("leaves the dev banner entry when the token is invalid", async () => {
-    await requestMagicLink("keep@e.com");
-    await consumeMagicToken("not-a-real-token");
-    expect(lastMagicLinks.has("keep@e.com")).toBe(true); // never opened → stays until dismissed
-  });
-
-  it("rejects unknown tokens", async () => {
-    expect(await consumeMagicToken("not-a-real-token")).toBeNull();
-  });
-
-  it("rejects expired tokens", async () => {
-    await requestMagicLink("exp@e.com");
-    await prisma.magicLinkToken.updateMany({
-      data: { expiresAt: new Date(Date.now() - 1000) },
-    });
-    expect(await consumeMagicToken(tokenFromLink("exp@e.com"))).toBeNull();
-  });
-
-  it("rejects an invalid email", async () => {
-    await expect(requestMagicLink("nope")).rejects.toBeInstanceOf(ValidationError);
+  it("requires Supabase configuration in development too", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
+    await expect(requestMagicLink("player@example.com")).rejects.toMatchObject({ httpStatus: 503 });
   });
 });
-
-describe("resolveMagicLinkBase", () => {
-  afterEach(() => vi.unstubAllEnvs());
-
-  it("uses the request origin in dev when provided", () => {
-    vi.stubEnv("NODE_ENV", "development");
-    vi.stubEnv("APP_URL", "http://localhost:3000");
+describe("canonical sign-in destinations", () => {
+  it("uses request origin in local development", () => {
     expect(resolveMagicLinkBase("http://172.16.14.20:3000")).toBe("http://172.16.14.20:3000");
   });
-
-  it("falls back to APP_URL in dev when no origin", () => {
-    vi.stubEnv("NODE_ENV", "development");
-    vi.stubEnv("APP_URL", "http://localhost:3000");
-    expect(resolveMagicLinkBase(undefined)).toBe("http://localhost:3000");
-  });
-
-  it("ignores the origin in production (never redirected by host)", () => {
-    vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("APP_URL", "https://rallypoint.example");
-    expect(resolveMagicLinkBase("http://attacker.test")).toBe("https://rallypoint.example");
+  it("ignores untrusted production hosts", () => {
+    vi.stubEnv("NODE_ENV", "production"); vi.stubEnv("APP_URL", "https://pikol.example");
+    expect(resolveMagicLinkBase("https://attacker.test")).toBe("https://pikol.example");
   });
 });
