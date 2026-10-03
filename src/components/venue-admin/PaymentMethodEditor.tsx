@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Field } from "@/components/ui/input";
 import { SelectField, SelectItem } from "@/components/ui/select";
@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/toast";
 import { channelLabel } from "@/lib/payment";
 import { sendJson } from "./api";
 import type { PaymentChannel } from "@/generated/prisma";
+import { SetupActions } from "./SetupActions";
 
 export interface MethodDTO {
   id: string;
@@ -67,16 +68,23 @@ export function PaymentMethodEditor({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      <div className="flex items-start gap-3 rounded-lg border border-brand-200/60 bg-mist/40 p-4">
+        <Wallet className="mt-0.5 size-5 shrink-0 text-brand-700" aria-hidden />
+        <p className="text-sm leading-relaxed text-ink-soft">
+          Payments go directly to your venue. Add the methods you accept and
+          instructions players should follow.
+        </p>
+      </div>
       <ul className="space-y-2">
         {methods.map((m) => (
           <li
             key={m.id}
-            className="flex items-center justify-between gap-3 rounded-xl border border-black/5 p-3"
+            className="flex items-center justify-between gap-3 rounded-lg border border-line bg-canvas/60 p-4 sm:p-5"
           >
-            <div>
+            <div className="min-w-0">
               <p className="font-medium text-ink">{channelLabel(m.channel)}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="mt-1 break-words text-sm text-muted-foreground">
                 {m.accountName} · {m.accountNumber}
               </p>
             </div>
@@ -92,7 +100,7 @@ export function PaymentMethodEditor({
                     ),
                   )
                 }
-                className="rounded-xl p-2 text-red-600 hover:bg-red-50"
+                className="size-11 shrink-0 p-0 text-red-600 hover:bg-red-50"
                 aria-label="Remove method"
               >
                 <Trash2 className="size-4" />
@@ -101,15 +109,19 @@ export function PaymentMethodEditor({
           </li>
         ))}
         {methods.length === 0 && (
-          <li className="text-sm text-muted-foreground">
-            No payment methods yet.
+          <li className="rounded-lg border border-dashed border-line px-5 py-8 text-center">
+            <p className="font-medium text-ink">Give players a way to pay.</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Add GCash, Maya, a bank account, or cash at the venue.
+            </p>
           </li>
         )}
       </ul>
 
       {!locked &&
         (adding ? (
-          <Card className="space-y-3 rounded-xl border border-brand-200 bg-brand-50/40 p-3">
+          <Card className="space-y-5 border-brand-200 bg-mist/30 p-5">
+            <h3 className="font-semibold text-ink">Add a payment method</h3>
             <Field label="Channel" htmlFor="pmch">
               <SelectField
                 id="pmch"
@@ -187,16 +199,16 @@ export function PaymentMethodEditor({
         ))}
 
       {!locked && (
-        <Button
-          size="lg"
-          block
-          onClick={() => {
+        <SetupActions
+          venueId={venueId}
+          back="hours"
+          label="Continue to review"
+          disabled={busy}
+          onContinue={() => {
             router.push(`/owner/venues/${venueId}/review`);
             router.refresh();
           }}
-        >
-          Continue to review
-        </Button>
+        />
       )}
     </div>
   );

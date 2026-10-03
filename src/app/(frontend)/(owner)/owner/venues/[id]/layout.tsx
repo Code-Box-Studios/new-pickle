@@ -1,10 +1,11 @@
-import { Card } from "@/components/ui/card";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { Clock } from "lucide-react";
+import { ArrowLeft, Clock, ShieldCheck } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { loadOwnerVenue, wizardProgress } from "@/lib/venue/owner-load";
 import { StepRail } from "@/components/venue-admin/StepRail";
 import { VenueStatusBadge } from "@/components/venue-admin/VenueStatusBadge";
+import { SetupStepPanel } from "@/components/venue-admin/SetupStepPanel";
 
 export default async function WizardLayout({
   children,
@@ -22,10 +23,34 @@ export default async function WizardLayout({
   const done = wizardProgress(venue);
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="page-title min-w-0 break-words">{venue.name}</h1>
-        <VenueStatusBadge status={venue.status} />
+    <div className="mx-auto max-w-6xl">
+      <Link
+        href="/owner/venues"
+        className="inline-flex min-h-10 items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-brand-700"
+      >
+        <ArrowLeft className="size-4" aria-hidden /> My venues
+      </Link>
+      <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="page-title">Set up your venue</h1>
+          <p className="mt-2 break-words text-sm text-muted-foreground">
+            {venue.name}{" "}
+            <span className="mx-1 text-line" aria-hidden>
+              {" "}
+              /{" "}
+            </span>{" "}
+            A new home for the game.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 pt-1">
+          <VenueStatusBadge status={venue.status} />
+          {venue.status === "DRAFT" && (
+            <span className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:inline-flex">
+              <ShieldCheck className="size-3.5" aria-hidden /> Only visible to
+              your team
+            </span>
+          )}
+        </div>
       </div>
 
       {venue.status === "PENDING_REVIEW" && (
@@ -40,9 +65,7 @@ export default async function WizardLayout({
         <StepRail venueId={id} done={done} />
       </div>
 
-      <Card className="mt-6 rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-card sm:p-7">
-        {children}
-      </Card>
+      <SetupStepPanel>{children}</SetupStepPanel>
     </div>
   );
 }

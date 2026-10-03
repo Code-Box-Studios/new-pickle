@@ -204,6 +204,12 @@ keeps local environment files, uploads, and tooling caches out of CLI source
 uploads. Set production values in Vercel's environment settings; do not upload
 your development `.env` or use its loopback database URLs.
 
+Functions are configured for Seoul (`icn1`) alongside this project's Supabase
+database in `ap-northeast-2`. If changing the database region, choose the nearest
+[Vercel function region](https://vercel.com/docs/regions) in `vercel.json` before
+deploying. Public CMS copy has a five-minute cache with immediate invalidation
+for CMS edits; auth and ownership checks remain request scoped.
+
 Uploads are limited to 4 MiB in both forms and storage validation. This leaves
 room for multipart fields within Vercel's
 [4.5 MB request limit](https://vercel.com/docs/functions/limitations#request-body-size).

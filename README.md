@@ -58,6 +58,30 @@ Date fields use the shared shadcn **Calendar + Popover** picker, including owner
 rescheduling. They display readable dates and submit `YYYY-MM-DD` civil dates
 without shifting the selected day through UTC conversion.
 
+### Venue setup
+
+The owner workspace guides venues through Details, Photos, Courts, Hours,
+Payments, and Review. The setup rail shows how many of the five required sections
+are ready; the final review step submits the venue for verification.
+Details are grouped into identity, location, amenities, and house rules. A live
+listing preview appears on wider screens. **Save draft** keeps owners on the
+current form; **Save & continue** moves to photos after a successful save.
+Failed saves retain entered fields and show an inline error. Save controls stay
+within reach above mobile navigation. Photo uploads and empty steps include
+guidance, with consistent Back/Continue actions throughout setup.
+
+The setup city picker also searches all 149 Philippine cities. Other cities or
+municipalities can be entered manually. Changing the city clears the previous
+barangay; locations without a curated barangay list use a text field.
+
+### Navigation performance
+
+Vercel functions run in Seoul (`icn1`) to match the current Supabase database
+region. Change `vercel.json` if moving the database. Verified sessions and
+owner venue loads are deduplicated within a server render; ownership, active
+user, and role checks still run on every request. Shared loading skeletons give
+immediate feedback while server pages load.
+
 ## Nationwide city search
 
 The homepage and search page offer a searchable catalog of all **149 Philippine
@@ -95,7 +119,6 @@ Supabase Auth requires the project URL and publishable key. Uploads require a
 server-only secret key and the private `pikol-uploads` bucket.
 
 ## Local development
-
 
 ```bash
 npm install
@@ -196,6 +219,12 @@ configuration is absent or unavailable they show the built-in copy and log
 load failures. Public reads have a two-second deadline and exclude unpublished
 content. The CMS itself requires a working database and secret.
 
+Published public fields are cached for five minutes. CMS edits invalidate this
+cache immediately, including unpublishing. Private drafts, auth data, and load
+failures are not cached here. CLI seeds or direct database edits outside Next.js
+are picked up after the cache expires. Cold public CMS reads retain the
+two-second deadline.
+
 The Pikol rename migration updates the previous brand name in saved CMS copy,
 including drafts and versions, while preserving other edits and links. Run
 `npm run cms:migrate` when updating an existing installation. Existing accounts,
@@ -245,20 +274,20 @@ and national city options when no venues are published.
 
 ## Scripts
 
-| Script              | What it does                              |
-| ------------------- | ----------------------------------------- |
-| `npm run dev`       | Dev server                                |
-| `npm run build`     | Production build and standalone assets    |
-| `npm run typecheck` | `tsc --noEmit`                            |
-| `npm run lint`      | ESLint                                    |
-| `npm test`          | Vitest suite                              |
-| `npm run db:deploy` | Apply committed migrations (**use this**) |
-| `npm run db:seed`   | Seed demo data                            |
-| `npm run db:studio` | Prisma Studio                             |
-| `npm run cms:migrate` | Apply committed CMS migrations          |
-| `npm run cms:seed` | Create missing marketing content           |
-| `npm run cms:types` | Generate Payload TypeScript types         |
-| `npm run cms:importmap` | Generate editor component imports     |
+| Script                  | What it does                              |
+| ----------------------- | ----------------------------------------- |
+| `npm run dev`           | Dev server                                |
+| `npm run build`         | Production build and standalone assets    |
+| `npm run typecheck`     | `tsc --noEmit`                            |
+| `npm run lint`          | ESLint                                    |
+| `npm test`              | Vitest suite                              |
+| `npm run db:deploy`     | Apply committed migrations (**use this**) |
+| `npm run db:seed`       | Seed demo data                            |
+| `npm run db:studio`     | Prisma Studio                             |
+| `npm run cms:migrate`   | Apply committed CMS migrations            |
+| `npm run cms:seed`      | Create missing marketing content          |
+| `npm run cms:types`     | Generate Payload TypeScript types         |
+| `npm run cms:importmap` | Generate editor component imports         |
 
 > Apply migrations with **`db:deploy`**, not `prisma migrate dev` — the
 > `bookings.period` generated column + EXCLUDE constraint make `migrate dev`

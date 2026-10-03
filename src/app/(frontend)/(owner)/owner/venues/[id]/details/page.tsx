@@ -3,7 +3,11 @@ import { getSession } from "@/lib/auth/session";
 import { loadOwnerVenue } from "@/lib/venue/owner-load";
 import { DetailsForm } from "@/components/venue-admin/DetailsForm";
 
-export default async function DetailsStep({ params }: { params: Promise<{ id: string }> }) {
+export default async function DetailsStep({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const session = await getSession();
   if (!session) redirect(`/login?next=/owner/venues/${id}/details`);
@@ -13,6 +17,7 @@ export default async function DetailsStep({ params }: { params: Promise<{ id: st
   return (
     <DetailsForm
       venueId={id}
+      coverPhoto={v.photos[0]}
       locked={v.status === "PENDING_REVIEW"}
       initial={{
         name: v.name,

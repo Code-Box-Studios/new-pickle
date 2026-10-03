@@ -151,6 +151,20 @@ components:
     rounded: "{rounded.lg}"
     padding: "{spacing.lg}"
     borderColor: "{colors.hairline}"
+  venue-setup-section:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.lg}"
+    padding: "{spacing.lg}"
+  venue-setup-tab-active:
+    backgroundColor: "{colors.brand-teal-deep}"
+    textColor: "{colors.on-dark}"
+    rounded: "{rounded.full}"
+    height: 48px
+  venue-setup-save-bar:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.slate}"
+    rounded: "{rounded.lg}"
   text-input:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
@@ -339,6 +353,16 @@ Verification states use quiet mint panels, a readable six-digit code field,
 and actions to correct an address or number. Switching methods fades in for
 240ms; page entrances are brief, and reduced-motion preferences keep them still.
 Links between sign-in and account creation retain the player's return path.
+
+Venue setup uses a compact workspace header and six numbered pill tabs in a
+white rail. The rail counts the five prerequisite sections; Review is a final
+action, not a completed prerequisite. Form sections have mint icon circles,
+plain headings, short hints, and white bordered cards. Wider screens pair details
+with a live listing preview; smaller screens prioritize fields. Amenities use
+icon pills with visible selected states. A sticky save bar offers separate
+draft and continue actions above mobile navigation. Photo upload panels and
+empty steps use restrained mint surfaces, with consistent back and next actions.
+Existing button motion and reduced-motion rules apply throughout setup.
 
 ## Do's and Don'ts
 

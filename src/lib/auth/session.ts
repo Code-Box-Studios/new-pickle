@@ -1,5 +1,6 @@
 import type { Role } from "@/generated/prisma";
 import type { NextRequest } from "next/server";
+import { cache } from "react";
 import prisma from "@/lib/prisma";
 import { hasSupabaseConfig } from "@/lib/supabase/config";
 import { createSupabaseHeadersClient, createSupabaseServerClient } from "@/lib/supabase/server";
@@ -20,10 +21,12 @@ async function verifiedSession(client: Awaited<ReturnType<typeof createSupabaseS
   return user?.isActive ? { id: user.id, email: user.email, mobile: user.verifiedMobile, role: user.role } : null;
 }
 
-export async function getSession(): Promise<SessionUser | null> {
+// Share verified identity only within one server render. React does not retain
+// this result across requests or memoize calls from API handlers.
+export const getSession = cache(async (): Promise<SessionUser | null> => {
   if (!hasSupabaseConfig()) return null;
   return verifiedSession(await createSupabaseServerClient());
-}
+});
 
 export async function getSessionFromHeaders(headers: Headers): Promise<SessionUser | null> {
   if (!hasSupabaseConfig()) return null;

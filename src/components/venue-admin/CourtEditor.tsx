@@ -12,6 +12,8 @@ import { SelectField, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
 import { pesos } from "@/lib/format";
 import { sendJson } from "./api";
+import { PaddleIcon } from "@/components/ui/pickleball";
+import { SetupActions } from "./SetupActions";
 
 export interface CourtDTO {
   id: string;
@@ -167,10 +169,20 @@ export function CourtEditor({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+        <p className="font-medium text-ink">Your courts</p>
+        <span className="text-muted-foreground">
+          {courts.filter((court) => court.active).length} active · Rates are per
+          hour
+        </span>
+      </div>
       <ul className="space-y-2">
         {courts.map((c) => (
-          <li key={c.id} className="rounded-xl border border-black/5 p-3">
+          <li
+            key={c.id}
+            className="rounded-lg border border-line bg-canvas/60 p-4 sm:p-5"
+          >
             {editing?.id === c.id ? (
               <div className="space-y-3">
                 <CourtFields
@@ -226,7 +238,7 @@ export function CourtEditor({
                       onClick={() =>
                         setEditing({ id: c.id, draft: toDraft(c) })
                       }
-                      className="grid size-11 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-mist focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                      className="grid size-11 shrink-0 place-items-center p-0 text-muted-foreground hover:bg-mist"
                       aria-label="Edit court"
                     >
                       <Pencil className="size-4" />
@@ -242,7 +254,7 @@ export function CourtEditor({
                           ),
                         )
                       }
-                      className="grid size-11 shrink-0 place-items-center rounded-xl text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                      className="grid size-11 shrink-0 place-items-center p-0 text-red-600 hover:bg-red-50"
                       aria-label="Delete court"
                     >
                       <Trash2 className="size-4" />
@@ -254,15 +266,27 @@ export function CourtEditor({
           </li>
         ))}
         {courts.length === 0 && (
-          <li className="text-sm text-muted-foreground">
-            No courts yet — add your first below.
+          <li className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-brand-200 bg-mist/30 px-5 py-9 text-center">
+            <span className="grid size-14 place-items-center rounded-full bg-white text-brand-700">
+              <PaddleIcon className="size-7" />
+            </span>
+            <p className="text-lg font-medium text-ink">
+              Every great venue starts with a court.
+            </p>
+            <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+              Add a name, court type, and hourly price. Players will choose from
+              these when booking.
+            </p>
           </li>
         )}
       </ul>
 
       {!locked &&
         (adding ? (
-          <Card className="space-y-3 rounded-xl border border-brand-200 bg-brand-50/40 p-3">
+          <Card className="space-y-5 border-brand-200 bg-mist/30 p-5">
+            <h3 className="flex items-center gap-2 font-semibold text-ink">
+              <Plus className="size-4 text-brand-700" aria-hidden /> Add a court
+            </h3>
             <CourtFields value={adding} onChange={setAdding} />
             <div className="flex gap-2">
               <Button
@@ -292,16 +316,16 @@ export function CourtEditor({
         ))}
 
       {!locked && (
-        <Button
-          size="lg"
-          block
-          onClick={() => {
+        <SetupActions
+          venueId={venueId}
+          back="photos"
+          label="Continue to hours"
+          disabled={busy}
+          onContinue={() => {
             router.push(`/owner/venues/${venueId}/hours`);
             router.refresh();
           }}
-        >
-          Continue
-        </Button>
+        />
       )}
     </div>
   );

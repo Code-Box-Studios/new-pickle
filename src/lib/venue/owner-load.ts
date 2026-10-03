@@ -1,8 +1,11 @@
 import prisma from "@/lib/prisma";
 import type { Role } from "@/generated/prisma";
+import { cache } from "react";
 
 /** Load a venue with wizard relations, access-checked for owner/staff/admin. */
-export async function loadOwnerVenue(id: string, userId: string, role: Role) {
+// The venue, verified user ID, and live role all participate in this
+// render-scoped cache. Every new request repeats the ownership checks.
+export const loadOwnerVenue = cache(async (id: string, userId: string, role: Role) => {
   const venue = await prisma.venue.findUnique({
     where: { id },
     include: {
@@ -17,7 +20,7 @@ export async function loadOwnerVenue(id: string, userId: string, role: Role) {
     where: { venueId_userId: { venueId: id, userId } },
   });
   return staff ? venue : null;
-}
+});
 
 export type OwnerVenue = NonNullable<Awaited<ReturnType<typeof loadOwnerVenue>>>;
 

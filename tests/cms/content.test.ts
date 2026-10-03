@@ -8,6 +8,13 @@ import { sql } from "@payloadcms/db-postgres";
 import { getHomeContent } from "@/cms/content";
 import { up as renameBrand, down as restoreBrand } from "@/cms/migrations/20261002_134500_pikol_brand";
 vi.mock("server-only", () => ({}));
+// The local Payload API runs outside Next's request/cache runtime. Keep these
+// integration checks on real database content; cache.test.ts covers actual Next
+// persistence and invalidation separately.
+vi.mock("next/cache", () => ({
+  unstable_cache: (read: (...args: unknown[]) => Promise<unknown>) => read,
+  revalidateTag: () => {},
+}));
 
 const identities = vi.hoisted(() => new Map<string, { id: string }>());
 vi.mock("@supabase/ssr", async importOriginal => {

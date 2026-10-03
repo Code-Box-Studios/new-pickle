@@ -8,6 +8,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { sendJson } from "./api";
+import Link from "next/link";
+import { Clock3 } from "lucide-react";
+import { SetupActions } from "./SetupActions";
 
 const DAY_NAMES = [
   "Sunday",
@@ -104,9 +107,21 @@ export function HoursEditor({
 
   if (!hasActiveCourts) {
     return (
-      <p className="text-sm text-muted-foreground">
-        Add at least one active court first — hours apply to all of your courts.
-      </p>
+      <div className="flex flex-col items-center gap-3 rounded-lg bg-mist/40 px-5 py-9 text-center">
+        <span className="grid size-14 place-items-center rounded-full bg-white text-brand-700">
+          <Clock3 className="size-6" aria-hidden />
+        </span>
+        <h3 className="text-lg font-medium text-ink">
+          A court needs a schedule.
+        </h3>
+        <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+          Add at least one active court first. Your opening hours will apply to
+          all active courts.
+        </p>
+        <Button asChild variant="outline" className="mt-2">
+          <Link href={`/owner/venues/${venueId}/courts`}>Go to courts</Link>
+        </Button>
+      </div>
     );
   }
 
@@ -117,14 +132,19 @@ export function HoursEditor({
           These hours apply to all your active courts.
         </p>
         {!locked && (
-          <Button variant="ghost" size="sm" onClick={applyToAll}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={applyToAll}
+            disabled={busy}
+          >
             Apply first day to all
           </Button>
         )}
       </div>
 
       <fieldset
-        disabled={locked}
+        disabled={locked || busy}
         className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface"
       >
         {rows.map((r) => (
@@ -173,9 +193,13 @@ export function HoursEditor({
       </fieldset>
 
       {!locked && (
-        <Button size="lg" block loading={busy} onClick={save}>
-          Save &amp; continue
-        </Button>
+        <SetupActions
+          venueId={venueId}
+          back="courts"
+          label="Save & continue"
+          loading={busy}
+          onContinue={save}
+        />
       )}
     </div>
   );

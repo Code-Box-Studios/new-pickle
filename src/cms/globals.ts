@@ -1,6 +1,7 @@
 import type { Field, GlobalConfig, TextField } from "payload";
 import { canManageContent } from "./access";
 import { homeDefaults, siteDefaults, venueLandingDefaults } from "./defaults";
+import { revalidatePublicContent } from "./cache";
 
 const link: TextField = {
   name: "href",
@@ -101,6 +102,7 @@ function contentGlobal(
       readVersions: canManageContent,
     },
     versions: { drafts: true, max: 30 },
+    hooks: { afterChange: [revalidatePublicContent] },
     fields: fieldsFor(defaults),
   };
 }
