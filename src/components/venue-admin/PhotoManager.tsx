@@ -155,7 +155,7 @@ export function PhotoManager({
             type="file"
             accept="image/jpeg,image/png,image/webp"
             disabled={busy}
-            className="sr-only"
+            className="sr-only!"
             onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])}
           />
         </Label>
