@@ -26,8 +26,8 @@ pending until the private service connections are available.
 
 - [x] Add preview guards and coming-soon UI; verify regression tests fail first.
 - [x] Run the suite and a build without database environment variables.
-- [ ] Review and commit on main; set the production preview flag and publish.
-- [ ] Check public pages, protected routes, and unavailable API responses live.
+- [x] Review and commit on main; set the production preview flag and publish.
+- [x] Check public pages, protected routes, and unavailable API responses live.
 
 ## Global constraints
 
@@ -68,7 +68,7 @@ pending until the private service connections are available.
 
 - Vercel CLI is authenticated to Code Box Studios. Project `pikol` is linked
   (`prj_MGRqoSZs8XhokzLsliOWVcbDHCaS`). Its assigned production domain is
-  `pikol-delta.vercel.app`; no deployment has been published yet.
+  `pikol-delta.vercel.app`; the successful preview deployment is recorded below.
 - Remote project settings are Next.js, Node 24, `npm ci`, and
   `npm run db:generate && npm run build`. Both the exact build command and
   `vercel build --yes --prod` completed successfully. The local build used
@@ -88,7 +88,7 @@ pending until the private service connections are available.
 - Public Supabase settings are in ignored `.env.local`. Hosted `DATABASE_URL`,
   `DIRECT_URL`, and `SUPABASE_SECRET_KEY` are still required for the full app.
   `CMS_DATABASE_URL` can use `DIRECT_URL`.
-- CMS content seeding, Auth project configuration, production publishing, and
+- CMS content seeding, Auth project configuration, full app enablement, and
   live authenticated/upload checks remain pending. No demo accounts or venues
   were inserted, and no email or SMS was sent.
 - Configured Vercel production `APP_URL=https://pikol-delta.vercel.app`, both
@@ -126,3 +126,22 @@ pending until the private service connections are available.
   passed. Vercel Production now has `APP_PREVIEW_MODE=true`. A dry source upload
   excludes all environment files, private deployment state, upload contents,
   tests, and local graph caches; only empty directory entries remain.
+- Committed preview implementation directly on main as `8b99547`. Published
+  fresh source through the scoped Vercel CLI; deployment
+  `dpl_3PrURZpkm1SdHsKuHEZDT5NQJqoG` is Ready and aliased to
+  `https://pikol-delta.vercel.app`. The cloud's npm install, Prisma generation,
+  and production build succeeded without database environment variables.
+- Live home/search/login/signup/venue-onboarding pages, the manifest, and
+  service worker return successfully. Account pages show coming-soon notices.
+  CMS API methods and media reads return 503; booking/owner/admin/proof APIs
+  require authentication; verification redirects to the unavailable notice.
+  No authentication message or data insertion was performed.
+- Real Chrome checks passed at 390px and 1440px without horizontal overflow.
+  The city picker selected Cebu City; the calendar selected October 5; search
+  retained those values and displayed the preview notice. City/date popovers
+  stayed within the mobile viewport. Bookings, admin, and owner pages redirected
+  to sign-in in the browser (Next streaming redirects can begin with HTTP 200).
+  Sign-up renders its notice on mobile. Service worker control was observed.
+- README now links the live preview and distinguishes its available website
+  features from the pending private service configuration. User ignore files
+  and the pnpm lockfile remain untouched and excluded from these commits.

@@ -4,6 +4,13 @@ A responsive, installable **marketplace for pickleball courts** — players disc
 venues, see real availability, hold a court, pay the venue, and track
 confirmation. Venue owners receive reservations and confirm payments.
 
+**Public preview:** [pikol-delta.vercel.app](https://pikol-delta.vercel.app).
+The deployed website currently runs with `APP_PREVIEW_MODE=true`: branding,
+city search, and the installable site are available. Accounts, bookings, CMS,
+and uploads remain coming soon while private service settings are pending.
+See [the deployment guide](docs/deployment/supabase.md#temporary-public-preview)
+before enabling the full app. Local development defaults to full app mode.
+
 This repo is the **end-to-end thin slice**: one complete vertical
 (discover → reserve → pay → confirm) built on a real booking engine with
 database-level double-booking protection. See
