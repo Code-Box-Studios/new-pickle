@@ -216,13 +216,13 @@ export function SiteHeader({
           )}
           <Button
             asChild
-            className="motion-trigger size-11 p-0 shadow-[0_3px_10px_-4px_rgb(0_104_74/0.24)] sm:w-auto sm:max-w-44 sm:gap-2 sm:px-5"
+            className="motion-trigger size-11 p-0 shadow-[0_3px_10px_-4px_rgb(0_104_74/0.24)] sm:w-auto sm:gap-2 sm:px-5"
             aria-label={content.searchLabel}
           >
             <Link href="/search">
               <Search className="size-4 sm:hidden" aria-hidden />
               <PickleballIcon className="hidden size-4 sm:block" />
-              <span className="hidden truncate sm:inline">
+              <span className="hidden sm:inline">
                 {content.searchLabel}
               </span>
               <ArrowUpRight
