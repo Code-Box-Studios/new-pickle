@@ -63,11 +63,15 @@ without shifting the selected day through UTC conversion.
 The owner workspace guides venues through Details, Photos, Courts, Hours,
 Payments, and Review. The setup rail shows how many of the five required sections
 are ready; the final review step submits the venue for verification.
+Phones and tablets use a compact current-step chooser with all six destinations
+instead of a scrolling tab rail. Shorter headings keep the form within reach.
 Details are grouped into identity, location, amenities, and house rules. A live
 listing preview appears on wider screens. **Save draft** keeps owners on the
-current form; **Save & continue** moves to photos after a successful save.
+current form; **Save & continue** (labeled **Continue** on phones) moves to photos
+after a successful save.
 Failed saves retain entered fields and show an inline error. Save controls stay
-within reach above mobile navigation. Photo uploads and empty steps include
+in a slim two-button bar above mobile navigation, with space reserved below the
+form so the last fields remain visible. Photo uploads and empty steps include
 guidance, with consistent Back/Continue actions throughout setup.
 
 The setup city picker also searches all 149 Philippine cities. Other cities or

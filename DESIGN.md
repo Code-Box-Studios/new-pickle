@@ -165,6 +165,15 @@ components:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.slate}"
     rounded: "{rounded.lg}"
+  venue-setup-mobile-navigation:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.full}"
+    height: 56px
+  venue-setup-mobile-save-actions:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    height: 69px
   text-input:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
@@ -354,15 +363,20 @@ and actions to correct an address or number. Switching methods fades in for
 240ms; page entrances are brief, and reduced-motion preferences keep them still.
 Links between sign-in and account creation retain the player's return path.
 
-Venue setup uses a compact workspace header and six numbered pill tabs in a
-white rail. The rail counts the five prerequisite sections; Review is a final
-action, not a completed prerequisite. Form sections have mint icon circles,
-plain headings, short hints, and white bordered cards. Wider screens pair details
-with a live listing preview; smaller screens prioritize fields. Amenities use
-icon pills with visible selected states. A sticky save bar offers separate
-draft and continue actions above mobile navigation. Photo upload panels and
-empty steps use restrained mint surfaces, with consistent back and next actions.
-Existing button motion and reduced-motion rules apply throughout setup.
+Venue setup uses a compact workspace header. Desktop shows six numbered pill
+tabs in a white rail; below 1024px, a 56px current-step button opens a shadcn
+Popover with all six destinations. Progress counts the five prerequisite
+sections; Review is a final action, not a completed prerequisite. Mobile hides
+repeated step eyebrows and section descriptions to bring fields higher on the
+page. Form sections have mint icon circles, plain headings, short hints, and
+white bordered cards. Wider screens pair details with a live listing preview.
+Amenities use icon pills with visible selected states. Desktop keeps a sticky
+save card; mobile uses a full-width 69px action bar above the 64px bottom
+navigation, adjusted for safe areas. Two equal-width 44px buttons offer draft
+and continue actions. Reserved form space keeps the last fields clear of the
+bar. Photo uploads and empty steps use restrained mint surfaces, with consistent
+back and next actions. Existing button motion and reduced-motion rules apply
+throughout setup.
 
 ## Do's and Don'ts
 

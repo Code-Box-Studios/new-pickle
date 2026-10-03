@@ -87,23 +87,23 @@ function Section({
 }) {
   return (
     <Card className="min-w-0 overflow-hidden border-line bg-white">
-      <div className="flex items-start gap-3 border-b border-line/70 px-5 py-5 sm:px-6">
-        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-mist text-brand-700">
+      <div className="flex items-center gap-3 border-b border-line/70 px-4 py-3 sm:px-5 lg:items-start lg:px-6 lg:py-5">
+        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-mist text-brand-700 lg:size-10">
           <Icon className="size-[18px]" aria-hidden />
         </span>
         <div className="min-w-0">
           <h3 className="text-base font-semibold text-ink">
-            <span className="mr-2 text-xs font-normal text-muted-foreground">
+            <span className="mr-2 hidden text-xs font-normal text-muted-foreground lg:inline">
               {number}
             </span>
             {title}
           </h3>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-1 hidden text-sm leading-relaxed text-muted-foreground lg:block">
             {description}
           </p>
         </div>
       </div>
-      <div className="space-y-5 p-5 sm:p-6">{children}</div>
+      <div className="space-y-4 p-4 sm:p-5 lg:space-y-5 lg:p-6">{children}</div>
     </Card>
   );
 }
@@ -198,7 +198,10 @@ export function DetailsForm({
     <form
       onSubmit={save}
       aria-label="Venue details"
-      className="relative space-y-5"
+      className={cn(
+        "relative space-y-4 lg:space-y-5",
+        !locked && "pb-20 lg:pb-0",
+      )}
     >
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
         <fieldset disabled={locked || !!saving} className="min-w-0 space-y-5">
@@ -228,7 +231,7 @@ export function DetailsForm({
                 id="desc"
                 rows={4}
                 placeholder="Tell players a little about your place…"
-                className="min-h-32 px-4 py-3 leading-relaxed"
+                className="min-h-28 px-4 py-3 leading-relaxed lg:min-h-32"
                 value={f.description ?? ""}
                 onChange={(event) => set("description", event.target.value)}
               />
@@ -499,46 +502,54 @@ export function DetailsForm({
         </div>
       )}
       {!locked && (
-        <Card className="sticky bottom-[calc(5rem+env(safe-area-inset-bottom)+0.5rem)] z-20 flex flex-col gap-3 border-line bg-white/95 p-3 shadow-card backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:p-4 lg:bottom-4">
-          <div
-            role="status"
-            className="flex items-center gap-2 px-1 text-xs text-muted-foreground sm:text-sm"
-          >
-            {saved ? (
-              <>
-                <Check className="size-4 text-brand-700" aria-hidden /> All
-                changes saved
-              </>
-            ) : (
-              <>
-                <Save className="size-4" aria-hidden />
-                <span>Save your progress, then add photos.</span>
-              </>
-            )}
-          </div>
-          <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2 sm:flex">
-            <Button
-              type="submit"
-              name="intent"
-              value="draft"
-              variant="outline"
-              loading={saving === "draft"}
-              disabled={!!saving}
-              className="px-3 sm:px-5"
+        <Card className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 rounded-none border-x-0 border-b-0 border-t border-line bg-white lg:sticky lg:inset-x-auto lg:bottom-4 lg:rounded-lg lg:border lg:bg-white/95 lg:p-4 lg:shadow-card lg:backdrop-blur-sm">
+          <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 lg:px-0 lg:py-0">
+            <div
+              role="status"
+              className="sr-only items-center gap-2 px-1 text-sm text-muted-foreground lg:not-sr-only lg:flex"
             >
-              Save draft
-            </Button>
-            <Button
-              type="submit"
-              name="intent"
-              value="continue"
-              loading={saving === "continue"}
-              disabled={!!saving}
-              className="px-3 sm:px-5"
-            >
-              Save &amp; continue{" "}
-              <ArrowRight className="hidden size-4 sm:block" aria-hidden />
-            </Button>
+              {saved ? (
+                <>
+                  <Check className="size-4 text-brand-700" aria-hidden /> All
+                  changes saved
+                </>
+              ) : (
+                <>
+                  <Save className="size-4" aria-hidden />
+                  <span>Save your progress, then add photos.</span>
+                </>
+              )}
+            </div>
+            <div className="grid w-full grid-cols-2 gap-2 lg:flex lg:w-auto">
+              <Button
+                type="submit"
+                name="intent"
+                value="draft"
+                variant="outline"
+                loading={saving === "draft"}
+                disabled={!!saving}
+                className="min-w-0 px-3 lg:px-5"
+              >
+                Save draft
+              </Button>
+              <Button
+                type="submit"
+                name="intent"
+                value="continue"
+                aria-label="Save & continue"
+                loading={saving === "continue"}
+                disabled={!!saving}
+                className="min-w-0 px-3 lg:px-5"
+              >
+                <span className="lg:hidden" aria-hidden>
+                  Continue
+                </span>
+                <span className="hidden lg:inline" aria-hidden>
+                  Save &amp; continue
+                </span>
+                <ArrowRight className="size-4" aria-hidden />
+              </Button>
+            </div>
           </div>
         </Card>
       )}
