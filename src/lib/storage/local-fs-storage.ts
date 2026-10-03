@@ -38,7 +38,7 @@ export class LocalFsStorage implements PaymentProofStorage {
       throw new ValidationError("Unsupported image type. Use JPG, PNG, or WebP.");
     }
     if (bytes.byteLength > MAX_PROOF_BYTES) {
-      throw new ValidationError("Image is too large (max 5 MB).");
+      throw new ValidationError("Image is too large (max 4 MB).");
     }
     const name = `${randomUUID()}.${EXT_BY_TYPE[contentType]}`;
     const key = `${this.subdir}/${name}`;

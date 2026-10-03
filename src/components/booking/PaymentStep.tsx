@@ -12,6 +12,7 @@ import { HoldCountdown, useCountdown } from "./HoldCountdown";
 import { pesos } from "@/lib/format";
 import { channelLabel } from "@/lib/payment";
 import { cn } from "@/lib/cn";
+import { MAX_PROOF_BYTES } from "@/lib/storage/proof-storage";
 import type { PaymentChannel } from "@/generated/prisma";
 
 export interface PaymentMethodDTO {
@@ -170,7 +171,7 @@ export function PaymentStep({
         >
           <Upload className="size-5 shrink-0 text-brand-700" aria-hidden />
           <span className="min-w-0 break-words text-sm leading-6 text-ink-soft">
-            {file ? file.name : "Tap to upload JPG, PNG, or WebP (max 5 MB)"}
+            {file ? file.name : "Tap to upload JPG, PNG, or WebP (max 4 MB)"}
           </span>
           <Input
             id="payment-screenshot"
@@ -178,7 +179,17 @@ export function PaymentStep({
             accept="image/jpeg,image/png,image/webp"
             className="sr-only"
             aria-labelledby="payment-screenshot-label"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            onChange={(e) => {
+              const selected = e.target.files?.[0] ?? null;
+              if (selected && selected.size > MAX_PROOF_BYTES) {
+                setFile(null);
+                setError("Image is too large (max 4 MB).");
+                e.target.value = "";
+                return;
+              }
+              setFile(selected);
+              setError(null);
+            }}
           />
         </Label>
       </div>

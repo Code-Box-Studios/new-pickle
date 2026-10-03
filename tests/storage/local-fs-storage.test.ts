@@ -26,7 +26,7 @@ describe("LocalFsStorage", () => {
   });
 
   it("rejects files over the size limit", async () => {
-    const big = Buffer.alloc(6 * 1024 * 1024, 1);
+    const big = Buffer.alloc(4 * 1024 * 1024 + 1, 1);
     await expect(
       storage.save({ bytes: big, contentType: "image/png" }),
     ).rejects.toBeInstanceOf(ValidationError);

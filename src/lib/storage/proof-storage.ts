@@ -19,4 +19,5 @@ export const ALLOWED_PROOF_TYPES = [
   "image/webp",
 ] as const;
 
-export const MAX_PROOF_BYTES = 5 * 1024 * 1024; // 5 MB
+// Leave room for multipart fields within Vercel's 4.5 MB request limit.
+export const MAX_PROOF_BYTES = 4 * 1024 * 1024;

@@ -115,7 +115,7 @@ delivery variables are no longer used.
 Set the server-only `SUPABASE_SECRET_KEY` from Supabase's API keys page (legacy
 `SUPABASE_SERVICE_ROLE_KEY` is also accepted). Never expose it with `NEXT_PUBLIC_`.
 Set `SUPABASE_STORAGE_BUCKET=pikol-uploads`. The SQL setup creates a private
-bucket with a 5 MiB limit for JPEG/PNG/WebP. Payment proofs and venue drafts
+bucket with a 4 MiB limit for JPEG/PNG/WebP. Payment proofs and venue drafts
 remain private; the existing Pikol routes decide who may view each object.
 
 Local filesystem storage is available only when explicitly setting
@@ -157,6 +157,35 @@ Node host. Run migrations as a separate deployment step before serving traffic.
 On Vercel, this current repository deploys the Next.js frontend and its server
 routes together; a separate Render backend requires an additional API split.
 Supabase replaces the database/auth/storage services, not Next.js hosting.
+
+### Vercel project settings
+
+The repository includes `vercel.json`: Next.js, `npm ci`, and
+`npm run db:generate && npm run build`. Prisma's generated client is ignored by
+Git, so generation must happen before every fresh cloud build. `.vercelignore`
+keeps local environment files, uploads, and tooling caches out of CLI source
+uploads. Set production values in Vercel's environment settings; do not upload
+your development `.env` or use its loopback database URLs.
+
+Uploads are limited to 4 MiB in both forms and storage validation. This leaves
+room for multipart fields within Vercel's
+[4.5 MB request limit](https://vercel.com/docs/functions/limitations#request-body-size).
+
+Select Node 24 in the project's settings (Node 22 is also supported). Link the
+intended Vercel account/project, configure the production environment variables
+above, apply the database setup separately, and publish:
+
+```bash
+npx vercel login
+npx vercel link
+npx vercel deploy --prod
+```
+
+After project linking, set `APP_URL` to its assigned production domain (or the
+custom domain), and set Supabase's Site URL/redirects to the same origin before
+deploying. Keep those values on the stable production domain rather than an
+individual deployment URL. Use a separate Supabase project for previews that
+need data; do not point untrusted previews at the production database.
 
 Verify sign-up, email sign-in, SMS test sign-in, session refresh, logout,
 booking ownership, owner promotion, CMS edits, image uploads, and denied proof

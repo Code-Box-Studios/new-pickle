@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { sendJson } from "./api";
 import { VenueImage } from "@/components/venue/VenueImage";
+import { MAX_PROOF_BYTES } from "@/lib/storage/proof-storage";
 
 export function PhotoManager({
   venueId,
@@ -28,6 +29,9 @@ export function PhotoManager({
   async function upload(file: File) {
     setBusy(true);
     try {
+      if (file.size > MAX_PROOF_BYTES) {
+        throw new Error("Image is too large (max 4 MB).");
+      }
       const fd = new FormData();
       fd.set("file", file);
       const res = await fetch(`/api/owner/venues/${venueId}/photos`, {
@@ -128,7 +132,7 @@ export function PhotoManager({
         >
           <ImagePlus className="size-5 shrink-0 text-brand-700" aria-hidden />
           <span className="text-sm text-ink-soft">
-            {busy ? "Uploading…" : "Upload a photo (JPG, PNG, WebP · max 5 MB)"}
+            {busy ? "Uploading…" : "Upload a photo (JPG, PNG, WebP · max 4 MB)"}
           </span>
           <Input
             id={`venue-photo-${venueId}`}

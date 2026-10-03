@@ -29,8 +29,9 @@ describe("private Supabase uploads", () => {
     }
   });
   it("rejects oversized images and unsupported types before upload", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ Key: "saved" }))));
     const storage = new SupabaseStorage("venue-media");
-    await expect(storage.save({ bytes: Buffer.alloc(5*1024*1024+1), contentType: "image/png" })).rejects.toMatchObject({ httpStatus: 400 });
+    await expect(storage.save({ bytes: Buffer.alloc(4*1024*1024+1), contentType: "image/png" })).rejects.toMatchObject({ httpStatus: 400 });
     await expect(storage.save({ bytes: Buffer.from("svg"), contentType: "image/svg+xml" })).rejects.toMatchObject({ httpStatus: 400 });
   });
   it("reports failed uploads instead of returning a usable file key", async () => {

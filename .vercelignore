@@ -1,0 +1,22 @@
+# Runtime values are supplied through Vercel's encrypted environment settings.
+.env
+.env.*
+
+# Local data and caches must not be uploaded as source.
+.git/
+.vercel/
+.next/
+node_modules/
+uploads/
+graft/
+coverage/
+.vitest/
+*.log
+*.tsbuildinfo
+
+# Vercel uses the committed npm lockfile through the explicit install command.
+pnpm-lock.yaml
+pnpm-workspace.yaml
+.ignore
+tests/
+docs/

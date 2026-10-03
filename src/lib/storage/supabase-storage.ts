@@ -12,7 +12,7 @@ export class SupabaseStorage implements PaymentProofStorage {
 
   async save({ bytes, contentType }: { bytes: Buffer; contentType: string }) {
     if (!(ALLOWED_PROOF_TYPES as readonly string[]).includes(contentType)) throw new ValidationError("Unsupported image type. Use JPG, PNG, or WebP.");
-    if (bytes.byteLength > MAX_PROOF_BYTES) throw new ValidationError("Image is too large (max 5 MB).");
+    if (bytes.byteLength > MAX_PROOF_BYTES) throw new ValidationError("Image is too large (max 4 MB).");
     const key = `${this.subdir}/${randomUUID()}.${extensions[contentType]}`;
     const { error } = await this.bucket().upload(key, bytes, { contentType, upsert: false });
     if (error) throw new AppError("We couldn't save this image. Please try again.", 503, "storage_unavailable");
