@@ -174,6 +174,11 @@ components:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     height: 69px
+  page-loading-rally:
+    textColor: "{colors.ink}"
+    typography: "{typography.body-sm}"
+    padding: "{spacing.xl}"
+    width: 280px
   text-input:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
@@ -377,6 +382,13 @@ and continue actions. Reserved form space keeps the last fields clear of the
 bar. Photo uploads and empty steps use restrained mint surfaces, with consistent
 back and next actions. Existing button motion and reduced-motion rules apply
 throughout setup.
+
+All page-loading boundaries use one compact Pikol rally illustration instead of
+layout-specific skeletons. Two paddles hit a perforated green ball on a 1.8s
+loop, with synchronized swings and subtle impact rings. SVG and CSS provide the
+motion without JavaScript timers or an animation library. The illustration
+scales down on phones; a polite loading status remains readable by assistive
+technology. Reduced-motion preferences show the paddles and ball at rest.
 
 ## Do's and Don'ts
 

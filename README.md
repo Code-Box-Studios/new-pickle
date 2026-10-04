@@ -83,8 +83,9 @@ barangay; locations without a curated barangay list use a text field.
 Vercel functions run in Seoul (`icn1`) to match the current Supabase database
 region. Change `vercel.json` if moving the database. Verified sessions and
 owner venue loads are deduplicated within a server render; ownership, active
-user, and role checks still run on every request. Shared loading skeletons give
-immediate feedback while server pages load.
+user, and role checks still run on every request. A shared Pikol loading animation
+shows two paddles rallying a ball while server pages load. It uses SVG and CSS,
+with a still illustration for reduced-motion preferences.
 
 ## Nationwide city search
 

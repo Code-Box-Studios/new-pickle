@@ -1,0 +1,156 @@
+.root {
+  display: flex;
+  min-height: min(60svh, 32rem);
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.scene {
+  display: block;
+  width: min(100%, 17.5rem);
+  height: auto;
+  overflow: visible;
+}
+
+.label {
+  margin-top: 0.25rem;
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.paddleLeft,
+.paddleRight,
+.flight,
+.ball,
+.hitLeft,
+.hitRight {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+
+.paddleLeft {
+  transform: rotate(24deg);
+}
+.paddleRight {
+  transform: rotate(-24deg);
+}
+.flight {
+  transform: translate(140px, 76px);
+}
+.hitLeft,
+.hitRight {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flight {
+    animation: rally-flight 1.8s linear infinite;
+  }
+  .ball {
+    animation: ball-turn 1.8s linear infinite;
+  }
+  .paddleLeft {
+    animation: paddle-left 1.8s ease-in-out infinite;
+  }
+  .paddleRight {
+    animation: paddle-right 1.8s ease-in-out infinite;
+  }
+  .hitLeft {
+    animation: hit-left 1.8s ease-out infinite;
+  }
+  .hitRight {
+    animation: hit-right 1.8s ease-out infinite;
+  }
+}
+
+@keyframes rally-flight {
+  0%,
+  100% {
+    transform: translate(70px, 76px) scale(0.88, 1.08);
+  }
+  4% {
+    transform: translate(79px, 72px);
+  }
+  25% {
+    transform: translate(140px, 60px);
+  }
+  46% {
+    transform: translate(201px, 72px);
+  }
+  50% {
+    transform: translate(210px, 76px) scale(0.88, 1.08);
+  }
+  54% {
+    transform: translate(201px, 80px);
+  }
+  75% {
+    transform: translate(140px, 92px);
+  }
+  96% {
+    transform: translate(79px, 80px);
+  }
+}
+
+@keyframes ball-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes paddle-left {
+  0%,
+  100% {
+    transform: rotate(36deg);
+  }
+  8%,
+  92% {
+    transform: rotate(20deg);
+  }
+}
+
+@keyframes paddle-right {
+  0%,
+  42%,
+  58%,
+  100% {
+    transform: rotate(-20deg);
+  }
+  50% {
+    transform: rotate(-36deg);
+  }
+}
+
+@keyframes hit-left {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.75);
+  }
+  8%,
+  92% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes hit-right {
+  0%,
+  42%,
+  100% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.75);
+  }
+  58% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
