@@ -11,7 +11,7 @@ const destructiveStyles =
   "button-destructive border border-transparent bg-destructive text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.2),0_2px_6px_-2px_rgb(180_35_24/0.16)] hover:bg-destructive/95 active:bg-destructive/90";
 
 export const buttonVariants = cva(
-  "ui-button relative isolate inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform,text-decoration-color] duration-200 active:duration-100 ease-[cubic-bezier(0.22,1,0.36,1)] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "ui-button relative isolate inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform,text-decoration-color] duration-200 active:duration-100 ease-[cubic-bezier(0.22,1,0.36,1)] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:aria-busy:opacity-100 aria-disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:aria-busy:opacity-100 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -51,6 +51,7 @@ export interface ButtonProps
   extends React.ComponentProps<"button">, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
+  loadingLabel?: string;
 }
 
 export function Button({
@@ -60,21 +61,30 @@ export function Button({
   block,
   asChild = false,
   loading = false,
+  loadingLabel,
   disabled,
   children,
   ...props
 }: ButtonProps) {
   const Comp = asChild ? Slot.Root : "button";
   const blocked = Boolean(disabled || loading);
-  const spinner = loading ? (
-    <Loader2 className="size-4 animate-spin" aria-hidden />
-  ) : null;
-  let content = (
-    <>
-      {spinner}
-      {children}
-    </>
-  );
+  // Keep the idle content in the layout so loading never changes the width.
+  // The overlay replaces it visually, including any existing action icons.
+  function loadingContent(idleContent: React.ReactNode) {
+    if (!loading) return idleContent;
+    return (
+      <>
+        <span className="inline-flex items-center justify-center gap-2 opacity-0">
+          {idleContent}
+        </span>
+        <span aria-hidden className="absolute inset-0 inline-flex items-center justify-center gap-2 animate-in fade-in duration-150 motion-reduce:animate-none">
+          <Loader2 className="size-4 animate-spin motion-reduce:animate-none" />
+          {loadingLabel}
+        </span>
+      </>
+    );
+  }
+  let content = loadingContent(children);
   if (asChild && React.isValidElement<React.ComponentProps<"a">>(children)) {
     content = React.cloneElement(children, {
       ...(blocked
@@ -85,12 +95,7 @@ export function Button({
             },
           }
         : {}),
-      children: (
-        <>
-          {spinner}
-          {children.props.children}
-        </>
-      ),
+      children: loadingContent(children.props.children),
     });
   }
   return (

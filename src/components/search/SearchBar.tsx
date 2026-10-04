@@ -108,6 +108,7 @@ export function SearchBar({
           type="submit"
           size="lg"
           loading={pending}
+          loadingLabel="Searching"
           className="col-span-2 lg:col-span-1"
         >
           <Search className="size-4" aria-hidden />
