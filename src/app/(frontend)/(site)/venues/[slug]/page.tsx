@@ -18,9 +18,14 @@ import { Gallery } from "@/components/venue/Gallery";
 import { Amenities } from "@/components/venue/Amenities";
 import { CourtBooking, type CourtDTO } from "@/components/court/CourtBooking";
 import { DateRail } from "@/components/court/DateRail";
+import { SessionDurationPicker } from "@/components/court/SessionDurationPicker";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { DURATIONS } from "@/lib/search-params";
+import {
+  minimumCourtHourlyPrice,
+  normalizeCourtTimeRates,
+} from "@/lib/court-pricing";
 import {
   dateLabel,
   isoDate,
@@ -33,7 +38,6 @@ import { venueJsonLd } from "@/lib/seo";
 import { venueMapUrl } from "@/lib/location/maps";
 import { venueRatingSummary, listVenueReviews } from "@/lib/review";
 import { Stars } from "@/components/review/Stars";
-import { cn } from "@/lib/cn";
 import { isPreviewMode } from "@/lib/deployment";
 
 const WEEKDAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
@@ -53,6 +57,7 @@ async function loadVenue(slug: string) {
   return prisma.venue.findFirst({
     where: { slug },
     include: {
+      sentry: { select: { connectionState: true } },
       courts: {
         where: { active: true },
         orderBy: { sortOrder: "asc" },
@@ -117,19 +122,27 @@ export default async function VenuePage({
   tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
   const dateStr = sp.date ?? isoDate(tomorrow);
   const date = parseIsoDate(dateStr);
-  const duration = sp.duration ?? "60";
-  const durationMinutes = Number(duration) || 60;
+  const duration =
+    DURATIONS.find((item) => item.value === sp.duration)?.value ?? "60";
+  const durationMinutes = Number(duration);
 
   const avail = await venueAvailability(venue.id, date, { durationMinutes });
   const availByCourt = new Map(avail.map((a) => [a.courtId, a.slots]));
 
-  const courts: CourtDTO[] = venue.courts.map((c) => ({
+  const effectiveCourts = venue.courts.map((court) => ({
+    ...court,
+    timeRates:
+      venue.sentry?.connectionState === "CONNECTED" ? [] : court.timeRates,
+  }));
+
+  const courts: CourtDTO[] = effectiveCourts.map((c) => ({
     id: c.id,
     name: c.name,
     indoor: c.indoor,
     covered: c.covered,
     surface: c.surface,
-    priceCents: c.priceCents,
+    priceCents: minimumCourtHourlyPrice(c),
+    hasVariableRates: normalizeCourtTimeRates(c.timeRates).length > 0,
     slots: (availByCourt.get(c.id) ?? []).map((s) => ({
       startsAt: s.startsAt.toISOString(),
       available: s.available,
@@ -168,8 +181,11 @@ export default async function VenuePage({
   const selectedDateLabel = `${weekdayLabel(date).slice(0, 3)}, ${dateLabel(date)}`;
 
   // Min price for the hero block — same logic VenueCard uses.
-  const minPriceCents = venue.courts.reduce<number | null>(
-    (min, c) => (min === null ? c.priceCents : Math.min(min, c.priceCents)),
+  const minPriceCents = effectiveCourts.reduce<number | null>(
+    (min, c) => {
+      const price = minimumCourtHourlyPrice(c);
+      return min === null ? price : Math.min(min, price);
+    },
     null,
   );
 
@@ -316,38 +332,18 @@ export default async function VenuePage({
                 </p>
                 <Clock3 className="size-4 text-muted-foreground" aria-hidden />
               </div>
-              <div
-                className="grid grid-cols-3 gap-2"
-                role="group"
-                aria-label="Booking duration"
-              >
-                {DURATIONS.map((dur) => {
-                  const active = dur.value === duration;
-                  return (
-                    <Button
-                      key={dur.value}
-                      asChild
-                      variant={active ? "secondary" : "outline"}
-                      className={cn(
-                        "gap-1 px-2 text-sm",
-                        active &&
-                          "border-brand-700/40 bg-secondary text-brand-700 ring-1 ring-brand-700/10",
-                      )}
-                    >
-                      <Link
-                        href={`/venues/${venue.slug}?date=${dateStr}&duration=${dur.value}`}
-                        scroll={false}
-                        aria-current={active ? "true" : undefined}
-                      >
-                        {dur.label}
-                      </Link>
-                    </Button>
-                  );
-                })}
-              </div>
+              <SessionDurationPicker
+                slug={venue.slug}
+                dateStr={dateStr}
+                duration={duration}
+              />
               <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
                 {longDateLabel(date)} · {Number(duration) / 60}{" "}
                 {duration === "60" ? "hour" : "hours"} of court time
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Available start times cover your entire session within the
+                venue&apos;s opening hours.
               </p>
             </div>
             <CourtBooking

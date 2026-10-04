@@ -1,14 +1,24 @@
 export const TIME_PRESETS = [
   { value: "any", label: "Any time", from: undefined, to: undefined },
+  { value: "midnight", label: "Midnight", from: 0, to: 6 * 60 },
   { value: "morning", label: "Morning", from: 6 * 60, to: 12 * 60 },
   { value: "afternoon", label: "Afternoon", from: 12 * 60, to: 17 * 60 },
-  { value: "evening", label: "Evening", from: 17 * 60, to: 23 * 60 },
+  { value: "evening", label: "Evening", from: 17 * 60, to: 24 * 60 },
 ] as const;
 
 export const DURATIONS = [
   { value: "60", label: "1 hour" },
   { value: "120", label: "2 hours" },
   { value: "180", label: "3 hours" },
+  { value: "240", label: "4 hours" },
+  { value: "300", label: "5 hours" },
+  { value: "360", label: "6 hours" },
+  { value: "420", label: "7 hours" },
+  { value: "480", label: "8 hours" },
+  { value: "540", label: "9 hours" },
+  { value: "600", label: "10 hours" },
+  { value: "660", label: "11 hours" },
+  { value: "720", label: "12 hours" },
 ] as const;
 
 export function resolveTimeWindow(preset?: string): {

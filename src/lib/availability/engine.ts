@@ -3,6 +3,10 @@ import { resolveBackend } from "@/lib/booking/resolve";
 import type { Court, CourtSchedule } from "@/generated/prisma";
 import { HOLD_PHASE, OCCUPYING } from "@/lib/booking/status";
 import { bookingWallNow } from "./time";
+import {
+  courtIntervalPrice,
+  minimumCourtHourlyPrice,
+} from "@/lib/court-pricing";
 
 /**
  * Availability derives from three sources, unified:
@@ -97,7 +101,7 @@ function slotsForCourt(
       startsAt,
       endsAt,
       available: !blocked,
-      priceCents: Math.round(court.priceCents * (durationMinutes / 60)),
+      priceCents: courtIntervalPrice(court, startsAt, endsAt),
     });
   }
   return slots;
@@ -111,7 +115,10 @@ export async function courtSlotsForDate(
   const durationMinutes = opts?.durationMinutes ?? 60;
   const court = await prisma.court.findUnique({
     where: { id: courtId },
-    include: { schedules: true },
+    include: {
+      schedules: true,
+      venue: { select: { sentry: { select: { connectionState: true } } } },
+    },
   });
   if (!court || !court.active) return [];
 
@@ -136,7 +143,11 @@ export async function courtSlotsForDate(
   ]);
 
   return slotsForCourt(
-    court,
+    // The current Sentry contract has no rate endpoint. Preserve the synced
+    // base price; saved local bands must not override a connected backend.
+    court.venue.sentry?.connectionState === "CONNECTED"
+      ? { ...court, timeRates: [] }
+      : court,
     day,
     durationMinutes,
     exceptions,
@@ -285,7 +296,15 @@ export async function searchAvailability(
       }
 
       const priceFromCents = courtsFiltered.length
-        ? Math.min(...courtsFiltered.map((c) => c.priceCents))
+        ? Math.min(
+            ...courtsFiltered.map((court) =>
+              minimumCourtHourlyPrice(
+                v.sentry?.connectionState === "CONNECTED"
+                  ? { ...court, timeRates: [] }
+                  : court,
+              ),
+            ),
+          )
         : null;
 
       return {

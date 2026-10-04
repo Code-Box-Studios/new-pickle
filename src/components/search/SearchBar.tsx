@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { SelectField, SelectItem } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { CityPicker } from "@/components/search/CityPicker";
+import { LocationChips } from "@/components/search/LocationChips";
 import type { CityOption } from "@/lib/cities";
 import { CourtPattern, PickleballIcon } from "@/components/ui/pickleball";
 import { DURATIONS, TIME_PRESETS, quickDateChoices } from "@/lib/search-params";
@@ -56,7 +57,11 @@ export function SearchBar({
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const p = new URLSearchParams({ city, date, time, duration });
+    searchCity(city);
+  }
+
+  function searchCity(nextCity: string) {
+    const p = new URLSearchParams({ city: nextCity, date, time, duration });
     startTransition(() => router.push(`/search?${p.toString()}`));
   }
 
@@ -123,6 +128,13 @@ export function SearchBar({
             Find courts
           </Button>
         </div>
+        <LocationChips
+          cities={cities}
+          city={city}
+          onCityChange={setCity}
+          onSearchCity={searchCity}
+          pending={pending}
+        />
         <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
             <div

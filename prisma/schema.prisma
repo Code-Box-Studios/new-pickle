@@ -196,6 +196,7 @@ model Court {
   capacity    Int      @default(4)
   slotMinutes Int      @default(60)
   priceCents  Int
+  timeRates   Json     @default("[]") // Optional daily hourly bands; uncovered minutes use priceCents.
   active      Boolean  @default(true)
   sortOrder   Int      @default(0)
   externalRef String? // Sentry resource id (SENTRY venues only)

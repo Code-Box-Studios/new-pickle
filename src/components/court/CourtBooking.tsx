@@ -28,6 +28,7 @@ export interface CourtDTO {
   covered: boolean;
   surface: string | null;
   priceCents: number;
+  hasVariableRates?: boolean;
   slots: SlotDTO[];
 }
 
@@ -126,7 +127,8 @@ export function CourtBooking({
       const hour = new Date(slot.startsAt).getUTCHours();
       return (
         band === "all" ||
-        (band === "morning" && hour < 12) ||
+        (band === "midnight" && hour < 6) ||
+        (band === "morning" && hour >= 6 && hour < 12) ||
         (band === "afternoon" && hour >= 12 && hour < 17) ||
         (band === "evening" && hour >= 17)
       );
@@ -155,7 +157,8 @@ export function CourtBooking({
             Choose a start time
           </h3>
           <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            Prices include all {durationLabel} of court time.
+            Choose one start time for all {durationLabel} of court time — one
+            booking, one checkout. Prices shown are the total for your session.
           </p>
         </div>
         <span className="rounded-full border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700">
@@ -166,10 +169,11 @@ export function CourtBooking({
       <StatefulTabs value={band} onValueChange={setBand} className="gap-3">
         <TabsList
           aria-label="Filter start times"
-          className="h-auto min-h-12 w-full justify-start rounded-full bg-surface p-1 group-data-[orientation=horizontal]/tabs:h-auto"
+          className="h-auto min-h-12 w-full flex-wrap justify-start rounded-2xl bg-surface p-1 group-data-[orientation=horizontal]/tabs:h-auto sm:rounded-full"
         >
           {[
             { value: "all", label: "All times" },
+            { value: "midnight", label: "Midnight" },
             { value: "morning", label: "Morning" },
             { value: "afternoon", label: "Afternoon" },
             { value: "evening", label: "Evening" },
@@ -177,7 +181,7 @@ export function CourtBooking({
             <TabsTrigger
               key={item.value}
               value={item.value}
-              className="min-h-11 rounded-full px-2 text-xs sm:px-3 sm:text-sm data-[state=active]:text-brand-700"
+              className="min-h-11 shrink-0 rounded-full px-3 text-xs sm:text-sm data-[state=active]:text-brand-700"
             >
               {item.label}
             </TabsTrigger>
@@ -218,7 +222,8 @@ export function CourtBooking({
       </StatefulTabs>
       <p className="flex items-center gap-2 border-t border-border pt-4 text-xs leading-relaxed text-muted-foreground">
         <Check className="size-4 shrink-0 text-brand-700" aria-hidden />
-        Pay the venue directly. Your reservation is confirmed by the venue.
+        One payment covers your full session. Pay the venue directly to confirm
+        your reservation.
       </p>
 
       {selected && (

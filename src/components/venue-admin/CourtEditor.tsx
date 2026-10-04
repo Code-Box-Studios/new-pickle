@@ -14,6 +14,13 @@ import { pesos } from "@/lib/format";
 import { sendJson } from "./api";
 import { PaddleIcon } from "@/components/ui/pickleball";
 import { SetupActions } from "./SetupActions";
+import {
+  COURT_RATE_PERIODS,
+  minimumCourtHourlyPrice,
+  normalizeCourtTimeRates,
+  type CourtTimeRate,
+} from "@/lib/court-pricing";
+import { ValidationError } from "@/lib/booking/errors";
 
 export interface CourtDTO {
   id: string;
@@ -23,9 +30,16 @@ export interface CourtDTO {
   surface: string | null;
   capacity: number;
   priceCents: number;
+  timeRates?: CourtTimeRate[];
   active: boolean;
 }
 
+type RateDraft = {
+  period: CourtTimeRate["period"];
+  startTime: string;
+  endTime: string;
+  pricePeso: number;
+};
 type Draft = {
   name: string;
   indoor: boolean;
@@ -33,6 +47,7 @@ type Draft = {
   surface: string;
   capacity: number;
   pricePeso: number;
+  timeRates: RateDraft[];
   active: boolean;
 };
 
@@ -43,6 +58,7 @@ const EMPTY: Draft = {
   surface: "",
   capacity: 4,
   pricePeso: 400,
+  timeRates: [],
   active: true,
 };
 
@@ -53,18 +69,47 @@ function toDraft(c: CourtDTO): Draft {
     covered: c.covered,
     surface: c.surface ?? "",
     capacity: c.capacity,
-    pricePeso: Math.round(c.priceCents / 100),
+    pricePeso: c.priceCents / 100,
+    timeRates: (c.timeRates ?? []).map((rate) => ({
+      period: rate.period,
+      startTime: rateTime(rate.startMinute),
+      endTime: rateTime(rate.endMinute),
+      pricePeso: rate.priceCents / 100,
+    })),
     active: c.active,
   };
 }
-function toPayload(d: Draft) {
+function rateTime(minute: number) {
+  return `${String(Math.floor(minute / 60)).padStart(2, "0")}:${String(minute % 60).padStart(2, "0")}`;
+}
+function timeMinute(time: string, isEnd = false) {
+  if (isEnd && time === "24:00") return 1440;
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) {
+    throw new ValidationError(
+      "Enter times as HH:MM, using 24:00 for the end of the day",
+    );
+  }
+  const [hour, minute] = time.split(":").map(Number);
+  return hour * 60 + minute;
+}
+function toPayload(d: Draft, pricingLocked = false) {
   return {
     name: d.name,
     indoor: d.indoor,
     covered: d.covered,
     surface: d.surface || null,
     capacity: Number(d.capacity) || 4,
-    priceCents: Math.round(Number(d.pricePeso) * 100),
+    ...(!pricingLocked && {
+      priceCents: Math.round(Number(d.pricePeso) * 100),
+      timeRates: normalizeCourtTimeRates(
+        d.timeRates.map((rate) => ({
+          period: rate.period,
+          startMinute: timeMinute(rate.startTime),
+          endMinute: timeMinute(rate.endTime, true),
+          priceCents: Math.round(Number(rate.pricePeso) * 100),
+        })),
+      ),
+    }),
     active: d.active,
   };
 }
@@ -72,9 +117,11 @@ function toPayload(d: Draft) {
 function CourtFields({
   value,
   onChange,
+  pricingLocked = false,
 }: {
   value: Draft;
   onChange: (d: Draft) => void;
+  pricingLocked?: boolean;
 }) {
   const fieldId = useId();
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) =>
@@ -88,11 +135,21 @@ function CourtFields({
           onChange={(e) => set("name", e.target.value)}
         />
       </Field>
-      <Field label="Price / hour (₱)" htmlFor={`${fieldId}-price`}>
+      <Field
+        label="Base price / hour (₱)"
+        htmlFor={`${fieldId}-price`}
+        hint={
+          value.timeRates.length
+            ? "Applies to any time outside your rate bands."
+            : undefined
+        }
+      >
         <Input
           id={`${fieldId}-price`}
           type="number"
           min={0}
+          step="0.01"
+          disabled={pricingLocked}
           value={value.pricePeso}
           onChange={(e) => set("pricePeso", Number(e.target.value))}
         />
@@ -122,6 +179,100 @@ function CourtFields({
         />
         Covered
       </Label>
+      <div className="space-y-3 sm:col-span-2">
+        <Label className="flex min-h-11 items-center gap-2 text-sm text-ink-soft">
+          <Checkbox
+            checked={value.timeRates.length > 0}
+            disabled={pricingLocked}
+            onCheckedChange={(checked) =>
+              set(
+                "timeRates",
+                checked === true
+                  ? COURT_RATE_PERIODS.map((rate) => ({
+                      period: rate.period,
+                      startTime: rateTime(rate.startMinute),
+                      endTime: rateTime(rate.endMinute),
+                      pricePeso: value.pricePeso,
+                    }))
+                  : [],
+              )
+            }
+          />
+          Different rates by time of day
+        </Label>
+        {value.timeRates.length > 0 && (
+          <div className="space-y-3 rounded-lg border border-line p-3 sm:p-4">
+            <p className="text-sm text-muted-foreground">
+              Rates apply every day. Adjust times in 24-hour format; use 24:00
+              for the end of the day. Bands cannot overlap.
+            </p>
+            {value.timeRates.map((rate, index) => {
+              const label = COURT_RATE_PERIODS.find(
+                (period) => period.period === rate.period,
+              )!.label;
+              const update = (change: Partial<RateDraft>) =>
+                set(
+                  "timeRates",
+                  value.timeRates.map((item, at) =>
+                    at === index ? { ...item, ...change } : item,
+                  ),
+                );
+              return (
+                <fieldset
+                  key={rate.period}
+                  className="grid min-w-0 gap-3 sm:grid-cols-3"
+                  disabled={pricingLocked}
+                >
+                  <legend className="mb-2 text-sm font-medium text-ink">
+                    {label}
+                  </legend>
+                  <Field
+                    label={`${label} starts`}
+                    htmlFor={`${fieldId}-${rate.period}-start`}
+                  >
+                    <Input
+                      id={`${fieldId}-${rate.period}-start`}
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="HH:MM"
+                      value={rate.startTime}
+                      onChange={(e) => update({ startTime: e.target.value })}
+                    />
+                  </Field>
+                  <Field
+                    label={`${label} ends`}
+                    htmlFor={`${fieldId}-${rate.period}-end`}
+                  >
+                    <Input
+                      id={`${fieldId}-${rate.period}-end`}
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="HH:MM"
+                      value={rate.endTime}
+                      onChange={(e) => update({ endTime: e.target.value })}
+                    />
+                  </Field>
+                  <Field
+                    label={`${label} price / hour (₱)`}
+                    htmlFor={`${fieldId}-${rate.period}-price`}
+                  >
+                    <Input
+                      id={`${fieldId}-${rate.period}-price`}
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      value={rate.pricePeso}
+                      onChange={(e) =>
+                        update({ pricePeso: Number(e.target.value) })
+                      }
+                    />
+                  </Field>
+                </fieldset>
+              );
+            })}
+          </div>
+        )}
+      </div>
       <Label className="flex min-h-11 items-center gap-2 rounded-lg text-sm text-ink-soft">
         <Checkbox
           checked={value.active}
@@ -137,10 +288,12 @@ export function CourtEditor({
   venueId,
   courts,
   locked,
+  pricingLocked = false,
 }: {
   venueId: string;
   courts: CourtDTO[];
   locked: boolean;
+  pricingLocked?: boolean;
 }) {
   const router = useRouter();
   const toast = useToast();
@@ -170,6 +323,11 @@ export function CourtEditor({
 
   return (
     <div className="space-y-5">
+      {pricingLocked && (
+        <p className="rounded-lg border border-line bg-mist/30 p-4 text-sm text-ink-soft">
+          Court rates are managed in Sentry for this connected venue.
+        </p>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
         <p className="font-medium text-ink">Your courts</p>
         <span className="text-muted-foreground">
@@ -188,6 +346,7 @@ export function CourtEditor({
                 <CourtFields
                   value={editing.draft}
                   onChange={(draft) => setEditing({ id: c.id, draft })}
+                  pricingLocked={pricingLocked}
                 />
                 <div className="flex gap-2">
                   <Button
@@ -198,7 +357,7 @@ export function CourtEditor({
                         sendJson(
                           `/api/owner/venues/${venueId}/courts/${c.id}`,
                           "PATCH",
-                          toPayload(editing.draft),
+                          toPayload(editing.draft, pricingLocked),
                         ),
                       )
                     }
@@ -227,8 +386,26 @@ export function CourtEditor({
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {c.indoor ? "Indoor" : "Outdoor"}
-                    {c.covered ? " · Covered" : ""} · {pesos(c.priceCents)}/hr
+                    {c.covered ? " · Covered" : ""} ·{" "}
+                    {c.timeRates?.length ? "From " : ""}
+                    {pesos(minimumCourtHourlyPrice(c))}/hr
                   </p>
+                  {!!c.timeRates?.length && (
+                    <div className="mt-2 grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
+                      {c.timeRates.map((rate) => (
+                        <p key={rate.period}>
+                          {
+                            COURT_RATE_PERIODS.find(
+                              (period) => period.period === rate.period,
+                            )!.label
+                          }{" "}
+                          {rateTime(rate.startMinute)}–
+                          {rateTime(rate.endMinute)} · {pesos(rate.priceCents)}
+                          /hr
+                        </p>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {!locked && (
                   <div className="flex shrink-0 gap-1">
@@ -282,6 +459,7 @@ export function CourtEditor({
       </ul>
 
       {!locked &&
+        !pricingLocked &&
         (adding ? (
           <Card className="space-y-5 border-brand-200 bg-mist/30 p-5">
             <h3 className="flex items-center gap-2 font-semibold text-ink">

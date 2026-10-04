@@ -2,12 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { NotFoundError, ValidationError } from "@/lib/booking/errors";
 import { requireEditableOwnVenue } from "@/lib/api/owner-venue-access";
-import { assertCourtDeletable } from "@/lib/venue/court";
+import {
+  assertCourtDeletable,
+  assertLocalCourtPricing,
+} from "@/lib/venue/court";
 import { errorResponse } from "@/lib/http";
+import {
+  normalizeCourtTimeRates,
+  validateCourtPrice,
+} from "@/lib/court-pricing";
 
 async function loadCourt(venueId: string, courtId: string) {
   const court = await prisma.court.findUnique({ where: { id: courtId } });
-  if (!court || court.venueId !== venueId) throw new NotFoundError("Court not found");
+  if (!court || court.venueId !== venueId)
+    throw new NotFoundError("Court not found");
   return court;
 }
 
@@ -20,6 +28,8 @@ export async function PATCH(
     await requireEditableOwnVenue(id);
     await loadCourt(id, courtId);
     const b = (await req.json()) as Record<string, unknown>;
+    if (b.priceCents !== undefined || b.timeRates !== undefined)
+      await assertLocalCourtPricing(id);
     const data: Record<string, unknown> = {};
     if (b.name !== undefined) {
       const name = String(b.name).trim();
@@ -27,13 +37,14 @@ export async function PATCH(
       data.name = name;
     }
     if (b.priceCents !== undefined) {
-      const p = Math.round(Number(b.priceCents));
-      if (!Number.isFinite(p) || p < 0) throw new ValidationError("Enter a valid price");
-      data.priceCents = p;
+      data.priceCents = validateCourtPrice(b.priceCents);
     }
+    if (b.timeRates !== undefined)
+      data.timeRates = normalizeCourtTimeRates(b.timeRates);
     if (b.indoor !== undefined) data.indoor = !!b.indoor;
     if (b.covered !== undefined) data.covered = !!b.covered;
-    if (b.surface !== undefined) data.surface = b.surface ? String(b.surface) : null;
+    if (b.surface !== undefined)
+      data.surface = b.surface ? String(b.surface) : null;
     if (b.capacity !== undefined) data.capacity = Number(b.capacity) || 4;
     if (b.active !== undefined) data.active = !!b.active;
 

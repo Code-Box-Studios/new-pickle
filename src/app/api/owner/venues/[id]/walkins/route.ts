@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { bookingBackend } from "@/lib/booking";
+import { resolveBackend } from "@/lib/booking/resolve";
 import { NotFoundError, ValidationError } from "@/lib/booking/errors";
 import { requireOperationalOwnVenue } from "@/lib/api/owner-venue-access";
 import { assertNoBlockOverlap } from "@/lib/venue/blocks";
 import { errorResponse } from "@/lib/http";
+import { courtIntervalPrice } from "@/lib/court-pricing";
 
 export async function POST(
   req: NextRequest,
@@ -15,13 +16,18 @@ export async function POST(
     await requireOperationalOwnVenue(id);
     const b = (await req.json()) as Record<string, unknown>;
 
-    const court = await prisma.court.findUnique({ where: { id: String(b.courtId ?? "") } });
-    if (!court || court.venueId !== id || !court.active) throw new NotFoundError("Court not found");
+    const court = await prisma.court.findUnique({
+      where: { id: String(b.courtId ?? "") },
+    });
+    if (!court || court.venueId !== id || !court.active)
+      throw new NotFoundError("Court not found");
 
     const startsAt = new Date(String(b.startsAt ?? ""));
-    if (Number.isNaN(startsAt.getTime())) throw new ValidationError("Invalid start time");
+    if (Number.isNaN(startsAt.getTime()))
+      throw new ValidationError("Invalid start time");
     const durationMinutes = Number(b.durationMinutes ?? court.slotMinutes);
-    if (!Number.isFinite(durationMinutes) || durationMinutes <= 0) throw new ValidationError("Invalid duration");
+    if (!Number.isFinite(durationMinutes) || durationMinutes <= 0)
+      throw new ValidationError("Invalid duration");
     const endsAt = new Date(startsAt.getTime() + durationMinutes * 60_000);
 
     const name = String(b.name ?? "").trim();
@@ -29,12 +35,13 @@ export async function POST(
 
     await assertNoBlockOverlap(id, court.id, startsAt, endsAt);
 
-    const priceCents = Math.round(court.priceCents * (durationMinutes / 60));
+    const priceCents = courtIntervalPrice(court, startsAt, endsAt);
     const noteParts: string[] = [];
     if (b.paymentMethod) noteParts.push(String(b.paymentMethod));
     if (b.note) noteParts.push(String(b.note));
 
-    const w = await bookingBackend.createWalkIn({
+    const backend = await resolveBackend(id);
+    const w = await backend.createWalkIn({
       venueId: id,
       courtId: court.id,
       startsAt,

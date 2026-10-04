@@ -1,0 +1,753 @@
+{
+  "source": "https://download.geonames.org/export/dump/PH.zip",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "retrievedOn": "2026-10-04",
+  "note": "GeoNames populated place points, matched to PSGC cities by city and province, with ambiguous names verified by GeoNames ID. Approximate city centers, not city boundaries or court locations.",
+  "cities": {
+    "Alaminos City": {
+      "latitude": 16.15611,
+      "longitude": 119.98111,
+      "geonameId": 1731685
+    },
+    "Angeles City": {
+      "latitude": 15.15,
+      "longitude": 120.58333,
+      "geonameId": 1730737
+    },
+    "Antipolo City": {
+      "latitude": 14.62578,
+      "longitude": 121.12251,
+      "geonameId": 1730501
+    },
+    "Bacolod City": {
+      "latitude": 10.66667,
+      "longitude": 122.95,
+      "geonameId": 1729564
+    },
+    "Bacoor City": {
+      "latitude": 14.45896,
+      "longitude": 120.93851,
+      "geonameId": 1729524
+    },
+    "Bago City": {
+      "latitude": 10.53333,
+      "longitude": 122.83333,
+      "geonameId": 1729085
+    },
+    "Baguio City": {
+      "latitude": 16.41639,
+      "longitude": 120.59306,
+      "geonameId": 1728930
+    },
+    "Bais City": {
+      "latitude": 9.59111,
+      "longitude": 123.12278,
+      "geonameId": 1728772
+    },
+    "Balanga City": {
+      "latitude": 14.67611,
+      "longitude": 120.53611,
+      "geonameId": 1728523
+    },
+    "Baliwag City": {
+      "latitude": 14.95472,
+      "longitude": 120.89694,
+      "geonameId": 1727995
+    },
+    "Batac City": {
+      "latitude": 18.0554,
+      "longitude": 120.56489,
+      "geonameId": 1726339
+    },
+    "Batangas City": {
+      "latitude": 13.7567,
+      "longitude": 121.0584,
+      "geonameId": 1726280
+    },
+    "Bayawan City": {
+      "latitude": 9.3649,
+      "longitude": 122.804,
+      "geonameId": 1725804
+    },
+    "Baybay City": {
+      "latitude": 10.6785,
+      "longitude": 124.8006,
+      "geonameId": 1725799
+    },
+    "Bayugan City": {
+      "latitude": 8.75611,
+      "longitude": 125.7675,
+      "geonameId": 1725684
+    },
+    "Biñan City": {
+      "latitude": 14.34267,
+      "longitude": 121.08071,
+      "geonameId": 1725115
+    },
+    "Bislig City": {
+      "latitude": 8.21528,
+      "longitude": 126.31639,
+      "geonameId": 1724767
+    },
+    "Bogo City": {
+      "latitude": 11.0517,
+      "longitude": 124.0055,
+      "geonameId": 1724435
+    },
+    "Borongan City": {
+      "latitude": 11.60806,
+      "longitude": 125.43194,
+      "geonameId": 1723893
+    },
+    "Butuan City": {
+      "latitude": 8.94917,
+      "longitude": 125.54361,
+      "geonameId": 1722186
+    },
+    "Cabadbaran City": {
+      "latitude": 9.12261,
+      "longitude": 125.53549,
+      "geonameId": 1722032
+    },
+    "Cabanatuan City": {
+      "latitude": 15.48586,
+      "longitude": 120.96648,
+      "geonameId": 1721906
+    },
+    "Cabuyao City": {
+      "latitude": 14.2726,
+      "longitude": 121.1262,
+      "geonameId": 1721281
+    },
+    "Cadiz City": {
+      "latitude": 10.9465,
+      "longitude": 123.288,
+      "geonameId": 1721168
+    },
+    "Cagayan De Oro City": {
+      "latitude": 8.48222,
+      "longitude": 124.64722,
+      "geonameId": 1721080
+    },
+    "Calaca City": {
+      "latitude": 13.93244,
+      "longitude": 120.81327,
+      "geonameId": 1720751
+    },
+    "Calamba City": {
+      "latitude": 14.21167,
+      "longitude": 121.16528,
+      "geonameId": 1720681
+    },
+    "Calapan City": {
+      "latitude": 13.4117,
+      "longitude": 121.1803,
+      "geonameId": 1720561
+    },
+    "Calbayog City": {
+      "latitude": 12.0668,
+      "longitude": 124.5962,
+      "geonameId": 1720402
+    },
+    "Caloocan City": {
+      "latitude": 14.64953,
+      "longitude": 120.96788,
+      "geonameId": 1720151
+    },
+    "Candon City": {
+      "latitude": 17.19472,
+      "longitude": 120.45167,
+      "geonameId": 1719251
+    },
+    "Canlaon City": {
+      "latitude": 10.38697,
+      "longitude": 123.2227,
+      "geonameId": 1719053
+    },
+    "Carcar City": {
+      "latitude": 10.1061,
+      "longitude": 123.6402,
+      "geonameId": 1718436
+    },
+    "Carmona City": {
+      "latitude": 14.3132,
+      "longitude": 121.0576,
+      "geonameId": 1718306
+    },
+    "Catbalogan City": {
+      "latitude": 11.77528,
+      "longitude": 124.88611,
+      "geonameId": 1717911
+    },
+    "Cauayan City": {
+      "latitude": 16.93472,
+      "longitude": 121.7725,
+      "geonameId": 1717729
+    },
+    "Cavite City": {
+      "latitude": 14.48369,
+      "longitude": 120.89878,
+      "geonameId": 1717641
+    },
+    "Cebu City": {
+      "latitude": 10.31672,
+      "longitude": 123.89071,
+      "geonameId": 1717512
+    },
+    "Cotabato City": {
+      "latitude": 7.22361,
+      "longitude": 124.24639,
+      "geonameId": 1716771
+    },
+    "Dagupan City": {
+      "latitude": 16.04313,
+      "longitude": 120.33325,
+      "geonameId": 1716198
+    },
+    "Danao City": {
+      "latitude": 10.52083,
+      "longitude": 124.02722,
+      "geonameId": 1715804
+    },
+    "Dapitan City": {
+      "latitude": 8.6561,
+      "longitude": 123.4227,
+      "geonameId": 1715542
+    },
+    "Dasmariñas City": {
+      "latitude": 14.32944,
+      "longitude": 120.93667,
+      "geonameId": 1715430
+    },
+    "Davao City": {
+      "latitude": 7.07306,
+      "longitude": 125.61278,
+      "geonameId": 1715348
+    },
+    "Digos City": {
+      "latitude": 6.74972,
+      "longitude": 125.35722,
+      "geonameId": 1714956
+    },
+    "Dipolog City": {
+      "latitude": 8.56697,
+      "longitude": 123.33471,
+      "geonameId": 1714674
+    },
+    "Dumaguete City": {
+      "latitude": 9.30646,
+      "longitude": 123.30769,
+      "geonameId": 1714201
+    },
+    "El Salvador City": {
+      "latitude": 8.56306,
+      "longitude": 124.5225,
+      "geonameId": 1713911
+    },
+    "Escalante City": {
+      "latitude": 10.84028,
+      "longitude": 123.49917,
+      "geonameId": 1713818
+    },
+    "Gapan City": {
+      "latitude": 15.3072,
+      "longitude": 120.9464,
+      "geonameId": 1713226
+    },
+    "General Santos City": {
+      "latitude": 6.11278,
+      "longitude": 125.17167,
+      "geonameId": 1713022
+    },
+    "General Trias City": {
+      "latitude": 14.38694,
+      "longitude": 120.88167,
+      "geonameId": 1713014
+    },
+    "Gingoog City": {
+      "latitude": 8.82778,
+      "longitude": 125.09972,
+      "geonameId": 1712875
+    },
+    "Guihulngan City": {
+      "latitude": 10.11947,
+      "longitude": 123.27287,
+      "geonameId": 1712520
+    },
+    "Himamaylan City": {
+      "latitude": 10.09889,
+      "longitude": 122.87056,
+      "geonameId": 1711718
+    },
+    "Ilagan City": {
+      "latitude": 17.14854,
+      "longitude": 121.88924,
+      "geonameId": 1711146
+    },
+    "Iligan City": {
+      "latitude": 8.2289,
+      "longitude": 124.24344,
+      "geonameId": 1711084
+    },
+    "Iloilo City": {
+      "latitude": 10.69694,
+      "longitude": 122.56444,
+      "geonameId": 1711005
+    },
+    "Imus City": {
+      "latitude": 14.42972,
+      "longitude": 120.93667,
+      "geonameId": 1710914
+    },
+    "Iriga City": {
+      "latitude": 13.4324,
+      "longitude": 123.4115,
+      "geonameId": 1710544
+    },
+    "Isabela City": {
+      "latitude": 6.70407,
+      "longitude": 121.97117,
+      "geonameId": 1710519
+    },
+    "Island Garden City of Samal": {
+      "latitude": 7.07444,
+      "longitude": 125.70833,
+      "geonameId": 1690666
+    },
+    "Kabankalan City": {
+      "latitude": 9.9839,
+      "longitude": 122.81423,
+      "geonameId": 1709968
+    },
+    "Kidapawan City": {
+      "latitude": 7.00833,
+      "longitude": 125.08944,
+      "geonameId": 1708824
+    },
+    "Koronadal City": {
+      "latitude": 6.50306,
+      "longitude": 124.84694,
+      "geonameId": 1708522
+    },
+    "La Carlota City": {
+      "latitude": 10.4242,
+      "longitude": 122.9212,
+      "geonameId": 1708226
+    },
+    "Lamitan City": {
+      "latitude": 6.6502,
+      "longitude": 122.12952,
+      "geonameId": 1707761
+    },
+    "Laoag City": {
+      "latitude": 18.1978,
+      "longitude": 120.5957,
+      "geonameId": 1707404
+    },
+    "Lapu-Lapu City": {
+      "latitude": 10.31028,
+      "longitude": 123.94944,
+      "geonameId": 1707267
+    },
+    "Las Piñas City": {
+      "latitude": 14.45056,
+      "longitude": 120.98278,
+      "geonameId": 1707174
+    },
+    "Legazpi City": {
+      "latitude": 13.14125,
+      "longitude": 123.74073,
+      "geonameId": 1706889
+    },
+    "Ligao City": {
+      "latitude": 13.21697,
+      "longitude": 123.51924,
+      "geonameId": 1706474
+    },
+    "Lipa City": {
+      "latitude": 13.9411,
+      "longitude": 121.1631,
+      "geonameId": 1706090
+    },
+    "Lucena City": {
+      "latitude": 13.93139,
+      "longitude": 121.61722,
+      "geonameId": 1705357
+    },
+    "Maasin City": {
+      "latitude": 10.13272,
+      "longitude": 124.84082,
+      "geonameId": 1704758
+    },
+    "Mabalacat City": {
+      "latitude": 15.22303,
+      "longitude": 120.57117,
+      "geonameId": 1704703
+    },
+    "Makati City": {
+      "latitude": 14.55027,
+      "longitude": 121.03269,
+      "geonameId": 1703417
+    },
+    "Malabon City": {
+      "latitude": 14.67333,
+      "longitude": 120.93972,
+      "geonameId": 1703320
+    },
+    "Malaybalay City": {
+      "latitude": 8.1575,
+      "longitude": 125.12778,
+      "geonameId": 1702934
+    },
+    "Malolos City": {
+      "latitude": 14.8443,
+      "longitude": 120.81039,
+      "geonameId": 1702540
+    },
+    "Mandaluyong City": {
+      "latitude": 14.5832,
+      "longitude": 121.0409,
+      "geonameId": 1701966
+    },
+    "Mandaue City": {
+      "latitude": 10.32361,
+      "longitude": 123.92222,
+      "geonameId": 1701947
+    },
+    "Manila City": {
+      "latitude": 14.6042,
+      "longitude": 120.9822,
+      "geonameId": 1701668
+    },
+    "Marawi City": {
+      "latitude": 8.0034,
+      "longitude": 124.28395,
+      "geonameId": 1701053
+    },
+    "Marikina City": {
+      "latitude": 14.6481,
+      "longitude": 121.1133,
+      "geonameId": 1700925
+    },
+    "Masbate City": {
+      "latitude": 12.37169,
+      "longitude": 123.62494,
+      "geonameId": 1700712
+    },
+    "Mati City": {
+      "latitude": 6.95508,
+      "longitude": 126.21655,
+      "geonameId": 1700360
+    },
+    "Meycauayan City": {
+      "latitude": 14.73694,
+      "longitude": 120.96083,
+      "geonameId": 1699802
+    },
+    "Muntinlupa City": {
+      "latitude": 14.39028,
+      "longitude": 121.0475,
+      "geonameId": 1699076
+    },
+    "Naga City, Camarines Sur": {
+      "latitude": 13.61917,
+      "longitude": 123.18139,
+      "geonameId": 1698829
+    },
+    "Naga City, Cebu": {
+      "latitude": 10.20898,
+      "longitude": 123.758,
+      "geonameId": 1698839
+    },
+    "Navotas City": {
+      "latitude": 14.66667,
+      "longitude": 120.95,
+      "geonameId": 1697846
+    },
+    "Olongapo City": {
+      "latitude": 14.82917,
+      "longitude": 120.28278,
+      "geonameId": 1697175
+    },
+    "Ormoc City": {
+      "latitude": 11.00639,
+      "longitude": 124.6075,
+      "geonameId": 1697018
+    },
+    "Oroquieta City": {
+      "latitude": 8.4859,
+      "longitude": 123.8048,
+      "geonameId": 1697006
+    },
+    "Ozamiz City": {
+      "latitude": 8.1481,
+      "longitude": 123.8405,
+      "geonameId": 1696899
+    },
+    "Pagadian City": {
+      "latitude": 7.8257,
+      "longitude": 123.437,
+      "geonameId": 1696710
+    },
+    "Palayan City": {
+      "latitude": 15.5415,
+      "longitude": 121.0848,
+      "geonameId": 1696165
+    },
+    "Panabo City": {
+      "latitude": 7.30806,
+      "longitude": 125.68417,
+      "geonameId": 1695804
+    },
+    "Parañaque City": {
+      "latitude": 14.48156,
+      "longitude": 121.01749,
+      "geonameId": 1694781
+    },
+    "Pasay City": {
+      "latitude": 14.53748,
+      "longitude": 121.00144,
+      "geonameId": 1694611
+    },
+    "Pasig City": {
+      "latitude": 14.58691,
+      "longitude": 121.0614,
+      "geonameId": 7290466
+    },
+    "Passi City": {
+      "latitude": 11.10778,
+      "longitude": 122.64194,
+      "geonameId": 1694498
+    },
+    "Puerto Princesa City": {
+      "latitude": 9.73917,
+      "longitude": 118.73528,
+      "geonameId": 1692685
+    },
+    "Quezon City": {
+      "latitude": 14.6488,
+      "longitude": 121.0509,
+      "geonameId": 1692192
+    },
+    "Roxas City": {
+      "latitude": 11.58528,
+      "longitude": 122.75111,
+      "geonameId": 1691444
+    },
+    "Sagay City": {
+      "latitude": 10.94472,
+      "longitude": 123.42417,
+      "geonameId": 1691150
+    },
+    "San Carlos City, Negros Occidental": {
+      "latitude": 10.484,
+      "longitude": 123.4203,
+      "geonameId": 1690219
+    },
+    "San Carlos City, Pangasinan": {
+      "latitude": 15.92941,
+      "longitude": 120.34863,
+      "geonameId": 1690206
+    },
+    "San Fernando City, La Union": {
+      "latitude": 16.61591,
+      "longitude": 120.31663,
+      "geonameId": 1690033
+    },
+    "San Fernando City, Pampanga": {
+      "latitude": 15.03425,
+      "longitude": 120.68445,
+      "geonameId": 1690039
+    },
+    "San Jose City": {
+      "latitude": 15.7923,
+      "longitude": 120.9894,
+      "geonameId": 1689431
+    },
+    "San Jose Del Monte City": {
+      "latitude": 14.81389,
+      "longitude": 121.04528,
+      "geonameId": 1689395
+    },
+    "San Juan City": {
+      "latitude": 14.6,
+      "longitude": 121.0333,
+      "geonameId": 1689286
+    },
+    "San Pablo City": {
+      "latitude": 14.0683,
+      "longitude": 121.3256,
+      "geonameId": 1688830
+    },
+    "San Pedro City": {
+      "latitude": 14.3595,
+      "longitude": 121.0473,
+      "geonameId": 1688749
+    },
+    "Santa Rosa City": {
+      "latitude": 14.31222,
+      "longitude": 121.11139,
+      "geonameId": 1687894
+    },
+    "Santiago City": {
+      "latitude": 16.68808,
+      "longitude": 121.5487,
+      "geonameId": 1687801
+    },
+    "Science City of Muñoz": {
+      "latitude": 15.71611,
+      "longitude": 120.90306,
+      "geonameId": 1699088
+    },
+    "Silay City": {
+      "latitude": 10.8003,
+      "longitude": 122.9763,
+      "geonameId": 1686501
+    },
+    "Sipalay City": {
+      "latitude": 9.75194,
+      "longitude": 122.40417,
+      "geonameId": 1686102
+    },
+    "Sorsogon City": {
+      "latitude": 12.97389,
+      "longitude": 123.99333,
+      "geonameId": 1685755
+    },
+    "Sto. Tomas City": {
+      "latitude": 14.1079,
+      "longitude": 121.14136,
+      "geonameId": 1687534
+    },
+    "Surigao City": {
+      "latitude": 9.789,
+      "longitude": 125.495,
+      "geonameId": 1685218
+    },
+    "Tabaco City": {
+      "latitude": 13.35861,
+      "longitude": 123.73361,
+      "geonameId": 1685117
+    },
+    "Tabuk City": {
+      "latitude": 17.41456,
+      "longitude": 121.44157,
+      "geonameId": 8031389
+    },
+    "Tacloban City": {
+      "latitude": 11.24333,
+      "longitude": 125.00472,
+      "geonameId": 1684712
+    },
+    "Tacurong City": {
+      "latitude": 6.6925,
+      "longitude": 124.67639,
+      "geonameId": 1684681
+    },
+    "Tagaytay City": {
+      "latitude": 14.09532,
+      "longitude": 120.93355,
+      "geonameId": 1684553
+    },
+    "Tagbilaran City": {
+      "latitude": 9.65556,
+      "longitude": 123.85219,
+      "geonameId": 1684497
+    },
+    "Taguig City": {
+      "latitude": 14.5243,
+      "longitude": 121.0792,
+      "geonameId": 1684308
+    },
+    "Tagum City": {
+      "latitude": 7.4475,
+      "longitude": 125.8046,
+      "geonameId": 1684269
+    },
+    "Talisay City, Cebu": {
+      "latitude": 10.24472,
+      "longitude": 123.84944,
+      "geonameId": 1683881
+    },
+    "Talisay City, Negros Occidental": {
+      "latitude": 10.7375,
+      "longitude": 122.9666,
+      "geonameId": 1683877
+    },
+    "Tanauan City": {
+      "latitude": 14.08627,
+      "longitude": 121.14975,
+      "geonameId": 1683340
+    },
+    "Tandag City": {
+      "latitude": 9.07833,
+      "longitude": 126.19861,
+      "geonameId": 1683302
+    },
+    "Tangub City": {
+      "latitude": 8.0618,
+      "longitude": 123.7477,
+      "geonameId": 1683116
+    },
+    "Tanjay City": {
+      "latitude": 9.5162,
+      "longitude": 123.158,
+      "geonameId": 1683088
+    },
+    "Tarlac City": {
+      "latitude": 15.48017,
+      "longitude": 120.59794,
+      "geonameId": 1682812
+    },
+    "Tayabas City": {
+      "latitude": 14.0259,
+      "longitude": 121.5929,
+      "geonameId": 1682659
+    },
+    "Toledo City": {
+      "latitude": 10.3773,
+      "longitude": 123.6386,
+      "geonameId": 1681602
+    },
+    "Trece Martires City": {
+      "latitude": 14.28323,
+      "longitude": 120.86766,
+      "geonameId": 1681339
+    },
+    "Tuguegarao City": {
+      "latitude": 17.61577,
+      "longitude": 121.72285,
+      "geonameId": 1680932
+    },
+    "Urdaneta City": {
+      "latitude": 15.97611,
+      "longitude": 120.57111,
+      "geonameId": 1680197
+    },
+    "Valencia City": {
+      "latitude": 7.90639,
+      "longitude": 125.09417,
+      "geonameId": 1680116
+    },
+    "Valenzuela City": {
+      "latitude": 14.7,
+      "longitude": 120.9667,
+      "geonameId": 1680102
+    },
+    "Victorias City": {
+      "latitude": 10.90154,
+      "longitude": 123.0705,
+      "geonameId": 1680007
+    },
+    "Vigan City": {
+      "latitude": 17.57472,
+      "longitude": 120.38694,
+      "geonameId": 1679980
+    },
+    "Zamboanga City": {
+      "latitude": 6.91028,
+      "longitude": 122.07389,
+      "geonameId": 1679432
+    }
+  }
+}

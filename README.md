@@ -50,9 +50,12 @@ still, and reduced-motion preferences remove decorative movement.
 
 Venue pages place booking ahead of long venue details on phones. Players can
 browse photos in a shadcn viewer, choose any future day with the calendar,
-filter start times by morning/afternoon/evening, and compare session totals.
+filter start times by midnight/morning/afternoon/evening, and compare session totals.
 The floating summary shows the full time range and can be cleared. Changing
 the day or duration clears the previous slot so the summary stays accurate.
+Sessions support **1–12 hours** where the court's schedule has a continuous
+opening. Pick one start time for the whole session: it creates one reservation
+and one checkout for the total, rather than separate bookings for each hour.
 
 Date fields use the shared shadcn **Calendar + Popover** picker, including owner
 rescheduling. They display readable dates and submit `YYYY-MM-DD` civil dates
@@ -78,6 +81,15 @@ The setup city picker also searches all 149 Philippine cities. Other cities or
 municipalities can be entered manually. Changing the city clears the previous
 barangay; locations without a curated barangay list use a text field.
 
+Court owners can keep a flat hourly price or enable **time based rates** in the
+Courts step. Midnight, morning, afternoon and evening have editable start/end
+times and hourly prices. Overlapping bands are rejected; uncovered time uses
+the base rate. A booking crossing bands combines each portion's price into one
+total, rounded once to whole centavos. Existing reservations retain their saved
+price. Connected Sentry courts keep their synced pricing rather than local
+overrides. Apply the additive `20261004082500_court_time_rates` Prisma migration
+before deploying this version against an existing database.
+
 ### Navigation performance
 
 Vercel functions run in Seoul (`icn1`) to match the current Supabase database
@@ -96,6 +108,25 @@ Results stream beneath the available form with Pikol's paddle loader, and search
 results retain the chosen duration when opening a venue. Local availability
 loads schedules, blocks and reservations in batches instead of per court; the
 booking API still revalidates every selected slot before creating a hold.
+
+**Current location** fills the nearest city after browser permission;
+**Near me** searches that city with the current date, time and duration.
+Suggested nearby cities search in one tap. Before location access, suggestions
+are based on the selected city. Denied/unavailable location leaves manual
+search usable. No location request runs automatically. Only nearby city names
+are cached in browser session storage for five minutes; precise coordinates
+stay in memory and are not sent to Pikol or a geocoding service.
+Proximity uses approximate city centers within 100 km, rather than court
+distances, driving routes or city boundary detection. Cities without published
+venues can still be suggested.
+
+The bundled coordinate snapshot in
+`src/lib/data/philippine-city-coordinates.json` covers the 149 city choices.
+Coordinates are adapted from the [GeoNames Philippines gazetteer](https://download.geonames.org/export/dump/PH.zip),
+retrieved on 2026-10-04, under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+Matching uses city/province names and GeoNames IDs to distinguish duplicate
+names. GeoNames supplies approximate place points without an accuracy warranty;
+see its [data documentation](https://download.geonames.org/export/dump/readme.txt).
 
 The homepage and search page offer a searchable catalog of all **149 Philippine
 cities**, including locations without published venues. Search accepts city or

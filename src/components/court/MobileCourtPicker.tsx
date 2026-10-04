@@ -16,16 +16,19 @@ type Selection = {
 type Band = { label: string; slots: SlotDTO[] };
 
 function toBands(slots: SlotDTO[]): Band[] {
+  const midnight: SlotDTO[] = [];
   const morning: SlotDTO[] = [];
   const afternoon: SlotDTO[] = [];
   const evening: SlotDTO[] = [];
   for (const s of slots) {
     const hour = new Date(s.startsAt).getUTCHours();
-    if (hour < 12) morning.push(s);
+    if (hour < 6) midnight.push(s);
+    else if (hour < 12) morning.push(s);
     else if (hour < 17) afternoon.push(s);
     else evening.push(s);
   }
   return [
+    { label: "Midnight", slots: midnight },
     { label: "Morning", slots: morning },
     { label: "Afternoon", slots: afternoon },
     { label: "Evening", slots: evening },
@@ -102,6 +105,7 @@ export function MobileCourtPicker({
             {activeCourt.covered ? " · Covered" : ""}
           </span>
           <span className="font-medium text-brand-700">
+            {activeCourt.hasVariableRates ? "From " : ""}
             {pesos(activeCourt.priceCents)} / hour
           </span>
         </div>

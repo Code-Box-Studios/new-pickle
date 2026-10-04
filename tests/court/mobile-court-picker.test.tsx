@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /// <reference types="@testing-library/jest-dom/vitest" />
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { MobileCourtPicker } from "@/components/court/MobileCourtPicker";
 import type { CourtDTO } from "@/components/court/CourtBooking";
 
@@ -33,6 +33,13 @@ const courts: CourtDTO[] = [
 ];
 
 describe("MobileCourtPicker", () => {
+  it("groups starts before 6 AM under midnight", () => {
+    render(<MobileCourtPicker courts={[{ ...courts[0], slots: [makeSlot(5), makeSlot(6)] }]} selected={null} onSelect={() => {}} />);
+    const midnight = screen.getByText("Midnight").parentElement as HTMLElement;
+    expect(within(midnight).getByRole("button", { name: /5:00 AM/ })).toBeInTheDocument();
+    expect(within(midnight).queryByRole("button", { name: /6:00 AM/ })).not.toBeInTheDocument();
+  });
+
   it("renders court selector chips", () => {
     render(<MobileCourtPicker courts={courts} selected={null} onSelect={() => {}} />);
     expect(screen.getByText("Court A")).toBeInTheDocument();

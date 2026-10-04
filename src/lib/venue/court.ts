@@ -13,3 +13,16 @@ export async function assertCourtDeletable(courtId: string): Promise<void> {
     );
   }
 }
+
+/** A connected external backend owns court pricing; local edits would diverge. */
+export async function assertLocalCourtPricing(venueId: string): Promise<void> {
+  const connection = await prisma.sentryConnection.findUnique({
+    where: { venueId },
+    select: { connectionState: true },
+  });
+  if (connection?.connectionState === "CONNECTED") {
+    throw new ConflictError(
+      "Manage court rates in Sentry for this connected venue",
+    );
+  }
+}

@@ -25,18 +25,21 @@ function allTimes(courts: CourtDTO[]): string[] {
   return Array.from(set).sort();
 }
 
-/** Groups sorted ISO time strings into Morning/Afternoon/Evening bands. */
+/** Groups sorted ISO time strings into time of day bands. */
 function toBands(times: string[]): Band[] {
+  const midnight: string[] = [];
   const morning: string[] = [];
   const afternoon: string[] = [];
   const evening: string[] = [];
   for (const t of times) {
     const hour = new Date(t).getUTCHours();
-    if (hour < 12) morning.push(t);
+    if (hour < 6) midnight.push(t);
+    else if (hour < 12) morning.push(t);
     else if (hour < 17) afternoon.push(t);
     else evening.push(t);
   }
   return [
+    { label: "Midnight", times: midnight },
     { label: "Morning", times: morning },
     { label: "Afternoon", times: afternoon },
     { label: "Evening", times: evening },
@@ -89,6 +92,7 @@ export function ScheduleGrid({
                 {c.indoor ? "Indoor" : "Outdoor"}
               </p>
               <p className="mt-1 text-xs font-medium text-brand-700">
+                {c.hasVariableRates ? "From " : ""}
                 {pesos(c.priceCents)}/hr
               </p>
               {(closed || full) && (
