@@ -1,7 +1,10 @@
 import { Prisma, type Booking, type BookingStatus } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
 import { lockBooking } from "./lock";
-import { assertNoActiveCheckout } from "@/lib/payments/paymongo/guard";
+import {
+  assertNoActiveCheckout,
+  assertCheckoutAllowsReschedule,
+} from "@/lib/payments/paymongo/guard";
 import { isExclusionViolation, withBookingRetry } from "@/lib/db/pg-errors";
 import {
   ConflictError,
@@ -211,7 +214,7 @@ export class LocalBookingBackend implements BookingBackend {
       try {
         await prisma.$transaction(async (tx) => {
           await lockBooking(tx, bookingId);
-          await assertNoActiveCheckout(bookingId, tx);
+          await assertCheckoutAllowsReschedule(bookingId, tx);
           const b = await tx.booking.findUnique({ where: { id: bookingId } });
           if (!b) throw new NotFoundError("Booking not found");
           if (!isOccupying(b.status)) {

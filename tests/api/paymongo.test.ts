@@ -8,6 +8,7 @@ import { POST as checkout } from "@/app/api/bookings/[id]/checkout/route";
 import { POST as status } from "@/app/api/bookings/[id]/checkout/status/route";
 import { POST as webhook } from "@/app/api/webhooks/paymongo/[merchant]/[mode]/route";
 import { GET as scheduled } from "@/app/api/payments/paymongo/reconcile/route";
+import { startCheckout } from "@/lib/payments/paymongo/checkout";
 const auth = vi.hoisted(() => ({
   session: null as null | { id: string; role: "CUSTOMER" },
 }));
@@ -48,6 +49,84 @@ async function setup() {
   return { ...s, b, user, params: { params: Promise.resolve({ id: b.id }) } };
 }
 describe("PayMongo route boundaries", () => {
+  it("recovers a paid session while its hold is still valid when the webhook and customer page are absent", async () => {
+    const { b, ownerId, venueId, user } = await setup();
+    vi.stubEnv("CRON_SECRET", "private-test-cron-key-at-least-32-characters");
+    vi.stubEnv("PAYMONGO_ENABLED", "true");
+    vi.stubEnv("PAYMONGO_LEDGER_READY", "true");
+    vi.stubEnv("PAYMONGO_MODE", "test");
+    vi.stubEnv("APP_URL", "http://localhost:3000");
+    vi.stubEnv(
+      "PAYMONGO_MERCHANTS",
+      JSON.stringify([{ alias: "default", ownerId, venueIds: [venueId] }]),
+    );
+    vi.stubEnv("PAYMONGO_SECRET_KEY", "sk_test_dummy");
+    vi.stubEnv("PAYMONGO_WEBHOOK_SECRET", "whsk_dummy");
+    const send = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            data: {
+              id: "cs_recovery",
+              attributes: {
+                checkout_url: "https://checkout.paymongo.com/cs_recovery",
+              },
+            },
+          }),
+        ),
+      );
+    vi.stubGlobal("fetch", send);
+    await startCheckout(b.id, user.id, "CUSTOMER");
+    const attempt = await prisma.paymentCheckout.findUniqueOrThrow({
+      where: { bookingId: b.id },
+    });
+    send.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: {
+            id: "cs_recovery",
+            attributes: {
+              status: "active",
+              livemode: false,
+              reference_number: b.reference,
+              metadata: { pikol_checkout_id: attempt.id },
+              payments: [
+                {
+                  id: "pay_recovery",
+                  attributes: {
+                    status: "paid",
+                    amount: 40000,
+                    currency: "PHP",
+                    livemode: false,
+                    source: { type: "qrph" },
+                  },
+                },
+              ],
+            },
+          },
+        }),
+      ),
+    );
+    const response = await scheduled(
+      new NextRequest("http://localhost:3000/api/payments/paymongo/reconcile", {
+        headers: {
+          authorization: "Bearer private-test-cron-key-at-least-32-characters",
+        },
+      }),
+    );
+    expect(await response.json()).toMatchObject({ checked: 1, failed: 0 });
+    expect(
+      (await prisma.booking.findUniqueOrThrow({ where: { id: b.id } })).status,
+    ).toBe("PENDING_CONFIRMATION");
+    expect(
+      (
+        await prisma.paymentCheckout.findUniqueOrThrow({
+          where: { bookingId: b.id },
+        })
+      ).status,
+    ).toBe("PAID");
+  });
   it("never lets anonymous requests run the scheduled reconciliation job", async () => {
     vi.stubEnv("CRON_SECRET", "private-test-cron-key-at-least-32-characters");
     expect(

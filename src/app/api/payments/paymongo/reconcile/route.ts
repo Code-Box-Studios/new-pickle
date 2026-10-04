@@ -27,7 +27,6 @@ export async function GET(req: NextRequest) {
         { disabled: true },
         { headers: { "Cache-Control": "no-store" } },
       );
-    const now = new Date();
     await prisma.paymentCheckout.updateMany({
       where: {
         status: "CREATING",
@@ -39,7 +38,6 @@ export async function GET(req: NextRequest) {
       where: {
         status: { in: ["PENDING", "REVIEW"] },
         sessionId: { not: null },
-        holdExpiresAt: { lt: now },
         OR: [
           { lastCheckedAt: null },
           { lastCheckedAt: { lt: new Date(Date.now() - 60000) } },
@@ -47,7 +45,8 @@ export async function GET(req: NextRequest) {
         // Old reviews require manual reconciliation; do not re-fetch them indefinitely.
         createdAt: { gt: new Date(Date.now() - 86400000) },
       },
-      orderBy: { lastCheckedAt: "asc" },
+      // Check new sessions first, then rotate the oldest checks so unresolved reviews cannot starve them.
+      orderBy: { lastCheckedAt: { sort: "asc", nulls: "first" } },
       take: 9,
       select: { bookingId: true },
     });

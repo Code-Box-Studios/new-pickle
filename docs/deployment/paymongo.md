@@ -98,6 +98,10 @@ Do not put the secret in the URL. There is no scheduler installed automatically.
 Each call handles up to nine sessions with three concurrent provider requests;
 monitor backlog and increase scheduling capacity when usage grows. Free hosting
 cron frequency may be insufficient, so verify the scheduler's actual cadence.
+Pending sessions are checked while their holds are still valid, so a missing
+webhook can be recovered before the reservation is released. New sessions are
+checked first, then the oldest status checks; abandoned sessions are expired
+only after their Pikol holds end.
 
 PayMongo session expiration is independent of Pikol's hold countdown. This job
 retrieves and attempts to expire abandoned checkout sessions through the

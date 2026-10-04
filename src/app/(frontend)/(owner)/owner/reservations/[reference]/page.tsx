@@ -121,7 +121,7 @@ export default async function OwnerReservationDetail({
       {/* Payment proof */}
       <Card className="mt-5 p-5 sm:p-6">
         <SectionHeader>Payment</SectionHeader>
-        {checkout?.mode === "test" && (
+        {checkout?.mode === "test" && !b.payment?.proofKey && (
           <p className="mt-3 text-sm font-semibold text-brand-700">
             Test payment · sandbox only, no real funds
           </p>

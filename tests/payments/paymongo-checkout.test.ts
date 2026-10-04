@@ -84,6 +84,56 @@ async function eventFor(
   };
 }
 describe("durable hosted checkout", () => {
+  it("allows an owner to reschedule a confirmed paid reservation without changing its receipt", async () => {
+    const { b, user, ownerId } = await setup();
+    await startCheckout(b.id, user.id, "CUSTOMER");
+    await settlePayment(
+      merchantByAlias("default", "test"),
+      await eventFor(b.id, b.reference),
+    );
+    await bookingBackend.confirm(b.id, { type: "OWNER", id: ownerId });
+    const moved = slot(4);
+    await bookingBackend.reschedule(b.id, moved.startsAt, moved.endsAt, {
+      type: "OWNER",
+      id: ownerId,
+    });
+    expect(
+      await prisma.booking.findUniqueOrThrow({ where: { id: b.id } }),
+    ).toMatchObject({
+      status: "CONFIRMED",
+      startsAt: moved.startsAt,
+      endsAt: moved.endsAt,
+    });
+    expect(
+      (
+        await prisma.paymentCheckout.findUniqueOrThrow({
+          where: { bookingId: b.id },
+        })
+      ).status,
+    ).toBe("PAID");
+    expect(
+      (
+        await prisma.paymentSubmission.findUniqueOrThrow({
+          where: { bookingId: b.id },
+        })
+      ).reference,
+    ).toBe("pay_test123");
+  });
+  it("blocks rescheduling while a hosted checkout can still accept payment", async () => {
+    const { b, user, ownerId } = await setup();
+    await startCheckout(b.id, user.id, "CUSTOMER");
+    const moved = slot(4);
+    await expect(
+      bookingBackend.reschedule(b.id, moved.startsAt, moved.endsAt, {
+        type: "OWNER",
+        id: ownerId,
+      }),
+    ).rejects.toMatchObject({ httpStatus: 409 });
+    expect(
+      (await prisma.booking.findUniqueOrThrow({ where: { id: b.id } }))
+        .startsAt,
+    ).toEqual(slot().startsAt);
+  });
   it("does not hand out a chargeable checkout after the reservation was cancelled during creation", async () => {
     const { b, user, send } = await setup();
     send

@@ -43,6 +43,8 @@ export default async function BookingStatusPage({
   const b = await getBookingByReference(reference, session.id, session.role);
   if (!b) notFound();
   const checkout = publicCheckoutStatus(await checkoutForBooking(b.id));
+  const showHostedReceipt =
+    checkout && !(b.payment && ["FAILED", "EXPIRED"].includes(checkout.status));
 
   const paid = [
     "PAYMENT_SUBMITTED",
@@ -156,7 +158,7 @@ export default async function BookingStatusPage({
         {/* Payment */}
         <Card className="mt-5 p-6 sm:p-7">
           <SectionHeader>Payment</SectionHeader>
-          {checkout ? (
+          {showHostedReceipt ? (
             <div className="mt-4">
               <PayMongoStatus
                 key={checkout.status}
