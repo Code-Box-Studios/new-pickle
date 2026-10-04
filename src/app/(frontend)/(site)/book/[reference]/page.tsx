@@ -8,13 +8,24 @@ import { DetailsForm } from "@/components/booking/DetailsForm";
 import { PaymentStep } from "@/components/booking/PaymentStep";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PayMongoPayment } from "@/components/booking/PayMongoPayment";
+import {
+  checkoutForBooking,
+  publicCheckoutStatus,
+} from "@/lib/payments/paymongo/checkout";
+import {
+  merchantForVenue,
+  type Merchant,
+} from "@/lib/payments/paymongo/config";
 
 export const metadata = { title: "Complete your booking" };
 
 export default async function BookPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ reference: string }>;
+  searchParams: Promise<{ payment?: string }>;
 }) {
   const { reference } = await params;
   const session = await getSession();
@@ -22,6 +33,18 @@ export default async function BookPage({
 
   const b = await getBookingByReference(reference, session.id, session.role);
   if (!b) notFound();
+  const query = await searchParams;
+  const checkout = await checkoutForBooking(b.id);
+  let merchant: Merchant | null = null;
+  try {
+    merchant = merchantForVenue(b.venueId, b.venue.ownerId);
+  } catch {
+    /* Manual payments remain usable if creation is misconfigured. */
+  }
+  const activeCheckout =
+    checkout && !["FAILED", "EXPIRED"].includes(checkout.status);
+  const hosted =
+    activeCheckout || (!checkout && merchant && query.payment !== "manual");
 
   // Already past the pay step → the permanent status page owns it.
   if (
@@ -65,6 +88,14 @@ export default async function BookPage({
                 This slot was released. Pick another time — it only takes a
                 moment.
               </p>
+              {checkout && (
+                <Link
+                  href={`/bookings/${reference}`}
+                  className={`${buttonVariants({ variant: "outline", size: "lg" })} mt-5 w-full`}
+                >
+                  Check payment status before paying again
+                </Link>
+              )}
               <Link
                 href={`/venues/${b.venue.slug}`}
                 className={`${buttonVariants({ size: "lg" })} mt-5`}
@@ -84,20 +115,34 @@ export default async function BookPage({
             </Card>
           ) : (
             <Card className="p-6 sm:p-7">
-              <PaymentStep
-                bookingId={b.id}
-                reference={b.reference}
-                expiresAt={b.holdExpiresAt!.toISOString()}
-                amountCents={b.priceCents}
-                venueName={b.venue.name}
-                methods={b.venue.paymentMethods.map((m) => ({
-                  id: m.id,
-                  channel: m.channel,
-                  accountName: m.accountName,
-                  accountNumber: m.accountNumber,
-                  instructions: m.instructions,
-                }))}
-              />
+              {hosted ? (
+                <PayMongoPayment
+                  bookingId={b.id}
+                  reference={b.reference}
+                  expiresAt={b.holdExpiresAt!.toISOString()}
+                  amountCents={b.priceCents}
+                  venueName={b.venue.name}
+                  methods={merchant?.methods ?? []}
+                  testMode={(checkout?.mode ?? merchant?.mode) === "test"}
+                  checkoutEnabled={!!merchant}
+                  initial={publicCheckoutStatus(checkout)}
+                />
+              ) : (
+                <PaymentStep
+                  bookingId={b.id}
+                  reference={b.reference}
+                  expiresAt={b.holdExpiresAt!.toISOString()}
+                  amountCents={b.priceCents}
+                  venueName={b.venue.name}
+                  methods={b.venue.paymentMethods.map((m) => ({
+                    id: m.id,
+                    channel: m.channel,
+                    accountName: m.accountName,
+                    accountNumber: m.accountNumber,
+                    instructions: m.instructions,
+                  }))}
+                />
+              )}
             </Card>
           )}
         </div>

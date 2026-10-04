@@ -3,6 +3,7 @@ import type { PaymentChannel } from "@/generated/prisma";
 export const CHANNEL_LABELS: Record<PaymentChannel, string> = {
   GCASH: "GCash",
   MAYA: "Maya",
+  QRPH: "QR Ph",
   BANK_TRANSFER: "Bank transfer",
   CASH: "Cash",
 };

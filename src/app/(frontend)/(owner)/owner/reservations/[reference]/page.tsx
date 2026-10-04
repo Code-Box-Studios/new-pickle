@@ -15,6 +15,7 @@ import { Card } from "@/components/ui/card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { channelLabel } from "@/lib/payment";
 import { pesos } from "@/lib/format";
+import { checkoutForBooking } from "@/lib/payments/paymongo/checkout";
 
 export const metadata = { title: "Reservation" };
 
@@ -41,6 +42,7 @@ export default async function OwnerReservationDetail({
 
   const ids = await accessibleVenueIds(session.id, session.role);
   if (!ids.includes(b.venueId)) notFound();
+  const checkout = await checkoutForBooking(b.id);
 
   const actionable =
     b.status === "PENDING_CONFIRMATION" || b.status === "PAYMENT_SUBMITTED";
@@ -118,26 +120,46 @@ export default async function OwnerReservationDetail({
 
       {/* Payment proof */}
       <Card className="mt-5 p-5 sm:p-6">
-        <SectionHeader>Payment proof</SectionHeader>
+        <SectionHeader>Payment</SectionHeader>
+        {checkout?.mode === "test" && (
+          <p className="mt-3 text-sm font-semibold text-brand-700">
+            Test payment · sandbox only, no real funds
+          </p>
+        )}
+        {(checkout?.status === "REVIEW" ||
+          checkout?.reviewReason === "additional_payment") && (
+          <p className="mt-3 rounded-lg border border-line bg-surface p-4 text-sm leading-6 text-ink-soft">
+            Payment needs reconciliation. Check this booking in your PayMongo
+            dashboard before confirming. Refunds must be handled in PayMongo;
+            rejecting a booking does not refund a payment.
+          </p>
+        )}
         {b.payment ? (
           <div className="mt-2">
             <p className="break-words text-sm leading-relaxed text-ink-soft">
               {channelLabel(b.payment.channel)} · ref {b.payment.reference} ·{" "}
               {pesos(b.payment.amountCents)}
             </p>
-            <a
-              href={`/api/proofs/${b.payment.proofKey}`}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-2 block"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`/api/proofs/${b.payment.proofKey}`}
-                alt="Payment screenshot"
-                className="max-h-96 w-full rounded-xl border border-black/5 object-contain"
-              />
-            </a>
+            {b.payment.proofKey ? (
+              <a
+                href={`/api/proofs/${b.payment.proofKey}`}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 block"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/api/proofs/${b.payment.proofKey}`}
+                  alt="Payment screenshot"
+                  className="max-h-96 w-full rounded-xl border border-black/5 object-contain"
+                />
+              </a>
+            ) : (
+              <p className="mt-3 rounded-lg border border-brand-200 bg-brand-50 p-4 text-sm leading-6 text-brand-800">
+                Payment verified by PayMongo. No screenshot is required. Venue
+                confirmation is still a separate step.
+              </p>
+            )}
           </div>
         ) : (
           <p className="mt-1 text-sm text-muted-foreground">
@@ -151,6 +173,8 @@ export default async function OwnerReservationDetail({
           <SectionHeader className="mb-3">Action required</SectionHeader>
           <p className="mb-3 text-sm text-ink-soft">
             Review the payment above, then confirm or reject this reservation.
+            {checkout?.status === "PAID" &&
+              " Rejecting a paid reservation does not refund the customer. Arrange any refund through PayMongo first."}
           </p>
           <ConfirmRejectActions bookingId={b.id} />
         </Card>

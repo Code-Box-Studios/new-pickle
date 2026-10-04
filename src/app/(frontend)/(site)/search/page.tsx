@@ -1,22 +1,25 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { SearchBar } from "@/components/search/SearchBar";
-import { VenueCard } from "@/components/venue/VenueCard";
-import { EmptyState } from "@/components/ui/states";
-import { SearchX } from "lucide-react";
+import { SearchResults } from "@/components/search/SearchResults";
+import { PageLoading } from "@/components/ui/page-loading";
 import { listCities } from "@/lib/venues";
-import { searchAvailability } from "@/lib/availability/engine";
-import { cached } from "@/lib/availability/cache";
-import { resolveTimeWindow } from "@/lib/search-params";
+import {
+  DURATIONS,
+  TIME_PRESETS,
+  philippineDate,
+  quickDateChoices,
+} from "@/lib/search-params";
 import { isoDate, longDateLabel, parseIsoDate } from "@/lib/format";
 import { DEFAULT_CITY } from "@/lib/cities";
 import { isPreviewMode } from "@/lib/deployment";
 
 export const metadata: Metadata = {
   title: "Search courts",
-  description: "Find available pickleball courts across Philippine cities by date and time.",
+  description:
+    "Find available pickleball courts across Philippine cities by date and time.",
 };
-
-function first(v: string | string[] | undefined): string | undefined {
+function first(v: string | string[] | undefined) {
   return Array.isArray(v) ? v[0] : v;
 }
 
@@ -25,76 +28,61 @@ export default async function SearchPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const sp = await searchParams;
-  const cities = await listCities();
-
-  const tomorrow = new Date();
-  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-
-  const city = first(sp.city) ?? DEFAULT_CITY;
-  const dateStr = first(sp.date) ?? isoDate(tomorrow);
-  const timePreset = first(sp.time) ?? "any";
-  const duration = first(sp.duration) ?? "60";
-  const date = parseIsoDate(dateStr);
-  const { from, to } = resolveTimeWindow(timePreset);
-  const durationMinutes = Number(duration) || 60;
-
-  const key = `search:${city}:${dateStr}:${timePreset}:${durationMinutes}`;
-  const preview = isPreviewMode();
-  const results = preview ? [] : await cached(key, 45_000, () =>
-    searchAvailability({ city, date, fromMinute: from, toMinute: to, durationMinutes }),
-  );
-  const withOpenings = results.filter((r) => r.nextSlots.length > 0).length;
-
+  const sp = await searchParams,
+    cities = await listCities();
+  const todayDate = philippineDate(new Date()),
+    tomorrow = quickDateChoices(todayDate)[1].value;
+  const requestedCity = first(sp.city),
+    requestedDate = first(sp.date);
+  const city = cities.some((c) => c.value === requestedCity)
+    ? requestedCity!
+    : DEFAULT_CITY;
+  const validDate =
+    requestedDate &&
+    /^\d{4}-\d{2}-\d{2}$/.test(requestedDate) &&
+    Number.isFinite(parseIsoDate(requestedDate).getTime()) &&
+    isoDate(parseIsoDate(requestedDate)) === requestedDate;
+  const dateStr = validDate
+    ? requestedDate < todayDate
+      ? todayDate
+      : requestedDate
+    : tomorrow;
+  const timePreset =
+    TIME_PRESETS.find((p) => p.value === first(sp.time))?.value ?? "any";
+  const duration =
+    DURATIONS.find((d) => d.value === first(sp.duration))?.value ?? "60";
+  const key = `${city}:${dateStr}:${timePreset}:${duration}`;
   return (
-    <div className="page-shell py-8 sm:py-10 lg:py-12">
+    <div className="page-shell py-6 sm:py-8 lg:py-10">
       <SearchBar
+        key={`form:${key}`}
         cities={cities}
         defaultCity={city}
         defaultDate={dateStr}
+        todayDate={todayDate}
         defaultTime={timePreset}
         defaultDuration={duration}
       />
-
-      <div className="mb-6 mt-9 sm:mb-8 sm:mt-12">
-        <h1 className="page-title">
-          Courts in {city}
-        </h1>
-        <p className="page-description mt-3">
-          {preview ? `${longDateLabel(date)} · Court bookings open soon` :
-            `${longDateLabel(date)} · ${withOpenings} of ${results.length} venue${results.length === 1 ? "" : "s"} with openings`}
-        </p>
-      </div>
-
-      {results.length === 0 ? (
-        <EmptyState
-          icon={<SearchX className="size-7" />}
-          title={preview ? "Your next game is coming soon" : "No venues here yet"}
-          description={preview ? "We're getting courts ready on Pikol. Check back soon to find your place to play." : "We couldn't find venues in this area. Try another city."}
+      <Suspense
+        key={`results:${key}`}
+        fallback={
+          <div className="mt-9">
+            <h1 className="page-title">Courts in {city}</h1>
+            <p className="page-description mt-3">
+              {longDateLabel(parseIsoDate(dateStr))} · Finding available courts
+            </p>
+            <PageLoading />
+          </div>
+        }
+      >
+        <SearchResults
+          city={city}
+          dateStr={dateStr}
+          timePreset={timePreset}
+          durationMinutes={Number(duration)}
+          preview={isPreviewMode()}
         />
-      ) : (
-        <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {results.map((r) => (
-            <VenueCard
-              key={r.venue.slug}
-              venue={{
-                slug: r.venue.slug,
-                name: r.venue.name,
-                barangay: r.venue.barangay,
-                city: r.venue.city,
-                photos: r.venue.photos,
-                ratingAvg: r.venue.ratingAvg,
-                ratingCount: r.venue.ratingCount,
-                indoor: r.venue.indoor,
-                courtCount: r.courtCount,
-                priceFromCents: r.priceFromCents,
-              }}
-              nextSlots={r.nextSlots}
-              isoDate={dateStr}
-            />
-          ))}
-        </div>
-      )}
+      </Suspense>
     </div>
   );
 }

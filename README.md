@@ -89,6 +89,14 @@ with a still illustration for reduced-motion preferences.
 
 ## Nationwide city search
 
+Court search puts **location, date and Find courts** first, with one-tap Today,
+Tomorrow and This weekend choices based on Philippine dates. Time and duration
+are optional shadcn controls; selected filters remain visible and can be reset.
+Results stream beneath the available form with Pikol's paddle loader, and search
+results retain the chosen duration when opening a venue. Local availability
+loads schedules, blocks and reservations in batches instead of per court; the
+booking API still revalidates every selected slot before creating a hold.
+
 The homepage and search page offer a searchable catalog of all **149 Philippine
 cities**, including locations without published venues. Search accepts city or
 province names and unaccented names such as `paranaque`. Duplicate city names
@@ -276,6 +284,21 @@ the generated migration, then apply it with `npm run cms:migrate`.
 4. Booking becomes `PENDING_CONFIRMATION`.
 5. Sign in as the owner → **Reservations** → review the proof → **Confirm**.
 6. The booking is `CONFIRMED`; the player sees it on their status page.
+
+## PayMongo readiness
+
+GCash, Maya and QR Ph hosted checkout is prepared and **disabled by default**.
+It uses explicit venue-to-merchant mappings, server-priced totals, signed
+webhooks, private payment records and server reconciliation. Success redirects
+do not mark payments paid; venue confirmation remains a separate step. Existing
+direct transfers and screenshots continue to work while PayMongo is disabled.
+
+After merchant verification, follow [the PayMongo activation guide](docs/deployment/paymongo.md)
+for database migration, keys, webhook registration, scheduled reconciliation,
+sandbox acceptance and live activation. `npm run payments:check` audits a disabled
+rollout; `npm run payments:check -- --activation` checks configured readiness.
+No charges or external webhooks are created by the check command. Refunds must
+currently be handled in PayMongo; cancelling a reservation does not refund money.
 
 ## Double-booking guarantee
 

@@ -24,14 +24,16 @@ export function VenueCard({
   venue,
   nextSlots,
   isoDate,
+  durationMinutes,
 }: {
   venue: VenueCardData;
   nextSlots?: Slot[];
   isoDate?: string;
+  durationMinutes?: number;
 }) {
   const photo = venue.photos[0];
   const href = isoDate
-    ? `/venues/${venue.slug}?date=${isoDate}`
+    ? `/venues/${venue.slug}?date=${isoDate}${durationMinutes ? `&duration=${durationMinutes}` : ""}`
     : `/venues/${venue.slug}`;
 
   return (

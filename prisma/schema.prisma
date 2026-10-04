@@ -39,8 +39,18 @@ enum BookingStatus {
 enum PaymentChannel {
   GCASH
   MAYA
+  QRPH
   BANK_TRANSFER
   CASH
+}
+
+enum PaymentCheckoutStatus {
+  CREATING
+  PENDING
+  PAID
+  REVIEW
+  FAILED
+  EXPIRED
 }
 
 enum ExceptionType {
@@ -256,6 +266,7 @@ model Booking {
   updatedAt      DateTime      @updatedAt
 
   payment PaymentSubmission?
+  checkout PaymentCheckout?
   history BookingStatusHistory[]
 
   // NOTE: a DB-generated `period` (tsrange) column and the
@@ -280,11 +291,60 @@ model PaymentSubmission {
   paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
   channel         PaymentChannel
   reference       String
-  proofKey        String
+  proofKey        String?
   amountCents     Int
   submittedAt     DateTime       @default(now())
 
   @@map("payment_submissions")
+}
+
+// Private server ledger. Never exposed through Supabase's browser Data API.
+model PaymentCheckout {
+  id               String @id @default(cuid())
+  bookingId        String @unique
+  booking          Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  merchantAlias    String
+  mode             String
+  recipientOwnerId String
+  amountCents      Int
+  currency         String @default("PHP")
+  status           PaymentCheckoutStatus @default(CREATING)
+  sessionId        String?
+  checkoutUrl      String?
+  paymentId        String?
+  reviewReason     String?
+  holdExpiresAt    DateTime
+  paidAt           DateTime?
+  lastCheckedAt    DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  receipts         PaymentWebhookReceipt[]
+
+  @@unique([merchantAlias, mode, sessionId])
+  @@unique([merchantAlias, mode, paymentId])
+  @@index([status, holdExpiresAt])
+  @@map("payment_checkouts")
+}
+
+model PaymentWebhookReceipt {
+  id            String @id @default(cuid())
+  merchantAlias String
+  mode          String
+  eventId       String
+  paymentId     String
+  sessionId     String
+  checkoutId    String?
+  checkout      PaymentCheckout? @relation(fields: [checkoutId], references: [id], onDelete: Restrict)
+  amountCents   Int
+  currency      String
+  channel       PaymentChannel
+  outcome       String
+  receivedAt    DateTime @default(now())
+
+  @@unique([merchantAlias, mode, eventId])
+  @@index([checkoutId])
+  @@index([merchantAlias, mode, paymentId])
+  @@map("payment_webhook_receipts")
 }
 
 model PaymentMethod {

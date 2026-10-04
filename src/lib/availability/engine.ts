@@ -1,5 +1,8 @@
 import prisma from "@/lib/prisma";
 import { resolveBackend } from "@/lib/booking/resolve";
+import type { Court, CourtSchedule } from "@/generated/prisma";
+import { HOLD_PHASE, OCCUPYING } from "@/lib/booking/status";
+import { bookingWallNow } from "./time";
 
 /**
  * Availability derives from three sources, unified:
@@ -65,6 +68,41 @@ function overlaps(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): boolean {
   return aStart < bEnd && aEnd > bStart;
 }
 
+type Range = { startsAt: Date; endsAt: Date };
+function slotsForCourt(
+  court: Court & { schedules: CourtSchedule[] },
+  day: Date,
+  durationMinutes: number,
+  exceptions: Range[],
+  occupied: Range[],
+  now: Date,
+): Slot[] {
+  const sched = court.schedules.find((s) => s.dayOfWeek === day.getUTCDay());
+  if (!sched || court.slotMinutes <= 0 || durationMinutes <= 0) return [];
+  const slots: Slot[] = [];
+  for (
+    let m = sched.openMinute;
+    m + durationMinutes <= sched.closeMinute;
+    m += court.slotMinutes
+  ) {
+    const startsAt = addMinutes(day, m),
+      endsAt = addMinutes(startsAt, durationMinutes);
+    const blocked =
+      startsAt <= now ||
+      exceptions.some((e) =>
+        overlaps(startsAt, endsAt, e.startsAt, e.endsAt),
+      ) ||
+      occupied.some((o) => overlaps(startsAt, endsAt, o.startsAt, o.endsAt));
+    slots.push({
+      startsAt,
+      endsAt,
+      available: !blocked,
+      priceCents: Math.round(court.priceCents * (durationMinutes / 60)),
+    });
+  }
+  return slots;
+}
+
 export async function courtSlotsForDate(
   courtId: string,
   date: Date,
@@ -92,26 +130,19 @@ export async function courtSlotsForDate(
         OR: [{ courtId }, { courtId: null, venueId: court.venueId }],
       },
     }),
-    resolveBackend(court.venueId).then((backend) => backend.getOccupied(courtId, day, dayEnd)),
+    resolveBackend(court.venueId).then((backend) =>
+      backend.getOccupied(courtId, day, dayEnd),
+    ),
   ]);
 
-  const now = new Date();
-  const slots: Slot[] = [];
-  for (let m = sched.openMinute; m + durationMinutes <= sched.closeMinute; m += court.slotMinutes) {
-    const startsAt = addMinutes(day, m);
-    const endsAt = addMinutes(startsAt, durationMinutes);
-    const blocked =
-      startsAt <= now ||
-      exceptions.some((e) => overlaps(startsAt, endsAt, e.startsAt, e.endsAt)) ||
-      occupied.some((o) => overlaps(startsAt, endsAt, o.startsAt, o.endsAt));
-    slots.push({
-      startsAt,
-      endsAt,
-      available: !blocked,
-      priceCents: Math.round(court.priceCents * (durationMinutes / 60)),
-    });
-  }
-  return slots;
+  return slotsForCourt(
+    court,
+    day,
+    durationMinutes,
+    exceptions,
+    occupied,
+    bookingWallNow(),
+  );
 }
 
 export async function venueAvailability(
@@ -133,32 +164,113 @@ export async function venueAvailability(
   );
 }
 
-function withinWindow(slot: Slot, day: Date, from?: number, to?: number): boolean {
+function withinWindow(
+  slot: Slot,
+  day: Date,
+  from?: number,
+  to?: number,
+): boolean {
   const mins = (slot.startsAt.getTime() - day.getTime()) / 60_000;
   return (from == null || mins >= from) && (to == null || mins < to);
 }
 
-export async function searchAvailability(q: SearchQuery): Promise<VenueSearchResult[]> {
+export async function searchAvailability(
+  q: SearchQuery,
+): Promise<VenueSearchResult[]> {
   const venues = await prisma.venue.findMany({
     where: { city: q.city, isPublished: true, status: "APPROVED" },
-    include: { courts: { where: { active: true } } },
+    include: {
+      courts: { where: { active: true }, include: { schedules: true } },
+      sentry: { select: { connectionState: true } },
+    },
   });
-  const day = dayStartUTC(q.date);
+  const day = dayStartUTC(q.date),
+    dayEnd = addMinutes(day, 1440),
+    now = new Date();
+  const localVenues = venues.filter(
+    (v) => v.sentry?.connectionState !== "CONNECTED",
+  );
+  const localCourtIds = localVenues.flatMap((v) => v.courts.map((c) => c.id));
+  const [blocks, bookings] = localCourtIds.length
+    ? await Promise.all([
+        prisma.scheduleException.findMany({
+          where: {
+            venueId: { in: localVenues.map((v) => v.id) },
+            startsAt: { lt: dayEnd },
+            endsAt: { gt: day },
+          },
+          select: {
+            venueId: true,
+            courtId: true,
+            startsAt: true,
+            endsAt: true,
+          },
+        }),
+        prisma.booking.findMany({
+          where: {
+            courtId: { in: localCourtIds },
+            status: { in: OCCUPYING },
+            startsAt: { lt: dayEnd },
+            endsAt: { gt: day },
+            NOT: {
+              AND: [
+                { status: { in: HOLD_PHASE } },
+                { holdExpiresAt: { lt: now } },
+              ],
+            },
+          },
+          select: { courtId: true, startsAt: true, endsAt: true },
+        }),
+      ])
+    : [[], []];
+  const courtBlocks = new Map<string, Range[]>(),
+    venueBlocks = new Map<string, Range[]>(),
+    occupied = new Map<string, Range[]>();
+  for (const block of blocks) {
+    const map = block.courtId ? courtBlocks : venueBlocks,
+      key = block.courtId ?? block.venueId;
+    map.set(key, [...(map.get(key) ?? []), block]);
+  }
+  for (const booking of bookings)
+    occupied.set(booking.courtId, [
+      ...(occupied.get(booking.courtId) ?? []),
+      booking,
+    ]);
 
   const results = await Promise.all(
     venues.map(async (v) => {
       const courtsFiltered =
-        q.indoor == null ? v.courts : v.courts.filter((c) => c.indoor === q.indoor);
+        q.indoor == null
+          ? v.courts
+          : v.courts.filter((c) => c.indoor === q.indoor);
       const courtIds = new Set(courtsFiltered.map((c) => c.id));
 
-      const avail = await venueAvailability(v.id, q.date, {
-        durationMinutes: q.durationMinutes,
-      });
+      const avail =
+        v.sentry?.connectionState === "CONNECTED"
+          ? await venueAvailability(v.id, q.date, {
+              durationMinutes: q.durationMinutes,
+            })
+          : courtsFiltered.map((c) => ({
+              courtId: c.id,
+              slots: slotsForCourt(
+                c,
+                day,
+                q.durationMinutes ?? 60,
+                [
+                  ...(venueBlocks.get(v.id) ?? []),
+                  ...(courtBlocks.get(c.id) ?? []),
+                ],
+                occupied.get(c.id) ?? [],
+                bookingWallNow(now),
+              ),
+            }));
 
       const available = avail
         .filter((a) => courtIds.has(a.courtId))
         .flatMap((a) => a.slots)
-        .filter((s) => s.available && withinWindow(s, day, q.fromMinute, q.toMinute))
+        .filter(
+          (s) => s.available && withinWindow(s, day, q.fromMinute, q.toMinute),
+        )
         .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
 
       // Distinct start times for the "next free" chips.

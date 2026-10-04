@@ -1,9 +1,8 @@
 import { Prisma, type Booking, type BookingStatus } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
-import {
-  isExclusionViolation,
-  withBookingRetry,
-} from "@/lib/db/pg-errors";
+import { lockBooking } from "./lock";
+import { assertNoActiveCheckout } from "@/lib/payments/paymongo/guard";
+import { isExclusionViolation, withBookingRetry } from "@/lib/db/pg-errors";
 import {
   ConflictError,
   HoldExpiredError,
@@ -31,24 +30,54 @@ function holdMinutes(): number {
   return Number.isFinite(n) && n > 0 ? n : 10;
 }
 
-function toHeld(b: Pick<Booking, "id" | "reference" | "status" | "holdExpiresAt">): HeldBooking {
-  return { id: b.id, reference: b.reference, status: b.status, holdExpiresAt: b.holdExpiresAt };
+function toHeld(
+  b: Pick<Booking, "id" | "reference" | "status" | "holdExpiresAt">,
+): HeldBooking {
+  return {
+    id: b.id,
+    reference: b.reference,
+    status: b.status,
+    holdExpiresAt: b.holdExpiresAt,
+  };
 }
 
-function isExpiredHold(b: Pick<Booking, "status" | "holdExpiresAt">, now = new Date()): boolean {
-  return HOLD_PHASE.includes(b.status) && !!b.holdExpiresAt && b.holdExpiresAt < now;
+function isExpiredHold(
+  b: Pick<Booking, "status" | "holdExpiresAt">,
+  now = new Date(),
+): boolean {
+  return (
+    HOLD_PHASE.includes(b.status) && !!b.holdExpiresAt && b.holdExpiresAt < now
+  );
 }
 
 /** Flip a court's stale holds to EXPIRED inside a transaction so their slots free up. */
-async function expireStaleForCourt(tx: Tx, courtId: string, now: Date): Promise<void> {
+async function expireStaleForCourt(
+  tx: Tx,
+  courtId: string,
+  now: Date,
+): Promise<void> {
   const stale = await tx.booking.findMany({
     where: { courtId, status: { in: HOLD_PHASE }, holdExpiresAt: { lt: now } },
     select: { id: true, status: true },
   });
   for (const b of stale) {
-    await tx.booking.update({ where: { id: b.id }, data: { status: "EXPIRED" } });
+    const changed = await tx.booking.updateMany({
+      where: {
+        id: b.id,
+        status: { in: HOLD_PHASE },
+        holdExpiresAt: { lt: now },
+      },
+      data: { status: "EXPIRED" },
+    });
+    if (!changed.count) continue;
     await tx.bookingStatusHistory.create({
-      data: { bookingId: b.id, fromStatus: b.status, toStatus: "EXPIRED", actor: "SYSTEM", note: "Hold expired" },
+      data: {
+        bookingId: b.id,
+        fromStatus: b.status,
+        toStatus: "EXPIRED",
+        actor: "SYSTEM",
+        note: "Hold expired",
+      },
     });
   }
 }
@@ -172,16 +201,28 @@ export class LocalBookingBackend implements BookingBackend {
     });
   }
 
-  async reschedule(bookingId: string, startsAt: Date, endsAt: Date, act: Actor): Promise<void> {
+  async reschedule(
+    bookingId: string,
+    startsAt: Date,
+    endsAt: Date,
+    act: Actor,
+  ): Promise<void> {
     await withBookingRetry(async () => {
       try {
         await prisma.$transaction(async (tx) => {
+          await lockBooking(tx, bookingId);
+          await assertNoActiveCheckout(bookingId, tx);
           const b = await tx.booking.findUnique({ where: { id: bookingId } });
           if (!b) throw new NotFoundError("Booking not found");
           if (!isOccupying(b.status)) {
-            throw new ConflictError("This booking can no longer be rescheduled");
+            throw new ConflictError(
+              "This booking can no longer be rescheduled",
+            );
           }
-          await tx.booking.update({ where: { id: bookingId }, data: { startsAt, endsAt } });
+          await tx.booking.update({
+            where: { id: bookingId },
+            data: { startsAt, endsAt },
+          });
           await tx.bookingStatusHistory.create({
             data: {
               bookingId,
@@ -200,8 +241,13 @@ export class LocalBookingBackend implements BookingBackend {
     });
   }
 
-  async submitDetails(bookingId: string, customer: CustomerDetails, actor: Actor): Promise<void> {
+  async submitDetails(
+    bookingId: string,
+    customer: CustomerDetails,
+    actor: Actor,
+  ): Promise<void> {
     await prisma.$transaction(async (tx) => {
+      await lockBooking(tx, bookingId);
       const b = await tx.booking.findUnique({ where: { id: bookingId } });
       if (!b) throw new NotFoundError("Booking not found");
       if (isExpiredHold(b)) throw new HoldExpiredError();
@@ -214,9 +260,19 @@ export class LocalBookingBackend implements BookingBackend {
 
       if (b.status === "HELD") {
         assertTransition(b.status, "PENDING_PAYMENT");
-        await tx.booking.update({ where: { id: bookingId }, data: { ...data, status: "PENDING_PAYMENT" } });
+        await tx.booking.update({
+          where: { id: bookingId },
+          data: { ...data, status: "PENDING_PAYMENT" },
+        });
         await tx.bookingStatusHistory.create({
-          data: { bookingId, fromStatus: b.status, toStatus: "PENDING_PAYMENT", actor: actor.type, actorId: actor.id ?? null, note: "Details submitted" },
+          data: {
+            bookingId,
+            fromStatus: b.status,
+            toStatus: "PENDING_PAYMENT",
+            actor: actor.type,
+            actorId: actor.id ?? null,
+            note: "Details submitted",
+          },
         });
       } else if (b.status === "PENDING_PAYMENT") {
         // Re-editing details before paying is idempotent (no state change).
@@ -227,8 +283,14 @@ export class LocalBookingBackend implements BookingBackend {
     });
   }
 
-  async submitPayment(bookingId: string, payment: PaymentInput, actor: Actor): Promise<void> {
+  async submitPayment(
+    bookingId: string,
+    payment: PaymentInput,
+    actor: Actor,
+  ): Promise<void> {
     await prisma.$transaction(async (tx) => {
+      await lockBooking(tx, bookingId);
+      await assertNoActiveCheckout(bookingId, tx);
       const b = await tx.booking.findUnique({ where: { id: bookingId } });
       if (!b) throw new NotFoundError("Booking not found");
       if (isExpiredHold(b)) throw new HoldExpiredError();
@@ -258,13 +320,29 @@ export class LocalBookingBackend implements BookingBackend {
         data: { status: "PAYMENT_SUBMITTED", holdExpiresAt: null },
       });
       await tx.bookingStatusHistory.create({
-        data: { bookingId, fromStatus: b.status, toStatus: "PAYMENT_SUBMITTED", actor: actor.type, actorId: actor.id ?? null, note: "Payment proof submitted" },
+        data: {
+          bookingId,
+          fromStatus: b.status,
+          toStatus: "PAYMENT_SUBMITTED",
+          actor: actor.type,
+          actorId: actor.id ?? null,
+          note: "Payment proof submitted",
+        },
       });
 
       // Auto-advance: submitted payment immediately awaits venue confirmation.
-      await tx.booking.update({ where: { id: bookingId }, data: { status: "PENDING_CONFIRMATION" } });
+      await tx.booking.update({
+        where: { id: bookingId },
+        data: { status: "PENDING_CONFIRMATION" },
+      });
       await tx.bookingStatusHistory.create({
-        data: { bookingId, fromStatus: "PAYMENT_SUBMITTED", toStatus: "PENDING_CONFIRMATION", actor: "SYSTEM", note: "Awaiting venue confirmation" },
+        data: {
+          bookingId,
+          fromStatus: "PAYMENT_SUBMITTED",
+          toStatus: "PENDING_CONFIRMATION",
+          actor: "SYSTEM",
+          note: "Awaiting venue confirmation",
+        },
       });
     });
     await safeNotify(() => notificationService.onPaymentSubmitted(bookingId));
@@ -275,7 +353,12 @@ export class LocalBookingBackend implements BookingBackend {
   }
 
   reject(bookingId: string, actor: Actor, note?: string): Promise<void> {
-    return this.transition(bookingId, "REJECTED", actor, note ?? "Rejected by venue");
+    return this.transition(
+      bookingId,
+      "REJECTED",
+      actor,
+      note ?? "Rejected by venue",
+    );
   }
 
   cancel(bookingId: string, actor: Actor): Promise<void> {
@@ -286,23 +369,45 @@ export class LocalBookingBackend implements BookingBackend {
     return this.transition(bookingId, "COMPLETED", actor, "Marked completed");
   }
 
-  private async transition(bookingId: string, to: BookingStatus, actor: Actor, note: string): Promise<void> {
+  private async transition(
+    bookingId: string,
+    to: BookingStatus,
+    actor: Actor,
+    note: string,
+  ): Promise<void> {
     await prisma.$transaction(async (tx) => {
+      await lockBooking(tx, bookingId);
       const b = await tx.booking.findUnique({ where: { id: bookingId } });
       if (!b) throw new NotFoundError("Booking not found");
       assertTransition(b.status, to);
       await tx.booking.update({
         where: { id: bookingId },
-        data: { status: to, ...(isOccupying(to) ? {} : { holdExpiresAt: null }) },
+        data: {
+          status: to,
+          ...(isOccupying(to) ? {} : { holdExpiresAt: null }),
+        },
       });
       await tx.bookingStatusHistory.create({
-        data: { bookingId, fromStatus: b.status, toStatus: to, actor: actor.type, actorId: actor.id ?? null, note },
+        data: {
+          bookingId,
+          fromStatus: b.status,
+          toStatus: to,
+          actor: actor.type,
+          actorId: actor.id ?? null,
+          note,
+        },
       });
     });
-    if (to === "CONFIRMED") await safeNotify(() => notificationService.onConfirmed(bookingId));
-    else if (to === "REJECTED") await safeNotify(() => notificationService.onRejected(bookingId));
-    else if (to === "CANCELLED") await safeNotify(() => notificationService.onCancelled(bookingId, actor.type));
-    else if (to === "COMPLETED") await safeNotify(() => notificationService.onCompleted(bookingId));
+    if (to === "CONFIRMED")
+      await safeNotify(() => notificationService.onConfirmed(bookingId));
+    else if (to === "REJECTED")
+      await safeNotify(() => notificationService.onRejected(bookingId));
+    else if (to === "CANCELLED")
+      await safeNotify(() =>
+        notificationService.onCancelled(bookingId, actor.type),
+      );
+    else if (to === "COMPLETED")
+      await safeNotify(() => notificationService.onCompleted(bookingId));
   }
 
   async expireStale(now = new Date()): Promise<number> {
@@ -310,19 +415,42 @@ export class LocalBookingBackend implements BookingBackend {
       where: { status: { in: HOLD_PHASE }, holdExpiresAt: { lt: now } },
       select: { id: true, status: true },
     });
+    let count = 0;
     for (const b of stale) {
-      await prisma.$transaction(async (tx) => {
-        await tx.booking.update({ where: { id: b.id }, data: { status: "EXPIRED" } });
-        await tx.bookingStatusHistory.create({
-          data: { bookingId: b.id, fromStatus: b.status, toStatus: "EXPIRED", actor: "SYSTEM", note: "Hold expired" },
+      const changed = await prisma.$transaction(async (tx) => {
+        const updated = await tx.booking.updateMany({
+          where: {
+            id: b.id,
+            status: { in: HOLD_PHASE },
+            holdExpiresAt: { lt: now },
+          },
+          data: { status: "EXPIRED" },
         });
+        if (!updated.count) return false;
+        await tx.bookingStatusHistory.create({
+          data: {
+            bookingId: b.id,
+            fromStatus: b.status,
+            toStatus: "EXPIRED",
+            actor: "SYSTEM",
+            note: "Hold expired",
+          },
+        });
+        return true;
       });
-      await safeNotify(() => notificationService.onExpired(b.id));
+      if (changed) {
+        count++;
+        await safeNotify(() => notificationService.onExpired(b.id));
+      }
     }
-    return stale.length;
+    return count;
   }
 
-  async getOccupied(courtId: string, from: Date, to: Date): Promise<OccupiedRange[]> {
+  async getOccupied(
+    courtId: string,
+    from: Date,
+    to: Date,
+  ): Promise<OccupiedRange[]> {
     const now = new Date();
     const rows = await prisma.booking.findMany({
       where: {
@@ -331,7 +459,9 @@ export class LocalBookingBackend implements BookingBackend {
         startsAt: { lt: to },
         endsAt: { gt: from },
         // treat expired-but-unswept holds as free
-        NOT: { AND: [{ status: { in: HOLD_PHASE } }, { holdExpiresAt: { lt: now } }] },
+        NOT: {
+          AND: [{ status: { in: HOLD_PHASE } }, { holdExpiresAt: { lt: now } }],
+        },
       },
       select: { startsAt: true, endsAt: true, status: true },
       orderBy: { startsAt: "asc" },
@@ -339,7 +469,9 @@ export class LocalBookingBackend implements BookingBackend {
     return rows;
   }
 
-  async getStatus(bookingId: string): Promise<{ status: BookingStatus; externalRef: string | null }> {
+  async getStatus(
+    bookingId: string,
+  ): Promise<{ status: BookingStatus; externalRef: string | null }> {
     const b = await prisma.booking.findUnique({
       where: { id: bookingId },
       select: { status: true, externalRef: true },

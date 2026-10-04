@@ -1,10 +1,11 @@
-import { beforeEach, describe, it, expect } from "vitest";
+import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { prisma, resetDb } from "../db";
 import { seedOwnerVenueCourt } from "../factories";
 import { courtSlotsForDate } from "@/lib/availability/engine";
 import { newReference } from "@/lib/booking/reference";
 
 beforeEach(resetDb);
+afterEach(() => vi.useRealTimers());
 
 /** Next future date landing on `target` weekday (0=Sun..6=Sat), at 00:00 UTC. */
 function nextWeekday(target: number): Date {
@@ -21,19 +22,38 @@ function at(day: Date, hour: number): Date {
   return d;
 }
 
-function slotAtHour<T extends { startsAt: Date }>(slots: T[], hour: number): T | undefined {
+function slotAtHour<T extends { startsAt: Date }>(
+  slots: T[],
+  hour: number,
+): T | undefined {
   return slots.find((s) => s.startsAt.getUTCHours() === hour);
 }
 
 async function setup(dayWeekday = 1 /* Monday */) {
   const { venueId, courtId } = await seedOwnerVenueCourt();
   await prisma.courtSchedule.create({
-    data: { courtId, dayOfWeek: dayWeekday, openMinute: 8 * 60, closeMinute: 22 * 60 },
+    data: {
+      courtId,
+      dayOfWeek: dayWeekday,
+      openMinute: 8 * 60,
+      closeMinute: 22 * 60,
+    },
   });
   return { venueId, courtId, day: nextWeekday(dayWeekday) };
 }
 
 describe("availability engine", () => {
+  it("uses Philippine wall time when validating today's slots before booking", async () => {
+    const { courtId } = await setup();
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-05T02:30:00Z"));
+    const slots = await courtSlotsForDate(
+      courtId,
+      new Date("2026-10-05T00:00:00Z"),
+    );
+    expect(slotAtHour(slots, 10)?.available).toBe(false);
+    expect(slotAtHour(slots, 11)?.available).toBe(true);
+  });
   it("generates hourly slots across the operating window", async () => {
     const { courtId, day } = await setup();
     const slots = await courtSlotsForDate(courtId, day);
@@ -65,7 +85,13 @@ describe("availability engine", () => {
   it("marks maintenance-exception slots unavailable", async () => {
     const { venueId, courtId, day } = await setup();
     await prisma.scheduleException.create({
-      data: { venueId, courtId, startsAt: at(day, 12), endsAt: at(day, 14), type: "MAINTENANCE" },
+      data: {
+        venueId,
+        courtId,
+        startsAt: at(day, 12),
+        endsAt: at(day, 14),
+        type: "MAINTENANCE",
+      },
     });
     const slots = await courtSlotsForDate(courtId, day);
     expect(slotAtHour(slots, 12)!.available).toBe(false);
@@ -76,7 +102,9 @@ describe("availability engine", () => {
 
   it("respects duration when generating slots (no slot spilling past close)", async () => {
     const { courtId, day } = await setup();
-    const slots = await courtSlotsForDate(courtId, day, { durationMinutes: 120 });
+    const slots = await courtSlotsForDate(courtId, day, {
+      durationMinutes: 120,
+    });
     // Last 2h slot starts at 20:00 (ends 22:00); no 21:00 start exists.
     expect(slotAtHour(slots, 20)).toBeTruthy();
     expect(slotAtHour(slots, 21)).toBeUndefined();

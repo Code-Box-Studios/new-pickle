@@ -15,6 +15,11 @@ import { nowMs } from "@/lib/now";
 import { cn } from "@/lib/cn";
 import { reviewEligibility } from "@/lib/review";
 import { ReviewPrompt } from "@/components/review/ReviewPrompt";
+import {
+  checkoutForBooking,
+  publicCheckoutStatus,
+} from "@/lib/payments/paymongo/checkout";
+import { PayMongoStatus } from "@/components/booking/PayMongoPayment";
 
 export const metadata = { title: "Booking status" };
 
@@ -37,6 +42,7 @@ export default async function BookingStatusPage({
 
   const b = await getBookingByReference(reference, session.id, session.role);
   if (!b) notFound();
+  const checkout = publicCheckoutStatus(await checkoutForBooking(b.id));
 
   const paid = [
     "PAYMENT_SUBMITTED",
@@ -150,7 +156,15 @@ export default async function BookingStatusPage({
         {/* Payment */}
         <Card className="mt-5 p-6 sm:p-7">
           <SectionHeader>Payment</SectionHeader>
-          {b.payment ? (
+          {checkout ? (
+            <div className="mt-4">
+              <PayMongoStatus
+                key={checkout.status}
+                bookingId={b.id}
+                initial={checkout}
+              />
+            </div>
+          ) : b.payment ? (
             <p className="mt-3 break-words text-sm leading-6 text-ink-soft">
               {channelLabel(b.payment.channel)} · ref {b.payment.reference} ·{" "}
               {pesos(b.payment.amountCents)} · submitted
