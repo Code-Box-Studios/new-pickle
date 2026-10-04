@@ -6,7 +6,11 @@ import { createSupabaseRequestClient } from "@/lib/supabase/request";
 import { isPreviewMode } from "@/lib/deployment";
 
 export async function GET(req: NextRequest) {
-  const base = resolveMagicLinkBase(req.nextUrl.origin);
+  // Next dev exposes its bind address in nextUrl. Keep redirects on the
+  // browser's host so the session cookie reaches the next page. Production
+  // still uses APP_URL exclusively via resolveMagicLinkBase.
+  const browserOrigin = req.headers.get("host") ? `${req.nextUrl.protocol}//${req.headers.get("host")}` : req.nextUrl.origin;
+  const base = resolveMagicLinkBase(browserOrigin);
   const tokenHash = req.nextUrl.searchParams.get("token_hash");
   const type = req.nextUrl.searchParams.get("type");
   const failure = (error: string) => NextResponse.redirect(new URL(`/login?error=${error}`, base), { headers: { "Cache-Control": "private, no-store", "Referrer-Policy": "no-referrer" } });

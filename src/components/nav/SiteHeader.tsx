@@ -38,7 +38,7 @@ const BASE_NAV = [
   { href: "/bookings", label: "My bookings", icon: CalendarCheck },
 ];
 
-const DARK_INTRO_ROUTES = new Set(["/", "/login", "/signup", "/list-your-venue", "/owner/login", "/owner/verify"]);
+const DARK_INTRO_ROUTES = new Set(["/", "/login", "/signup", "/list-your-venue", "/owner/login", "/owner/verify", "/forgot-password", "/reset-password"]);
 
 function subscribeToScroll(onChange: () => void) {
   window.addEventListener("scroll", onChange, { passive: true });

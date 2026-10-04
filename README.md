@@ -4,7 +4,7 @@ A responsive, installable **marketplace for pickleball courts** — players disc
 venues, see real availability, hold a court, pay the venue, and track
 confirmation. Venue owners receive reservations and confirm payments.
 
-**Live website:** [pikol-delta.vercel.app](https://pikol-delta.vercel.app).
+**Live website:** [pikol-ph.vercel.app](https://pikol-ph.vercel.app).
 Production connects to Supabase and runs with `APP_PREVIEW_MODE=false`, exposing
 the sign-in and sign-up forms. Email delivery requires Supabase's email templates,
 redirect settings, and SMTP configuration; phone sign-in requires its Phone
@@ -149,15 +149,20 @@ Keep this value private and stable across deployments.
 
 `/login` and `/signup` share a responsive Pikol layout, with a branded introduction
 on desktop and a focused form on phones. Both offer **Email** and **Phone number**
-tabs with passwordless verification. Links between the pages preserve the booking
-destination. Verification screens explain the next step and let players correct
-their email address or phone number. New players use the same verified auth flows;
-there is no separate password or registration endpoint.
+tabs. **Email and password** is the default for players and venue owners; email
+links and phone verification remain available. New password accounts confirm
+their email before receiving access. Links between the pages preserve the booking
+destination, and verification screens let players correct their contact details.
+
+**Forgot password?** opens `/forgot-password`. Existing email-link accounts can
+also use it to set their first password. A single-use verified email link opens
+`/reset-password`; owners still complete their authenticator step before changing
+their password. Supabase stores passwords, never Pikol's application database.
 
 ### Venue workspace security
 
-Venue owners have a dedicated entry at **`/owner/login`**. Email or phone
-verification is followed by a **TOTP authenticator code** at `/owner/verify`.
+Venue owners have a dedicated entry at **`/owner/login`**. Password, email-link or
+phone sign-in is followed by a **TOTP authenticator code** at `/owner/verify`.
 Owners, staff and administrators must complete this second step before private
 pages, media or APIs receive an authenticated application session. First-time
 owners set up an authenticator with a QR code or a manual setup key; existing
@@ -178,11 +183,13 @@ an authenticator when first entering the workspace after this update.
 
 ### Supabase authentication
 
-Email magic links and six-digit Philippine phone OTPs are issued and verified
+Passwords, email magic links and six-digit Philippine phone OTPs are managed
 by Supabase. Configure the **Magic Link** and **Confirm signup** email templates
 from `supabase/templates/magic-link.html`; Pikol's callback verifies the token
 hash and retains the booking return path. Set Site URL and redirect allowlists
-in Supabase. Custom SMTP is needed for real email recipients; phone sign-in
+in Supabase. Password recovery reuses the verified Magic Link template; no
+additional recovery template or environment variable is required. Custom SMTP
+is needed for real email recipients; phone sign-in
 requires enabling the Phone provider and configuring a paid SMS service in
 Supabase. Dashboard test phone numbers can be used during development.
 

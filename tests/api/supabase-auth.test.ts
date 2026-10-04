@@ -19,6 +19,11 @@ beforeEach(async () => {
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe("Supabase email callbacks and logout", () => {
+  it.each(["valid-hash", "expired"])("keeps callback %s on the browser host when dev binds to 0.0.0.0", async hash => {
+    vi.stubEnv("NODE_ENV", "development");
+    const response = await verify(new NextRequest(`http://0.0.0.0:3000/auth/verify?token_hash=${hash}&type=email&next=/reset-password`, { headers: { Host: "localhost:3000" } }));
+    expect(new URL(response.headers.get("location")!).origin).toBe("http://localhost:3000");
+  });
   it("verifies a token hash, creates an account, and commits HttpOnly cookies", async () => {
     const response = await verify(new NextRequest("http://localhost:3000/auth/verify?token_hash=valid-hash&type=email&next=/book/ABC"));
     expect(response.headers.get("location")).toBe("http://localhost:3000/book/ABC");

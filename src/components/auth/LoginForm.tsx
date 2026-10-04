@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Field } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PhoneLoginForm } from "./PhoneLoginForm";
+import { PasswordLoginForm } from "./PasswordLoginForm";
 import { Brand } from "@/components/ui/brand";
 
 export type AuthMode = "login" | "signup";
@@ -26,7 +27,7 @@ export function LoginForm({
 }) {
   const signup = mode === "signup";
   const owner = audience === "owner";
-  const counterpart = signup ? "/login" : "/signup";
+  const counterpart = signup ? (owner ? "/owner/login" : "/login") : "/signup";
   const counterpartNext = owner ? "/list-your-venue" : nextPath;
   const counterpartHref = counterpartNext
     ? `${counterpart}?next=${encodeURIComponent(counterpartNext)}`
@@ -40,10 +41,10 @@ export function LoginForm({
           <span className="text-[10px] font-semibold tracking-[0.12em] text-brand-700">{owner ? "VENUE ACCESS" : "LET’S PLAY"}</span>
         </div>
         <h1 className="text-[30px] font-medium leading-tight tracking-[-1px] text-ink sm:text-[34px]">
-          {owner ? "Your venue workspace" : signup ? "Create your account" : "Welcome back"}
+          {owner ? (signup ? "Create your venue account" : "Your venue workspace") : signup ? "Create your account" : "Welcome back"}
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          {owner ? "Sign in, then enter your authenticator code to securely manage your venue." : signup ? "Find your court and keep every booking in one place." : "Sign in to keep your plans together and get back to the game."}
+          {owner ? (signup ? "Create your account, then start setting up your home court." : "Sign in, then enter your authenticator code to securely manage your venue.") : signup ? "Find your court and keep every booking in one place." : "Sign in to keep your plans together and get back to the game."}
         </p>
       </div>
       {authError && !preview && (
@@ -72,12 +73,12 @@ export function LoginForm({
       </Tabs>
       )}
       {!preview && <p className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-        <ShieldCheck className="size-3.5 shrink-0 text-brand-700" aria-hidden /> {owner ? "Two-step verification protects your workspace" : "No password to remember"}
+        <ShieldCheck className="size-3.5 shrink-0 text-brand-700" aria-hidden /> {owner ? "Two-step verification protects your workspace" : "Secure sign-in. More time to play."}
       </p>}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-x-1 border-t border-line pt-4 text-sm text-muted-foreground">
-        <span>{owner ? "Listing your first venue?" : signup ? "Already on Pikol?" : "New to Pikol?"}</span>
+        <span>{owner && !signup ? "Listing your first venue?" : signup ? "Already on Pikol?" : "New to Pikol?"}</span>
         <Button asChild variant="link" className="min-h-11 px-2 font-semibold">
-          <Link href={counterpartHref}>{owner ? "Get started" : signup ? "Sign in" : "Create an account"}</Link>
+          <Link href={counterpartHref}>{owner && !signup ? "Get started" : signup ? "Sign in" : "Create an account"}</Link>
         </Button>
       </div>
     </div>
@@ -85,6 +86,14 @@ export function LoginForm({
 }
 
 function EmailLoginForm({ nextPath, mode }: { nextPath?: string; mode: AuthMode }) {
+  const [useLink, setUseLink] = useState(false);
+  return <div className="space-y-4">
+    {useLink ? <EmailLinkForm nextPath={nextPath} mode={mode} /> : <PasswordLoginForm nextPath={nextPath} mode={mode} />}
+    <Button type="button" variant="ghost" block className="text-xs text-muted-foreground" onClick={() => setUseLink(!useLink)}>{useLink ? "Use a password instead" : "Use an email link instead"}</Button>
+  </div>;
+}
+
+function EmailLinkForm({ nextPath, mode }: { nextPath?: string; mode: AuthMode }) {
   const [email, setEmail] = useState("");
   const [editingEmail, setEditingEmail] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(

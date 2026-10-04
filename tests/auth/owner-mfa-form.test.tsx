@@ -14,7 +14,7 @@ describe("venue workspace sign-in", () => {
     render(<OwnerLoginForm nextPath="/owner" />);
     expect(screen.getByRole("heading", { name: "Your venue workspace" })).toBeInTheDocument();
     expect(screen.getByText(/authenticator/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Continue with email" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Sign in" })).toBeEnabled();
   });
 
   it("starts setup only after the owner explicitly requests it", async () => {

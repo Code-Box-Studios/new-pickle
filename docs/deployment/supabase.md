@@ -105,7 +105,9 @@ Keep the original local files until hosted reads and authorization checks pass.
 
 In Supabase **Authentication**:
 
-1. Enable Email and allow new sign-ups.
+1. Enable Email, allow new sign-ups, and keep **Confirm email** enabled.
+   Pikol offers email/password by default, plus email links and phone OTP.
+   Set Supabase's minimum password length to at least eight characters.
 2. Set the **Site URL** to `APP_URL`.
 3. Allow `http://localhost:3000/auth/verify**` for local work and
    `https://YOUR-DOMAIN/auth/verify**` for production. Add a LAN origin only if
@@ -124,6 +126,13 @@ Email templates and SMTP are project settings, not environment variables in
 Pikol. The app no longer sends its own development links. Local Supabase with
 its email inbox is another development option; set this app's Supabase URL/key
 and PostgreSQL URLs to that local stack, and use the same token-hash template.
+
+**Password recovery:** `/forgot-password` sends a verified email link for an
+existing account; `/reset-password` sets its Supabase password. This also lets
+existing email-link users create their first password. It reuses the Magic Link
+template above and does not require a new environment variable or recovery
+template. Venue owners must still complete TOTP before changing a password.
+Passwords are stored only by Supabase; no application password column is added.
 
 ## 3. Configure phone OTP
 
@@ -157,7 +166,8 @@ second factor. The first-factor phone sign-in above still needs its SMS provider
 Owners sign in at `/owner/login`, then complete setup or enter an authenticator
 code at `/owner/verify`. OWNER, STAFF and ADMIN sessions are denied by Pikol's
 central server gate until they have verified TOTP. This also protects direct
-API requests and CMS access, while CUSTOMER accounts retain passwordless sign-in.
+API requests and CMS access. CUSTOMER accounts can use passwords, email links
+or phone OTP without the workspace authenticator step.
 The app uses Prisma/Payload rather than the Supabase Data API for application
 data; keep the existing RLS lockdown and trusted runtime connections.
 

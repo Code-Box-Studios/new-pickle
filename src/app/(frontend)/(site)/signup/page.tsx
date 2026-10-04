@@ -22,9 +22,11 @@ export default async function SignUpPage({
   }
   if (session) redirect(safeNextPath(sp.next) ?? "/bookings");
 
+  const nextPath = safeNextPath(sp.next);
+  const owner = nextPath?.startsWith("/owner") || nextPath === "/list-your-venue" || nextPath === "/admin";
   return (
-    <AuthShell>
-      <LoginForm preview={isPreviewMode()} mode="signup" nextPath={safeNextPath(sp.next)} authError={sp.error === "missing" || sp.error === "invalid" ? sp.error : undefined} />
+    <AuthShell audience={owner ? "owner" : "player"}>
+      <LoginForm audience={owner ? "owner" : "player"} preview={isPreviewMode()} mode="signup" nextPath={safeNextPath(sp.next)} authError={sp.error === "missing" || sp.error === "invalid" ? sp.error : undefined} />
     </AuthShell>
   );
 }

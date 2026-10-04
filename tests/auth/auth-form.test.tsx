@@ -3,6 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { LoginForm } from "@/components/auth/LoginForm";
 
+vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }) }));
+
 afterEach(() => vi.unstubAllGlobals());
 
 function respond(body: unknown, status = 200) {
@@ -30,7 +32,7 @@ describe("Pikol sign-in and account creation", () => {
   it("explains expired email links and lets players request a new one", () => {
     render(<LoginForm authError="invalid" />);
     expect(screen.getByRole("alert")).toHaveTextContent("expired");
-    expect(screen.getByRole("button", { name: "Continue with email" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Sign in" })).toBeEnabled();
   });
 
   it("offers existing players a sign-in link from account creation", () => {
@@ -45,6 +47,7 @@ describe("Pikol sign-in and account creation", () => {
     const request = vi.fn().mockResolvedValue(respond({ ok: true }));
     vi.stubGlobal("fetch", request);
     render(<LoginForm mode="signup" nextPath="/bookings" />);
+    fireEvent.click(screen.getByRole("button", { name: "Use an email link instead" }));
     fireEvent.change(screen.getByLabelText("Email address"), {
       target: { value: "player@example.com" },
     });
@@ -62,6 +65,7 @@ describe("Pikol sign-in and account creation", () => {
   it("shows an email delivery failure with a retry action", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(respond({ error: "Please try again later." }, 429)));
     render(<LoginForm />);
+    fireEvent.click(screen.getByRole("button", { name: "Use an email link instead" }));
     fireEvent.change(screen.getByLabelText("Email address"), { target: { value: "player@example.com" } });
     fireEvent.click(screen.getByRole("button", { name: "Continue with email" }));
     expect(await screen.findByText("Please try again later.")).toBeInTheDocument();
