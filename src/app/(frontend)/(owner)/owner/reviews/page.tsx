@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { Star } from "lucide-react";
-import { getSession } from "@/lib/auth/session";
+import { getOwnerPageSession } from "@/lib/auth/owner-page";
 import { accessibleVenueIds } from "@/lib/api/owner-access";
 import { listReviewsForVenues } from "@/lib/review";
 import { Stars } from "@/components/review/Stars";
@@ -12,7 +12,7 @@ import { dateLabel } from "@/lib/format";
 export const metadata = { title: "Reviews" };
 
 export default async function OwnerReviewsPage() {
-  const session = await getSession();
+  const session = await getOwnerPageSession();
   if (!session) redirect("/login?next=/owner/reviews");
 
   const ids = await accessibleVenueIds(session.id, session.role);

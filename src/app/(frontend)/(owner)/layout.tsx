@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth/session";
+import { getOwnerPageSession } from "@/lib/auth/owner-page";
 import { resolveOwnerVenues } from "@/lib/venue/owner-context";
 import { OwnerSidebar } from "@/components/nav/OwnerSidebar";
 import { OwnerMobileNav } from "@/components/nav/OwnerMobileNav";
@@ -12,7 +12,7 @@ export default async function OwnerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSession();
+  const session = await getOwnerPageSession();
   if (!session || !["OWNER", "STAFF", "ADMIN"].includes(session.role)) {
     redirect("/login?next=/owner");
   }

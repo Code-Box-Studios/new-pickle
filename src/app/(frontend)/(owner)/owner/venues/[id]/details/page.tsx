@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getSession } from "@/lib/auth/session";
+import { getOwnerPageSession } from "@/lib/auth/owner-page";
 import { loadOwnerVenue } from "@/lib/venue/owner-load";
 import { DetailsForm } from "@/components/venue-admin/DetailsForm";
 
@@ -9,7 +9,7 @@ export default async function DetailsStep({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const session = await getSession();
+  const session = await getOwnerPageSession();
   if (!session) redirect(`/login?next=/owner/venues/${id}/details`);
   const v = await loadOwnerVenue(id, session.id, session.role);
   if (!v) notFound();

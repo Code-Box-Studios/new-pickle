@@ -19,7 +19,13 @@ vi.mock("next/cache", () => ({
 const identities = vi.hoisted(() => new Map<string, { id: string }>());
 vi.mock("@supabase/ssr", async importOriginal => {
   const original = await importOriginal<typeof import("@supabase/ssr")>();
-  return { ...original, createServerClient: (_url: string, _key: string, options: { cookies: { getAll(): { name: string; value: string }[] } }) => ({ auth: { getUser: async () => ({ data: { user: identities.get(options.cookies.getAll().find(cookie => cookie.name === "pikol-test-session")?.value ?? "") ?? null }, error: null }) } }) };
+  return { ...original, createServerClient: (_url: string, _key: string, options: { cookies: { getAll(): { name: string; value: string }[] } }) => ({ auth: {
+    getUser: async () => {
+      const user = identities.get(options.cookies.getAll().find(cookie => cookie.name === "pikol-test-session")?.value ?? "");
+      return { data: { user: user ? { ...user, factors: [{ factor_type: "totp", status: "verified" }] } : null }, error: null };
+    },
+    mfa: { getAuthenticatorAssuranceLevel: async () => ({ data: { currentLevel: "aal2", currentAuthenticationMethods: [{ method: "totp" }] }, error: null }) },
+  } }) };
 });
 let payload: Payload;
 beforeAll(async () => {

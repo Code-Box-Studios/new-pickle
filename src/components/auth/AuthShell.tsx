@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { CalendarCheck, MapPin, Wallet } from "lucide-react";
+import { CalendarCheck, MapPin, ShieldCheck, Wallet } from "lucide-react";
 import { BrandMark } from "@/components/ui/brand";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,20 +11,27 @@ const BENEFITS = [
   { icon: Wallet, title: "Pay the venue directly", detail: "Book here. Settle up with your venue." },
 ];
 
-export function AuthShell({ children }: { children: ReactNode }) {
+const OWNER_BENEFITS = [
+  { icon: ShieldCheck, title: "A protected workspace", detail: "An authenticator keeps your venue access secure." },
+  { icon: CalendarCheck, title: "Every reservation, together", detail: "Plan your schedule and look after your players." },
+  { icon: Wallet, title: "Your venue. Your payments.", detail: "Manage payment instructions with extra protection." },
+];
+
+export function AuthShell({ children, audience = "player" }: { children: ReactNode; audience?: "player" | "owner" }) {
+  const owner = audience === "owner";
   return (
     <div className="hero-band relative -mb-24 overflow-hidden px-4 pb-10 pt-28 sm:px-6 sm:pb-16 sm:pt-32 md:mb-0 lg:px-8 lg:pt-36">
       <CourtPattern className="pointer-events-none absolute -right-52 top-12 w-[900px] rotate-[-28deg] text-brand-300 opacity-[0.055]" />
       <div className="relative mx-auto grid max-w-[1060px] items-center gap-12 lg:min-h-[560px] lg:grid-cols-[1.05fr_1fr] lg:gap-16 xl:gap-24">
         <aside className="motion-enter hidden min-w-0 lg:block" aria-labelledby="auth-intro-title">
           <Badge variant="outline" className="mb-6 gap-2 border-white/20 bg-white/5 px-3.5 py-2 text-white/85">
-            <PickleballIcon /> A little more game time
+            <PickleballIcon /> {owner ? "Built for your home court" : "A little more game time"}
           </Badge>
           <h2 id="auth-intro-title" className="text-[48px] font-medium leading-[1.12] tracking-[-1.5px] text-white">
-            Less planning.<br /><span className="text-brand-200">More playing.</span>
+            {owner ? "Your courts." : "Less planning."}<br /><span className="text-brand-200">{owner ? "In safe hands." : "More playing."}</span>
           </h2>
           <p className="mt-5 max-w-sm text-base leading-relaxed text-white/65">
-            From the first serve to your next match, make room for the game you love.
+            {owner ? "A little extra security for the place your community comes to play." : "From the first serve to your next match, make room for the game you love."}
           </p>
           <div className="relative my-8 flex h-36 max-w-sm items-center justify-center" aria-hidden="true">
             <svg viewBox="0 0 380 140" fill="none" className="absolute inset-0 size-full text-brand-300/30">
@@ -36,7 +43,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
             <PickleballIcon className="absolute right-5 top-6 size-12 rotate-12 text-brand-200" />
           </div>
           <ul className="space-y-5 border-t border-white/10 pt-6">
-            {BENEFITS.map(({ icon: Icon, title, detail }) => (
+            {(owner ? OWNER_BENEFITS : BENEFITS).map(({ icon: Icon, title, detail }) => (
               <li key={title} className="flex items-start gap-3.5">
                 <span className="grid size-9 shrink-0 place-items-center rounded-full border border-brand-300/15 bg-brand-300/5 text-brand-300">
                   <Icon className="size-4" strokeWidth={1.7} aria-hidden />

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Building2 } from "lucide-react";
 import prisma from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { getOwnerPageSession } from "@/lib/auth/owner-page";
 import { accessibleVenueIds } from "@/lib/api/owner-access";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/states";
@@ -13,7 +13,7 @@ import { CreateVenueButton } from "@/components/venue-admin/CreateVenueButton";
 export const metadata = { title: "My venues" };
 
 export default async function OwnerVenuesPage() {
-  const session = await getSession();
+  const session = await getOwnerPageSession();
   if (!session) redirect("/login?next=/owner/venues");
 
   const ids = await accessibleVenueIds(session.id, session.role);

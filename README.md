@@ -154,6 +154,28 @@ destination. Verification screens explain the next step and let players correct
 their email address or phone number. New players use the same verified auth flows;
 there is no separate password or registration endpoint.
 
+### Venue workspace security
+
+Venue owners have a dedicated entry at **`/owner/login`**. Email or phone
+verification is followed by a **TOTP authenticator code** at `/owner/verify`.
+Owners, staff and administrators must complete this second step before private
+pages, media or APIs receive an authenticated application session. First-time
+owners set up an authenticator with a QR code or a manual setup key; existing
+owners enter the latest code. Player accounts keep their normal sign-in flow.
+
+The server verifies Supabase identity, current database permissions, AAL2,
+the TOTP authentication method and a currently verified authenticator. Revoked
+roles, inactive users, deleted factors and failed assurance checks deny access.
+MFA runs through same-origin server routes with HttpOnly cookies; access and
+refresh tokens are never returned to browser JavaScript. Supabase supplies
+verification rate limits. No additional database migration is needed.
+
+**Lost-device recovery:** an operator must independently verify the owner's
+identity before resetting a factor in Supabase administration. An email link
+does not bypass MFA. Do not remove factors merely because an unauthenticated
+person supplies a venue name or email. Existing owners will be asked to set up
+an authenticator when first entering the workspace after this update.
+
 ### Supabase authentication
 
 Email magic links and six-digit Philippine phone OTPs are issued and verified

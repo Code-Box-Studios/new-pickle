@@ -16,16 +16,20 @@ export function LoginForm({
   mode = "login",
   authError,
   preview = false,
+  audience = "player",
 }: {
   nextPath?: string;
   mode?: AuthMode;
   authError?: "missing" | "invalid";
   preview?: boolean;
+  audience?: "player" | "owner";
 }) {
   const signup = mode === "signup";
+  const owner = audience === "owner";
   const counterpart = signup ? "/login" : "/signup";
-  const counterpartHref = nextPath
-    ? `${counterpart}?next=${encodeURIComponent(nextPath)}`
+  const counterpartNext = owner ? "/list-your-venue" : nextPath;
+  const counterpartHref = counterpartNext
+    ? `${counterpart}?next=${encodeURIComponent(counterpartNext)}`
     : counterpart;
 
   return (
@@ -33,13 +37,13 @@ export function LoginForm({
       <div className="mb-7">
         <div className="mb-7 flex items-center justify-between gap-4">
           <Brand className="gap-2 text-lg [&_svg]:size-9" />
-          <span className="text-[10px] font-semibold tracking-[0.12em] text-brand-700">LET&apos;S PLAY</span>
+          <span className="text-[10px] font-semibold tracking-[0.12em] text-brand-700">{owner ? "VENUE ACCESS" : "LET’S PLAY"}</span>
         </div>
         <h1 className="text-[30px] font-medium leading-tight tracking-[-1px] text-ink sm:text-[34px]">
-          {signup ? "Create your account" : "Welcome back"}
+          {owner ? "Your venue workspace" : signup ? "Create your account" : "Welcome back"}
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          {signup ? "Find your court and keep every booking in one place." : "Sign in to keep your plans together and get back to the game."}
+          {owner ? "Sign in, then enter your authenticator code to securely manage your venue." : signup ? "Find your court and keep every booking in one place." : "Sign in to keep your plans together and get back to the game."}
         </p>
       </div>
       {authError && !preview && (
@@ -68,12 +72,12 @@ export function LoginForm({
       </Tabs>
       )}
       {!preview && <p className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-        <ShieldCheck className="size-3.5 shrink-0 text-brand-700" aria-hidden /> No password to remember
+        <ShieldCheck className="size-3.5 shrink-0 text-brand-700" aria-hidden /> {owner ? "Two-step verification protects your workspace" : "No password to remember"}
       </p>}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-x-1 border-t border-line pt-4 text-sm text-muted-foreground">
-        <span>{signup ? "Already on Pikol?" : "New to Pikol?"}</span>
+        <span>{owner ? "Listing your first venue?" : signup ? "Already on Pikol?" : "New to Pikol?"}</span>
         <Button asChild variant="link" className="min-h-11 px-2 font-semibold">
-          <Link href={counterpartHref}>{signup ? "Sign in" : "Create an account"}</Link>
+          <Link href={counterpartHref}>{owner ? "Get started" : signup ? "Sign in" : "Create an account"}</Link>
         </Button>
       </div>
     </div>

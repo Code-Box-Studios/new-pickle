@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, Clock, ShieldCheck } from "lucide-react";
-import { getSession } from "@/lib/auth/session";
+import { getOwnerPageSession } from "@/lib/auth/owner-page";
 import { loadOwnerVenue, wizardProgress } from "@/lib/venue/owner-load";
 import { StepRail } from "@/components/venue-admin/StepRail";
 import { VenueStatusBadge } from "@/components/venue-admin/VenueStatusBadge";
@@ -15,7 +15,7 @@ export default async function WizardLayout({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const session = await getSession();
+  const session = await getOwnerPageSession();
   if (!session) redirect(`/login?next=/owner/venues/${id}/details`);
   const venue = await loadOwnerVenue(id, session.id, session.role);
   if (!venue) notFound();

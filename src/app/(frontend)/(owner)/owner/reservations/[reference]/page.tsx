@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, Mail, Phone } from "lucide-react";
 import prisma from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { getOwnerPageSession } from "@/lib/auth/owner-page";
 import { accessibleVenueIds } from "@/lib/api/owner-access";
 import { BookingSummary } from "@/components/booking/BookingSummary";
 import { StatusTimeline } from "@/components/booking/StatusTimeline";
@@ -24,7 +24,7 @@ export default async function OwnerReservationDetail({
   params: Promise<{ reference: string }>;
 }) {
   const { reference } = await params;
-  const session = await getSession();
+  const session = await getOwnerPageSession();
   if (!session) redirect("/login?next=/owner");
 
   const b = await prisma.booking.findUnique({

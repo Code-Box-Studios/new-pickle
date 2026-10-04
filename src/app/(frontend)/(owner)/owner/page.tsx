@@ -9,7 +9,7 @@ import {
   Plus,
 } from "lucide-react";
 import prisma from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { getOwnerPageSession } from "@/lib/auth/owner-page";
 import { resolveOwnerVenues } from "@/lib/venue/owner-context";
 import { ownerDaySchedule } from "@/lib/venue/ops";
 import { OCCUPYING } from "@/lib/booking/status";
@@ -31,7 +31,7 @@ export default async function OwnerDashboard({
 }: {
   searchParams: Promise<{ venue?: string }>;
 }) {
-  const session = await getSession();
+  const session = await getOwnerPageSession();
   if (!session) redirect("/login?next=/owner");
   const sp = await searchParams;
   const { venues, active } = await resolveOwnerVenues(session, sp.venue);

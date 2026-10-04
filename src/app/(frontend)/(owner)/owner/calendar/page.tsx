@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ChevronLeft, ChevronRight, LayoutGrid } from "lucide-react";
-import { getSession } from "@/lib/auth/session";
+import { getOwnerPageSession } from "@/lib/auth/owner-page";
 import { resolveOwnerVenues } from "@/lib/venue/owner-context";
 import { ownerDaySchedule, ownerWeekAgenda } from "@/lib/venue/ops";
 import { VenueSwitcher } from "@/components/owner/VenueSwitcher";
@@ -39,7 +39,7 @@ export default async function CalendarPage({
     block?: string;
   }>;
 }) {
-  const session = await getSession();
+  const session = await getOwnerPageSession();
   if (!session) redirect("/login?next=/owner/calendar");
   const sp = await searchParams;
   const { venues, active } = await resolveOwnerVenues(session, sp.venue);

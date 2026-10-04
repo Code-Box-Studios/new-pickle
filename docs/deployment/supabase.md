@@ -147,6 +147,26 @@ numbers and codes during development. No SMS credentials belong in Pikol's
 browser or `.env`; no local codes are displayed by the app. The old Twilio Verify
 delivery variables are no longer used.
 
+### Mandatory authenticator verification for workspace accounts
+
+Leave **TOTP enrollment and verification enabled** in Supabase Authentication's
+MFA settings. [Supabase's TOTP guide](https://supabase.com/docs/guides/auth/auth-mfa/totp)
+documents the free authenticator API. No SMS provider is required for this
+second factor. The first-factor phone sign-in above still needs its SMS provider.
+
+Owners sign in at `/owner/login`, then complete setup or enter an authenticator
+code at `/owner/verify`. OWNER, STAFF and ADMIN sessions are denied by Pikol's
+central server gate until they have verified TOTP. This also protects direct
+API requests and CMS access, while CUSTOMER accounts retain passwordless sign-in.
+The app uses Prisma/Payload rather than the Supabase Data API for application
+data; keep the existing RLS lockdown and trusted runtime connections.
+
+Before launch, define an operator-assisted lost-device process. Independently
+verify ownership before using Supabase administration to reset MFA. The next
+workspace visit requires enrollment again. Never provide an email-only bypass.
+Do not enroll authenticators for real owners from a shared demo device. Setting
+up MFA changes the real Supabase account even when the website runs locally.
+
 ## 4. Configure uploads
 
 Set the server-only `SUPABASE_SECRET_KEY` from Supabase's API keys page (legacy

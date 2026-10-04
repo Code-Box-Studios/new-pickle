@@ -53,7 +53,7 @@ export default async function ListYourVenuePage() {
                 <CreateVenueButton label={content.createLabel} />
               ) : (
                 <Button asChild size="lg">
-                  <Link href="/login?next=/list-your-venue">
+                  <Link href="/owner/login?next=/list-your-venue">
                     {content.signInLabel}
                   </Link>
                 </Button>

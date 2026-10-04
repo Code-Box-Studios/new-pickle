@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Inbox } from "lucide-react";
 import prisma from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { getOwnerPageSession } from "@/lib/auth/owner-page";
 import { accessibleVenueIds } from "@/lib/api/owner-access";
 import { ReservationRow } from "@/components/owner/ReservationRow";
 import { EmptyState } from "@/components/ui/states";
@@ -23,7 +23,7 @@ export default async function OwnerReservationsPage({
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
-  const session = await getSession();
+  const session = await getOwnerPageSession();
   if (!session) redirect("/login?next=/owner");
   const sp = await searchParams;
   const filter =
