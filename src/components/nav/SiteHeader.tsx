@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import type { SessionUser } from "@/lib/auth/session";
 import {
   ArrowUpRight,
+  ArrowRightLeft,
   Building2,
   CalendarCheck,
   Home,
@@ -36,6 +37,7 @@ const BASE_NAV = [
   { href: "/", label: "Home", icon: Home },
   { href: "/search", label: "Explore", icon: Search },
   { href: "/bookings", label: "My bookings", icon: CalendarCheck },
+  { href: "/pasalo", label: "Pasalo", icon: ArrowRightLeft },
 ];
 
 const DARK_INTRO_ROUTES = new Set(["/", "/login", "/signup", "/list-your-venue", "/owner/login", "/owner/verify", "/forgot-password", "/reset-password"]);
@@ -64,7 +66,7 @@ export function SiteHeader({
     ...item,
     label: [content.homeLabel, content.exploreLabel, content.bookingsLabel][
       index
-    ],
+    ] ?? item.label,
   }));
   const pathname = usePathname();
   const scrolled = useSyncExternalStore(
@@ -105,7 +107,7 @@ export function SiteHeader({
         </Link>
         <nav
           aria-label="Main navigation"
-          className="mx-auto hidden min-w-0 items-center gap-1.5 lg:flex"
+          className="mx-auto hidden min-w-0 items-center gap-1 xl:flex"
         >
           {NAV.map((item) => (
             <Button
@@ -113,7 +115,7 @@ export function SiteHeader({
               asChild
               variant="ghost"
               className={cn(
-                "h-11 max-w-40 gap-2 px-4 text-[13px] font-medium transition-colors duration-200",
+                "h-11 max-w-40 gap-2 px-3 text-[13px] font-medium transition-colors duration-200",
                 active(item.href)
                   ? transparent
                     ? "bg-white/10 text-white ring-1 ring-white/15 hover:bg-white/10 hover:text-white active:bg-white/15"
@@ -238,7 +240,7 @@ export function SiteHeader({
                 variant={transparent ? "outlineOnDark" : "outline"}
                 size="icon"
                 className={cn(
-                  "lg:hidden",
+                  "xl:hidden",
                   transparent
                     ? "border-white/25 bg-white/5 text-white"
                     : "border-border/80 bg-surface/60",

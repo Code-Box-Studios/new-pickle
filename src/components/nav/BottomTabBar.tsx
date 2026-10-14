@@ -2,13 +2,14 @@
 
 import { NavigationLink as Link } from "@/components/nav/NavigationLink";
 import { usePathname } from "next/navigation";
-import { CalendarCheck, Home, Search, User } from "lucide-react";
+import { ArrowRightLeft, CalendarCheck, Home, Search, User } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
 
 const TABS = [
   { href: "/", label: "Home", icon: Home, exact: true },
   { href: "/search", label: "Explore", icon: Search },
+  { href: "/pasalo", label: "Pasalo", icon: ArrowRightLeft },
   { href: "/bookings", label: "Bookings", icon: CalendarCheck },
   { href: "/login", label: "Account", icon: User },
 ];

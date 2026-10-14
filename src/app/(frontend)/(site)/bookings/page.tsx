@@ -29,6 +29,7 @@ export default async function MyBookingsPage() {
       <div className="page-shell py-8 sm:py-12">
         <div className="mx-auto max-w-3xl">
           <h1 className="page-title">My bookings</h1>
+          <Link href="/pasalo/mine" className={`${buttonVariants({ variant: "outline" })} mt-4`}>My Pasalo transfers</Link>
           <EmptyState
             icon={<CalendarCheck className="size-7" />}
             title="You don't have any bookings yet"
@@ -44,6 +45,7 @@ export default async function MyBookingsPage() {
     <div className="page-shell py-8 sm:py-12">
       <div className="mx-auto max-w-3xl">
         <h1 className="page-title">My bookings</h1>
+        <Link href="/pasalo/mine" className={`${buttonVariants({ variant: "outline" })} mt-4`}>My Pasalo transfers</Link>
 
         {upcoming.length > 0 && (
           <Section title="Upcoming">

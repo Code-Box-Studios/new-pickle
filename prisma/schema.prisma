@@ -53,6 +53,24 @@ enum PaymentCheckoutStatus {
   EXPIRED
 }
 
+enum PasaloListingStatus {
+  ACTIVE
+  RESERVED
+  SOLD
+  WITHDRAWN
+  EXPIRED
+  VOIDED
+}
+
+enum PasaloTradeStatus {
+  RESERVED
+  PAYMENT_SENT
+  TRANSFERRED
+  RELEASED
+  EXPIRED
+  VOIDED
+}
+
 enum ExceptionType {
   MAINTENANCE
   HOLIDAY
@@ -98,6 +116,9 @@ model User {
   reviews       Review[]
   magicTokens   MagicLinkToken[]
   notifications Notification[]
+  pasaloListings PasaloListing[]
+  pasaloTrades PasaloTrade[]
+  pasaloMessages PasaloMessage[]
 
   @@map("users")
 }
@@ -269,6 +290,7 @@ model Booking {
   payment PaymentSubmission?
   checkout PaymentCheckout?
   history BookingStatusHistory[]
+  pasaloListing PasaloListing?
 
   // NOTE: a DB-generated `period` (tsrange) column and the
   // `bookings_no_overlap` EXCLUDE constraint are added by the raw-SQL migration
@@ -282,6 +304,79 @@ model Booking {
   @@index([userId])
   @@index([backendType])
   @@map("bookings")
+}
+
+model PasaloListing {
+  id String @id @default(cuid())
+  bookingId String @unique
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  sellerId String
+  seller User @relation(fields: [sellerId], references: [id])
+  originalReference String
+  venueName String
+  venueSlug String
+  courtName String
+  city String
+  startsAt DateTime
+  endsAt DateTime
+  originalPriceCents Int
+  priceCents Int
+  note String?
+  paymentChannel PaymentChannel
+  paymentAccountName String
+  paymentAccountNumber String
+  status PasaloListingStatus @default(ACTIVE)
+  soldAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  trades PasaloTrade[]
+
+  @@index([status, startsAt])
+  @@index([city, status, startsAt])
+  @@index([sellerId, createdAt])
+  @@map("pasalo_listings")
+}
+
+model PasaloTrade {
+  id String @id @default(cuid())
+  listingId String
+  listing PasaloListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyerId String
+  buyer User @relation(fields: [buyerId], references: [id])
+  priceCents Int
+  customerName String
+  customerMobile String
+  customerEmail String?
+  listingSnapshot Json
+  paymentChannel PaymentChannel
+  paymentAccountName String
+  paymentAccountNumber String
+  status PasaloTradeStatus @default(RESERVED)
+  expiresAt DateTime
+  paymentSentAt DateTime?
+  paymentReference String?
+  transferredAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages PasaloMessage[]
+
+  @@index([listingId, status])
+  @@index([buyerId, createdAt])
+  @@map("pasalo_trades")
+}
+
+model PasaloMessage {
+  id String @id @default(cuid())
+  tradeId String
+  trade PasaloTrade @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  senderId String?
+  sender User? @relation(fields: [senderId], references: [id])
+  body String
+  createdAt DateTime @default(now())
+
+  @@index([tradeId, createdAt, id])
+  @@index([senderId, createdAt])
+  @@map("pasalo_messages")
 }
 
 model PaymentSubmission {

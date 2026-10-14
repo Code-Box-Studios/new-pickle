@@ -20,6 +20,8 @@ import {
   publicCheckoutStatus,
 } from "@/lib/payments/paymongo/checkout";
 import { PayMongoStatus } from "@/components/booking/PayMongoPayment";
+import { BookingPasaloActions } from "@/components/pasalo/BookingPasaloActions";
+import { actualStart, CUTOFF_MS } from "@/lib/pasalo/rules";
 
 export const metadata = { title: "Booking status" };
 
@@ -42,7 +44,8 @@ export default async function BookingStatusPage({
 
   const b = await getBookingByReference(reference, session.id, session.role);
   if (!b) notFound();
-  const checkout = publicCheckoutStatus(await checkoutForBooking(b.id));
+  const sale = b.pasaloListing?.status === "SOLD" ? b.pasaloListing.trades[0] : null;
+  const checkout = sale ? null : publicCheckoutStatus(await checkoutForBooking(b.id));
   const showHostedReceipt =
     checkout && !(b.payment && ["FAILED", "EXPIRED"].includes(checkout.status));
 
@@ -91,7 +94,7 @@ export default async function BookingStatusPage({
             courtName={b.court.name}
             startsAt={b.startsAt}
             endsAt={b.endsAt}
-            priceCents={b.priceCents}
+            priceCents={sale?.priceCents ?? b.priceCents}
           />
         </div>
 
@@ -110,6 +113,18 @@ export default async function BookingStatusPage({
             venueName={b.venue.name}
             existing={eligibility?.existingReview ?? null}
           />
+        )}
+
+        {!sale && b.userId === session.id && (
+          <div className="mt-5">
+            <BookingPasaloActions
+              bookingId={b.id}
+              originalPriceCents={b.priceCents}
+              listingId={b.pasaloListing?.id}
+              listingStatus={b.pasaloListing?.status}
+              eligible={b.status === "CONFIRMED" && b.backendType === "LOCAL" && b.source === "ONLINE" && b.currency === "PHP" && b.venue.isPublished && b.venue.status === "APPROVED" && b.court.active && actualStart(b.startsAt) - nowMs() > CUTOFF_MS && ((b.payment?.amountCents ?? 0) >= b.priceCents || checkout?.status === "PAID")}
+            />
+          </div>
         )}
 
         {/* Progress */}
@@ -158,7 +173,13 @@ export default async function BookingStatusPage({
         {/* Payment */}
         <Card className="mt-5 p-6 sm:p-7">
           <SectionHeader>Payment</SectionHeader>
-          {showHostedReceipt ? (
+          {sale ? (
+            <div className="mt-3 space-y-3 text-sm leading-6 text-ink-soft">
+              <p>Pasalo transfer · {pesos(sale.priceCents)} paid directly to the seller. The seller confirmed receipt.</p>
+              <p>The venue’s original payment remains on record. Your current reservation status is shown above.</p>
+              <Link href={`/pasalo/trades/${sale.id}`} className={buttonVariants({ variant: "outline" })}>View transfer receipt and conversation</Link>
+            </div>
+          ) : showHostedReceipt ? (
             <div className="mt-4">
               <PayMongoStatus
                 key={checkout.status}
@@ -204,8 +225,7 @@ export default async function BookingStatusPage({
         </Card>
 
         <p className="mt-6 text-center text-sm leading-6 text-muted-foreground">
-          Confirmation comes from the venue. Payment goes to the venue. This
-          page is the neutral status both sides can check.
+          {sale ? "This booking was transferred between players through Pasalo. Your current reference is shown above." : "Confirmation comes from the venue. Payment goes to the venue. This page shows your reservation status."}
         </p>
       </div>
     </div>

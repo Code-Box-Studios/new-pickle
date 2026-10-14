@@ -21,12 +21,13 @@ export async function GET(
     const key = (await params).key.join("/");
     const submission = await prisma.paymentSubmission.findFirst({
       where: { proofKey: key },
-      include: { booking: true },
+      include: { booking: { include: { pasaloListing: { select: { sellerId: true, status: true } } } } },
     });
     if (!submission) throw new NotFoundError("Proof not found");
 
     const booking = submission.booking;
-    const isCustomer = !!booking.userId && booking.userId === session.id;
+    const payerId = booking.pasaloListing?.status === "SOLD" ? booking.pasaloListing.sellerId : booking.userId;
+    const isCustomer = !!payerId && payerId === session.id;
     let allowed = isCustomer || session.role === "ADMIN";
     if (!allowed) {
       try {

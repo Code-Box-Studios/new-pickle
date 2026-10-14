@@ -19,6 +19,35 @@ for the design and
 [`docs/superpowers/plans/2026-09-07-rallypoint-thin-slice.md`](docs/superpowers/plans/2026-09-07-rallypoint-thin-slice.md)
 for the plan.
 
+## Pasalo and player statistics
+
+**Pasalo** lets players offer a paid, confirmed future Pikol booking at a lower
+price on `/pasalo`. A buyer reserves the whole session, discusses it in a private
+conversation, and pays the seller directly using GCash or Maya. The seller checks
+their wallet and confirms receipt before Pikol transfers the booking and issues
+the buyer a fresh reference. No venue approval is required; the original court
+reservation and venue payment remain intact. Original payment proofs and receipt
+references are not shared with the buyer.
+
+Offers close thirty minutes before play. Unpaid buyer claims last ten minutes.
+Declaring payment sent freezes an offer rather than reopening it automatically.
+Pikol cannot automatically verify or refund these direct payments. PayMongo
+seller payouts are not part of this release. Only local online PHP reservations
+qualify; connected Sentry bookings and repeat resales are not supported yet.
+See [Pasalo specification](docs/superpowers/specs/2026-10-15-pasalo.md).
+
+Before deploying Pasalo, apply the additive `20261015080000_pasalo` and
+`20261015090000_pasalo_trade_snapshot` migrations with `npm run db:deploy`
+using a database role authorized to run migrations. The application runtime
+role remains restricted. The new tables use RLS and have no browser Data API
+grants; authenticated Next.js routes enforce listing, transfer, and chat access.
+
+**Player statistics are scoped, not implemented.** The planned feature supports
+optional booking rosters with guest nicknames, accepted registered-player
+invitations, private attendance history, and separately confirmed match results.
+Booking a court does not automatically count as playing or winning. See
+[player statistics scope](docs/superpowers/specs/2026-10-15-player-statistics.md).
+
 ## Stack
 
 Next.js 16 (App Router) · TypeScript · Prisma · PostgreSQL 16 · Tailwind CSS 4 ·

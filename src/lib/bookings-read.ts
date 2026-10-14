@@ -17,11 +17,15 @@ export async function getBookingByReference(
       },
       court: true,
       payment: true,
+      pasaloListing: { include: { trades: { where: { status: "TRANSFERRED" }, take: 1 } } },
       history: { orderBy: { at: "asc" } },
     },
   });
   if (!booking) return null;
   if (booking.userId !== userId && role !== "ADMIN") return null;
+  if (booking.pasaloListing?.status === "SOLD" && role !== "ADMIN") {
+    return { ...booking, payment: null };
+  }
   return booking;
 }
 

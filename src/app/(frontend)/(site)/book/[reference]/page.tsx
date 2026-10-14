@@ -34,7 +34,7 @@ export default async function BookPage({
   const b = await getBookingByReference(reference, session.id, session.role);
   if (!b) notFound();
   const query = await searchParams;
-  const checkout = await checkoutForBooking(b.id);
+  const checkout = b.pasaloListing?.status === "SOLD" ? null : await checkoutForBooking(b.id);
   let merchant: Merchant | null = null;
   try {
     merchant = merchantForVenue(b.venueId, b.venue.ownerId);

@@ -5,7 +5,8 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export function pesos(cents: number): string {
-  return `₱${Math.round(cents / 100).toLocaleString("en-PH")}`;
+  const fractional = cents % 100 !== 0;
+  return `₱${(cents / 100).toLocaleString("en-PH", { minimumFractionDigits: fractional ? 2 : 0, maximumFractionDigits: 2 })}`;
 }
 
 export function timeLabel(d: Date): string {

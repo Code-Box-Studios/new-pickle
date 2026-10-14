@@ -5,6 +5,9 @@ export { prisma };
 /** Wipe every table between tests. Explicit list keeps it deterministic. */
 export async function resetDb(): Promise<void> {
   await prisma.$executeRawUnsafe(`TRUNCATE TABLE
+    "pasalo_messages",
+    "pasalo_trades",
+    "pasalo_listings",
     "payment_webhook_receipts",
     "payment_checkouts",
     "booking_status_history",

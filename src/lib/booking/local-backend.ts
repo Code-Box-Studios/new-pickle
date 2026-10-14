@@ -1,6 +1,7 @@
 import { Prisma, type Booking, type BookingStatus } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
 import { lockBooking } from "./lock";
+import { guardPasaloBookingMutation } from "@/lib/pasalo/booking-guard";
 import {
   assertNoActiveCheckout,
   assertCheckoutAllowsReschedule,
@@ -217,6 +218,7 @@ export class LocalBookingBackend implements BookingBackend {
           await assertCheckoutAllowsReschedule(bookingId, tx);
           const b = await tx.booking.findUnique({ where: { id: bookingId } });
           if (!b) throw new NotFoundError("Booking not found");
+          await guardPasaloBookingMutation(tx, b, act, true);
           if (!isOccupying(b.status)) {
             throw new ConflictError(
               "This booking can no longer be rescheduled",
@@ -253,6 +255,7 @@ export class LocalBookingBackend implements BookingBackend {
       await lockBooking(tx, bookingId);
       const b = await tx.booking.findUnique({ where: { id: bookingId } });
       if (!b) throw new NotFoundError("Booking not found");
+      await guardPasaloBookingMutation(tx, b, actor, false);
       if (isExpiredHold(b)) throw new HoldExpiredError();
 
       const data = {
@@ -296,6 +299,7 @@ export class LocalBookingBackend implements BookingBackend {
       await assertNoActiveCheckout(bookingId, tx);
       const b = await tx.booking.findUnique({ where: { id: bookingId } });
       if (!b) throw new NotFoundError("Booking not found");
+      await guardPasaloBookingMutation(tx, b, actor, false);
       if (isExpiredHold(b)) throw new HoldExpiredError();
       assertTransition(b.status, "PAYMENT_SUBMITTED");
 
@@ -382,6 +386,7 @@ export class LocalBookingBackend implements BookingBackend {
       await lockBooking(tx, bookingId);
       const b = await tx.booking.findUnique({ where: { id: bookingId } });
       if (!b) throw new NotFoundError("Booking not found");
+      await guardPasaloBookingMutation(tx, b, actor, to !== "CONFIRMED");
       assertTransition(b.status, to);
       await tx.booking.update({
         where: { id: bookingId },
