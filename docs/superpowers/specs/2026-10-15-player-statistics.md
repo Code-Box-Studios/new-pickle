@@ -1,6 +1,6 @@
 # Player statistics scope
 
-**Status: scoped, not built.** This document scopes a future feature; roster, history, and statistics are not implemented.
+**Status: implemented locally; production deployment pending.** The MVP includes rosters, invitations, private history, attendance, and match statistics. Apply the additive player statistics migration before deploying.
 
 ## Purpose and boundaries
 
@@ -11,6 +11,8 @@ Players can optionally list booking participants. Registered players can later s
 The booking holder can add guests by nickname and share invitations with registered players. A registered player must accept an invitation before their account joins the roster; the holder cannot attach arbitrary accounts. Invitations grant participation access, not booking ownership or payment control. Players may decline or leave before the session. Guest nicknames identify entries within that booking, not unique people across bookings. Repeated nicknames must remain separate entries.
 
 The holder may join their own roster, but booking ownership alone does not count as participation. An optional, self-described skill level such as beginner, intermediate, or advanced helps participants describe themselves. It is not a calculated rating or an official competitive credential.
+
+Roster membership freezes at the scheduled start to keep participation consent stable during play. Invitation links expire at the scheduled start or after seven days, whichever comes first. The roster and open invitations together are limited to 32 places.
 
 ## Attendance and personal history
 
@@ -35,6 +37,8 @@ Players can correct attendance and propose result corrections. Any changed resul
 A booking has roster entries and a completed play session; the session has attendance records and multiple matches. Each roster entry references either an accepted registered user or a local guest nickname. Matches reference roster entries, while attendance and result confirmations reference their actor and revision. Personal summaries derive from eligible records rather than editable counters.
 
 Pasalo is a separate whole-booking transfer with no venue approval. Its first release uses direct GCASH/MAYA payment confirmed by the seller. On transfer, preserve other accepted roster members and guest entries, exchange holder management access, and revoke or reissue pending invitation links under the new holder. The buyer must opt into participation; neither payment nor transfer proves attendance. Retain the seller as an ordinary participant only by explicit roster choice. Ownership changes must never reassign historical attendance, match authorship, or confirmations.
+
+Choosing Add myself before a transfer is an explicit participation choice and preserves the seller as an ordinary participant. The seller can leave before play starts; the buyer receives holder permissions without automatically becoming a player.
 
 ## Delivery phases and verification
 

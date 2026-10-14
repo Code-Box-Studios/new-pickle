@@ -20,7 +20,7 @@ export function PasaloDiscovery() {
       <div className="mb-7 space-y-5">
         <PasaloRiskDisclosure />
         <form onSubmit={event => { event.preventDefault(); setFilter(city.trim()); }} className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="min-w-0 flex-1"><Label htmlFor="pasalo-city" className="mb-2">Find offers in your city</Label><Input id="pasalo-city" placeholder="All cities" value={city} maxLength={120} onChange={event => setCity(event.target.value)} className="h-11 bg-white" /></div>
+          <div className="min-w-0 flex-1"><Label htmlFor="pasalo-city" className="mb-2">Find offers in your city</Label><Input id="pasalo-city" placeholder="All cities" value={city} maxLength={100} onChange={event => setCity(event.target.value)} className="h-11 bg-white" /></div>
           <Button type="submit"><Search className="size-4" aria-hidden />Find offers</Button>
           {filter && <Button type="button" variant="ghost" onClick={() => { setCity(""); setFilter(""); }}>Clear</Button>}
         </form>

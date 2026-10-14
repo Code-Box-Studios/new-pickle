@@ -97,6 +97,45 @@ enum BackendType {
   SENTRY
 }
 
+enum PlayerSkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+enum PlayerAttendance {
+  UNKNOWN
+  ATTENDED
+  ABSENT
+}
+enum ParticipantStatus {
+  ACTIVE
+  LEFT
+  REMOVED
+}
+enum PlayerInvitationStatus {
+  OPEN
+  ACCEPTED
+  DECLINED
+  REVOKED
+}
+enum PlayerMatchFormat {
+  SINGLES
+  DOUBLES
+}
+enum PlayerMatchWinner {
+  A
+  B
+  UNFINISHED
+}
+enum PlayerMatchTeam {
+  A
+  B
+}
+enum PlayerMatchDecision {
+  CONFIRMED
+  DISPUTED
+}
+
 model User {
   id        String   @id @default(cuid())
   supabaseId String? @unique
@@ -119,6 +158,14 @@ model User {
   pasaloListings PasaloListing[]
   pasaloTrades PasaloTrade[]
   pasaloMessages PasaloMessage[]
+  playerProfile PlayerProfile?
+  playerMemberships BookingParticipant[]
+  playerInvitationsSent PlayerInvitation[] @relation("PlayerInviteCreator")
+  playerInvitationsResponded PlayerInvitation[] @relation("PlayerInviteResponder")
+  createdPlayerMatches PlayerMatch[]
+  authoredPlayerRevisions PlayerMatchRevision[]
+  playerVotes PlayerMatchVote[]
+  playerAudits PlayerAudit[]
 
   @@map("users")
 }
@@ -291,6 +338,10 @@ model Booking {
   checkout PaymentCheckout?
   history BookingStatusHistory[]
   pasaloListing PasaloListing?
+  participants BookingParticipant[]
+  playerInvitations PlayerInvitation[]
+  playSession PlaySession?
+  playerAudits PlayerAudit[]
 
   // NOTE: a DB-generated `period` (tsrange) column and the
   // `bookings_no_overlap` EXCLUDE constraint are added by the raw-SQL migration
@@ -335,6 +386,140 @@ model PasaloListing {
   @@index([city, status, startsAt])
   @@index([sellerId, createdAt])
   @@map("pasalo_listings")
+}
+
+model PlayerProfile {
+  userId String @id
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName String
+  skillLevel PlayerSkillLevel?
+  updatedAt DateTime @updatedAt
+  @@map("player_profiles")
+}
+
+model BookingParticipant {
+  id String @id @default(cuid())
+  bookingId String
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  userId String?
+  user User? @relation(fields: [userId], references: [id])
+  nickname String
+  status ParticipantStatus @default(ACTIVE)
+  attendance PlayerAttendance @default(UNKNOWN)
+  attendanceAt DateTime?
+  joinedAt DateTime @default(now())
+  leftAt DateTime?
+  matchEntries PlayerMatchMember[]
+  @@unique([bookingId, userId])
+  @@index([userId, status, attendance])
+  @@map("booking_participants")
+}
+
+model PlayerInvitation {
+  id String @id @default(cuid())
+  bookingId String
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdById String
+  creator User @relation("PlayerInviteCreator", fields: [createdById], references: [id])
+  respondedById String?
+  responder User? @relation("PlayerInviteResponder", fields: [respondedById], references: [id])
+  tokenHash String @unique
+  label String?
+  status PlayerInvitationStatus @default(OPEN)
+  expiresAt DateTime
+  startsAt DateTime
+  endsAt DateTime
+  respondedAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([bookingId, status, expiresAt])
+  @@index([createdById])
+  @@index([respondedById])
+  @@map("player_invitations")
+}
+
+model PlaySession {
+  id String @id @default(cuid())
+  bookingId String @unique
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  matches PlayerMatch[]
+  @@map("play_sessions")
+}
+
+model PlayerMatch {
+  id String @id @default(cuid())
+  sessionId String
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdById String
+  creator User @relation(fields: [createdById], references: [id])
+  submissionId String @default(uuid()) @db.Uuid
+  submissionHash String? @db.VarChar(64)
+  currentRevision Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  revisions PlayerMatchRevision[]
+  @@unique([sessionId, createdById, submissionId])
+  @@index([sessionId, createdAt])
+  @@index([createdById])
+  @@map("player_matches")
+}
+
+model PlayerMatchRevision {
+  id String @id @default(cuid())
+  matchId String
+  match PlayerMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  number Int
+  format PlayerMatchFormat
+  winner PlayerMatchWinner
+  scoreA Int?
+  scoreB Int?
+  note String?
+  authoredById String
+  author User @relation(fields: [authoredById], references: [id])
+  createdAt DateTime @default(now())
+  players PlayerMatchMember[]
+  votes PlayerMatchVote[]
+  @@unique([matchId, number])
+  @@index([authoredById])
+  @@map("player_match_revisions")
+}
+
+model PlayerMatchMember {
+  revisionId String
+  revision PlayerMatchRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  participantId String
+  participant BookingParticipant @relation(fields: [participantId], references: [id])
+  team PlayerMatchTeam
+  @@id([revisionId, participantId])
+  @@index([participantId])
+  @@map("player_match_members")
+}
+
+model PlayerMatchVote {
+  id String @id @default(cuid())
+  revisionId String
+  revision PlayerMatchRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  decision PlayerMatchDecision
+  createdAt DateTime @default(now())
+  @@unique([revisionId, userId, decision])
+  @@index([userId, createdAt])
+  @@map("player_match_votes")
+}
+
+model PlayerAudit {
+  id String @id @default(cuid())
+  bookingId String?
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  actorId String
+  actor User @relation(fields: [actorId], references: [id])
+  action String
+  details Json?
+  createdAt DateTime @default(now())
+  @@index([actorId, createdAt])
+  @@index([bookingId, createdAt])
+  @@map("player_audits")
 }
 
 model PasaloTrade {

@@ -171,6 +171,9 @@ export function SiteHeader({
           {session ? (
             <>
               <NotificationBell inverse={transparent} />
+              <Button asChild variant={transparent ? "outlineOnDark" : "ghost"} size="icon" aria-label="Player profile" className="hidden md:inline-flex">
+                <Link href="/players"><UserRound aria-hidden /><span className="sr-only">Player profile</span></Link>
+              </Button>
               <span
                 className="sr-only"
                 title={session.email ?? session.mobile ?? undefined}

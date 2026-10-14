@@ -21,6 +21,7 @@ import {
 } from "@/lib/payments/paymongo/checkout";
 import { PayMongoStatus } from "@/components/booking/PayMongoPayment";
 import { BookingPasaloActions } from "@/components/pasalo/BookingPasaloActions";
+import { PlayerRosterCard } from "@/components/players/PlayerRosterCard";
 import { actualStart, CUTOFF_MS } from "@/lib/pasalo/rules";
 
 export const metadata = { title: "Booking status" };
@@ -128,6 +129,7 @@ export default async function BookingStatusPage({
         )}
 
         {/* Progress */}
+        {b.userId === session.id && <div className="mt-5"><PlayerRosterCard bookingId={b.id} compact /></div>}
         <Card className="mt-6 p-6 sm:p-7">
           <ul className="space-y-4">
             {STEPS.map((s) => {

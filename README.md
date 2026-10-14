@@ -42,11 +42,38 @@ using a database role authorized to run migrations. The application runtime
 role remains restricted. The new tables use RLS and have no browser Data API
 grants; authenticated Next.js routes enforce listing, transfer, and chat access.
 
-**Player statistics are scoped, not implemented.** The planned feature supports
-optional booking rosters with guest nicknames, accepted registered-player
-invitations, private attendance history, and separately confirmed match results.
-Booking a court does not automatically count as playing or winning. See
+**Player statistics** adds private player profiles and history at `/players`.
+Booking holders can optionally add nickname-only guests, choose **Add myself**,
+and invite registered players after venue confirmation. Invitations require the
+recipient's consent and grant session access without booking or payment control.
+Rosters freeze when play starts; invitation links expire at that time or after
+seven days, whichever comes first. No roster is required to reserve or pay.
+
+After a completed booking's scheduled end, registered players confirm their own
+attendance; holders report guest attendance. Singles and doubles games support
+multiple results, optional scores, corrections, and disputes. Every registered
+participant must confirm the current result. Games with registered opponents
+have **peer-confirmed** totals; games against guests have separate
+**self-reported** totals. Pending, disputed, and unfinished results do not count.
+Reserved time is not counted as actual playing time, and self-described skill
+levels are not official ratings. Venue owners cannot see private player history.
+
+Pasalo preserves accepted players and guests, revokes unused invitations, and
+gives the buyer roster management. A seller who explicitly joined remains an
+ordinary participant; the buyer must choose to join. Invitation tokens are hashed
+at rest and shared in URL fragments. A ten-minute HttpOnly cookie preserves an
+invitation through sign-in. See
 [player statistics scope](docs/superpowers/specs/2026-10-15-player-statistics.md).
+
+Apply `20261015100000_player_statistics` and `20261015110000_player_match_replay`
+with `npm run db:deploy` before deploying this version. Player tables have RLS and
+no browser Data API grants; private
+Next.js routes enforce access. Local implementation does not imply production
+deployment.
+
+Both attended and unconfirmed session lists support pagination. Game creation
+retains a submission ID across retries so a lost response cannot duplicate a
+game or its totals. Separate game submissions may have identical scores.
 
 ## Stack
 

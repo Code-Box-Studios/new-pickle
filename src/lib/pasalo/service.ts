@@ -8,6 +8,7 @@ import { activeUser, bookingAvailable, listingInclude, normalizeListing, systemM
 import { actualStart, assertListingWindow, assertOfferPrice, boundedText, CLAIM_MS } from "./rules";
 import type { ClaimInput, CreateListingInput } from "./types";
 import { listingView } from "./read";
+import { revokePlayerInvitationsOnTransfer } from "@/lib/players/transfer";
 
 export async function createListing(userId: string, input: CreateListingInput) {
   const bookingId = boundedText(input.bookingId, "Booking", 100);
@@ -87,6 +88,7 @@ export async function transferTrade(userId: string, tradeId: string) {
     await activeUser(t.buyerId, tx);
     const reference = newReference();
     const now = new Date(Date.now());
+    await revokePlayerInvitationsOnTransfer(tx, l.bookingId);
     await tx.booking.update({ where: { id: l.bookingId }, data: { userId: t.buyerId, reference, customerName: t.customerName, customerMobile: t.customerMobile, customerEmail: t.customerEmail, note: null } });
     await tx.pasaloTrade.update({ where: { id: t.id }, data: { status: "TRANSFERRED", transferredAt: now } });
     await tx.pasaloListing.update({ where: { id: l.id }, data: { status: "SOLD", soldAt: now } });

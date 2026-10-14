@@ -5,6 +5,15 @@ export { prisma };
 /** Wipe every table between tests. Explicit list keeps it deterministic. */
 export async function resetDb(): Promise<void> {
   await prisma.$executeRawUnsafe(`TRUNCATE TABLE
+    "player_audits",
+    "player_match_votes",
+    "player_match_members",
+    "player_match_revisions",
+    "player_matches",
+    "play_sessions",
+    "player_invitations",
+    "booking_participants",
+    "player_profiles",
     "pasalo_messages",
     "pasalo_trades",
     "pasalo_listings",

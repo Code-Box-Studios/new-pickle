@@ -11,7 +11,7 @@ const TABS = [
   { href: "/search", label: "Explore", icon: Search },
   { href: "/pasalo", label: "Pasalo", icon: ArrowRightLeft },
   { href: "/bookings", label: "Bookings", icon: CalendarCheck },
-  { href: "/login", label: "Account", icon: User },
+  { href: "/players", label: "Account", icon: User },
 ];
 
 export function BottomTabBar() {
@@ -25,7 +25,7 @@ export function BottomTabBar() {
         {TABS.map((t) => {
           const active = t.exact
             ? pathname === t.href
-            : pathname.startsWith(t.href) || (t.href === "/login" && pathname === "/signup");
+            : pathname.startsWith(t.href) || (t.href === "/players" && ["/login", "/signup"].includes(pathname));
           const Icon = t.icon;
           return (
             <li key={t.href} className="flex-1">

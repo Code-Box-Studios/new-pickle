@@ -1,9 +1,10 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
+import { readJsonBody } from "@/lib/api/json";
 import { requireUser } from "@/lib/auth/guards";
 import { assertPhoneOrigin } from "@/lib/auth/phone-origin";
 import { assertFullAppEnabled } from "@/lib/deployment";
-import { AppError, ForbiddenError, NotFoundError, ValidationError } from "@/lib/booking/errors";
+import { ForbiddenError, NotFoundError, ValidationError } from "@/lib/booking/errors";
 import { errorResponse } from "@/lib/http";
 import { createListing, claimListing, withdrawListing, markPaymentSent, transferTrade, releaseTrade, postMessage } from "./service";
 import { marketListings, myPasalo, publicListing, tradeThread, sellerConversations } from "./read";
@@ -13,28 +14,6 @@ export function pasaloJson(value: unknown, status = 200) {
   return NextResponse.json(value, { status, headers: { "Cache-Control": "private, no-store" } });
 }
 
-async function jsonBody(req: NextRequest): Promise<Record<string, unknown>> {
-  const limit = 12000;
-  if (Number(req.headers.get("content-length")) > limit) throw new AppError("Request body is too large.", 413, "body_too_large");
-  const reader = req.body?.getReader();
-  if (!reader) throw new ValidationError("Request body is required.");
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      size += value.byteLength;
-      if (size > limit) { await reader.cancel(); throw new AppError("Request body is too large.", 413, "body_too_large"); }
-      chunks.push(value);
-    }
-  } finally { reader.releaseLock(); }
-  try {
-    const body = JSON.parse(Buffer.concat(chunks, size).toString("utf8"));
-    if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("Invalid body");
-    return body;
-  } catch { throw new ValidationError("Send a valid JSON object."); }
-}
 
 function validatePath(path: string[]) {
   if (path.length > 3 || path.some(p => !/^[a-zA-Z0-9_-]{1,100}$/.test(p))) throw new NotFoundError();
@@ -74,7 +53,7 @@ export async function mutatePasalo(req: NextRequest, path: string[] = []) {
     if (!req.headers.get("origin")) throw new ForbiddenError("Open Pikol directly to manage Pasalo.");
     assertPhoneOrigin(req);
     const s = await requireUser();
-    const body = await jsonBody(req);
+    const body = await readJsonBody(req);
     if (!path.length) return pasaloJson(await createListing(s.id, body as unknown as CreateListingInput), 201);
     if (path.length === 2 && path[1] === "claim") {
       const claim = await claimListing(s.id, path[0], { customerName: body.customerName as string, customerMobile: body.customerMobile as string });

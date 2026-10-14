@@ -9,6 +9,7 @@ import { PaymentStep } from "@/components/booking/PaymentStep";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PayMongoPayment } from "@/components/booking/PayMongoPayment";
+import { PlayerRosterCard } from "@/components/players/PlayerRosterCard";
 import {
   checkoutForBooking,
   publicCheckoutStatus,
@@ -146,6 +147,7 @@ export default async function BookPage({
             </Card>
           )}
         </div>
+        {!dead && b.userId === session.id && <div className="mt-5"><PlayerRosterCard bookingId={b.id} compact /></div>}
       </div>
     </div>
   );
