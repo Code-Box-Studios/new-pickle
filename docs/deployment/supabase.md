@@ -228,10 +228,14 @@ Supabase replaces the database/auth/storage services, not Next.js hosting.
 ### Vercel project settings
 
 The repository includes `vercel.json`: Next.js, `npm ci`, and
-`npm run db:generate && npm run build`. Prisma's generated client is ignored by
+`npm run db:generate && npm run db:check && npm run build`. Prisma's generated client is ignored by
 Git, so generation must happen before every fresh cloud build. `.vercelignore`
 keeps local environment files, uploads, and tooling caches out of CLI source
-uploads. Set production values in Vercel's environment settings; do not upload
+uploads. The migration check blocks a full app release when committed migrations
+are pending or database access is unavailable. It does not apply schema changes;
+run `npm run db:deploy` separately with an administrator connection. An explicit
+`APP_PREVIEW_MODE=true` preview skips the database check.
+Set production values in Vercel's environment settings; do not upload
 your development `.env` or use its loopback database URLs.
 
 Functions are configured for Seoul (`icn1`) alongside this project's Supabase

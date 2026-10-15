@@ -89,5 +89,23 @@ Follow-up: the server now returns canLeave from active membership and the actual
 Manila start-time gate. The UI uses that permission instead of booking status.
 Both the backend boundary and UI regression were observed failing before the fix.
 Follow-up verification: 626 tests passed across 113 files; ESLint and TypeScript
-passed. Production deployment remains pending; apply both player migrations
-before publishing this version.
+passed. The subsequent production audit found commit ba0cf51 deployed, while
+runtime logs reported missing pasalo_listings (Prisma P2021). Production database
+migration verification remains required. A read-only db:check gate now runs
+before the Vercel build to prevent releases with pending migrations. Preview
+mode can build without a database; full app builds must pass the gate.
+
+## Release audit follow-up
+
+- Final local verification: 630 tests across 114 files, ESLint, TypeScript, and
+  the gated production build passed. The deployment guard tests include a real
+  pending migration check and verify that it does not apply the migration.
+- Local browser checks passed at 320px and 1280px, including password forms,
+  protected-page redirects, header bounds, and service worker activation.
+- Vercel serves ba0cf51 on the production domain. Runtime logs confirm missing
+  pasalo_listings; production migration inspection/application remains blocked
+  until this session loads the authenticated supabase-pikol MCP connection.
+- Supabase public Auth settings report email enabled, phone disabled, and email
+  confirmation required. Real email delivery and paid transactions were not exercised.
+- Automated production browser requests received Vercel security challenges for
+  CSS and JavaScript. Production visual verification remains incomplete.

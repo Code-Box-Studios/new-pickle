@@ -3,5 +3,5 @@
   "framework": "nextjs",
   "regions": ["icn1"],
   "installCommand": "npm ci",
-  "buildCommand": "npm run db:generate && npm run build"
+  "buildCommand": "npm run db:generate && npm run db:check && npm run build"
 }

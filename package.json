@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "payments:check": "node scripts/with-env.mjs node --conditions=react-server --import tsx scripts/paymongo-check.mjs",
     "db:generate": "node scripts/with-env.mjs prisma generate",
+    "db:check": "node scripts/with-env.mjs node scripts/check-deployment-db.mjs",
     "db:migrate": "node scripts/with-env.mjs prisma migrate dev",
     "db:deploy": "node scripts/with-env.mjs prisma migrate deploy",
     "db:seed": "node scripts/with-env.mjs tsx prisma/seed.ts",

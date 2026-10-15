@@ -1,6 +1,6 @@
 # Player statistics scope
 
-**Status: implemented locally; production deployment pending.** The MVP includes rosters, invitations, private history, attendance, and match statistics. Apply the additive player statistics migration before deploying.
+**Status: implemented; production database verification pending.** The code is deployed, but the release audit found missing Pasalo tables in production. Verify and apply the committed Pasalo and player migrations before treating these features as available. The MVP includes rosters, invitations, private history, attendance, and match statistics.
 
 ## Purpose and boundaries
 

@@ -426,6 +426,7 @@ and national city options when no venues are published.
 | `npm run lint`          | ESLint                                    |
 | `npm test`              | Vitest suite                              |
 | `npm run db:deploy`     | Apply committed migrations (**use this**) |
+| `npm run db:check`      | Read-only deployment check for pending migrations |
 | `npm run db:seed`       | Seed demo data                            |
 | `npm run db:studio`     | Prisma Studio                             |
 | `npm run cms:migrate`   | Apply committed CMS migrations            |
