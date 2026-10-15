@@ -85,7 +85,9 @@ A seller's explicit Add myself choice preserves ordinary participation after
 Pasalo, so sellers must leave before start when no longer playing. Rosters freeze
 at scheduled start, preventing retrospective additions.
 
-Deferred minor: a started CONFIRMED session can still show Leave roster, although
-the server rejects it safely. A server-derived canLeave flag is a later UI polish
-change. Production deployment remains pending; apply both player migrations
+Follow-up: the server now returns canLeave from active membership and the actual
+Manila start-time gate. The UI uses that permission instead of booking status.
+Both the backend boundary and UI regression were observed failing before the fix.
+Follow-up verification: 626 tests passed across 113 files; ESLint and TypeScript
+passed. Production deployment remains pending; apply both player migrations
 before publishing this version.

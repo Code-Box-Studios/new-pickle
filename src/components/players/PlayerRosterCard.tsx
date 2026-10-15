@@ -76,15 +76,7 @@ function RosterContent({
   const [copyError, setCopyError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const base = `/api/players/bookings/${encodeURIComponent(data.booking.id)}`;
-  const canLeave =
-    Boolean(data.selfParticipantId) &&
-    [
-      "HELD",
-      "PENDING_PAYMENT",
-      "PAYMENT_SUBMITTED",
-      "PENDING_CONFIRMATION",
-      "CONFIRMED",
-    ].includes(data.booking.status);
+  const canLeave = data.canLeave;
 
   async function mutate(path: string, body: unknown, onSuccess?: () => void) {
     if (busy) return;

@@ -66,6 +66,7 @@ const roster: RosterView = {
   isHolder: true,
   canEdit: false,
   canInvite: false,
+  canLeave: false,
   canRecord: true,
   canConfirmAttendance: true,
   selfParticipantId: "me",
@@ -400,6 +401,12 @@ describe("private results and totals", () => {
 });
 
 describe("result dispute controls", () => {
+  it("hides Leave roster when the server says a confirmed session has already started", async () => {
+    vi.stubGlobal("fetch",vi.fn(async () => response({...roster,booking:{...booking,status:"CONFIRMED"},canLeave:false})));
+    render(<PlayerRosterCard bookingId="booking-1" />);
+    await screen.findByText("Sam");
+    expect(screen.queryByRole("button",{name:"Leave roster"})).not.toBeInTheDocument();
+  });
   it("retains the same game submission ID after a lost response", async () => {
     const bodies: {submissionId:string}[] = [];
     vi.stubGlobal("fetch", vi.fn(async (_path: string, init?: RequestInit) => {
@@ -435,7 +442,7 @@ describe("result dispute controls", () => {
     let left = false;
     vi.stubGlobal("fetch", vi.fn(async (path: string) => {
       if (path.endsWith("/leave")) { left = true; return response({ok:true}); }
-      return left ? response({error:"No session access"},403) : response({...roster,isHolder:false,booking:{...booking,status:"CONFIRMED"},canConfirmAttendance:false});
+      return left ? response({error:"No session access"},403) : response({...roster,isHolder:false,booking:{...booking,status:"CONFIRMED"},canConfirmAttendance:false,canLeave:true});
     }));
     render(<PlayerRosterCard bookingId="booking-1" />);
     fireEvent.click(await screen.findByRole("button", {name:"Leave roster"}));

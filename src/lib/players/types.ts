@@ -13,7 +13,7 @@ export interface RevisionView { number: number; format: MatchFormat; teamA: Part
 export interface MatchView extends RevisionView { id: string; verification: Verification; canEdit: boolean; canVote: boolean; canDispute: boolean; myDecision: Decision | null; revisionCount: number }
 export interface SessionBookingView { id: string; venueName: string; courtName: string; startsAt: string; endsAt: string; status: string }
 export interface RosterView {
-  booking: SessionBookingView; isHolder: boolean; canEdit: boolean; canInvite: boolean; canRecord: boolean; canConfirmAttendance: boolean;
+  booking: SessionBookingView; isHolder: boolean; canEdit: boolean; canInvite: boolean; canLeave: boolean; canRecord: boolean; canConfirmAttendance: boolean;
   selfParticipantId: string | null; participants: ParticipantView[];
   invitations: { id: string; label: string | null; status: "OPEN" | "ACCEPTED" | "DECLINED" | "REVOKED" | "EXPIRED"; expiresAt: string }[];
   matches: MatchView[];

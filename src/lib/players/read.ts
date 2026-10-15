@@ -49,7 +49,7 @@ export async function rosterView(userId: string, bookingId: string): Promise<Ros
       const ownVotes = r.votes.filter(v => v.userId === userId);
       return { ...revisionView(r, userId), id: m.id, verification: verification(r), canEdit: finished && (holder || mine), canVote: finished && mine && me?.attendance === "ATTENDED" && !r.votes.some(v => v.decision === "DISPUTED"), canDispute: finished && mine && !r.votes.some(v => v.decision === "DISPUTED"), myDecision: ownVotes.find(v => v.decision === "DISPUTED")?.decision || ownVotes[0]?.decision || null, revisionCount: m.currentRevision };
     });
-    return { booking: sessionBookingView(b), isHolder: holder, canEdit: editable && holder, canInvite: editable && holder && b.status === "CONFIRMED", canRecord: finished && (holder || me?.attendance === "ATTENDED"), canConfirmAttendance: finished, selfParticipantId: me?.id ?? null,
+    return { booking: sessionBookingView(b), isHolder: holder, canEdit: editable && holder, canInvite: editable && holder && b.status === "CONFIRMED", canLeave: editable && Boolean(me), canRecord: finished && (holder || me?.attendance === "ATTENDED"), canConfirmAttendance: finished, selfParticipantId: me?.id ?? null,
       participants: b.participants.filter(p => p.status === "ACTIVE").map(p => participantView(p, userId)),
       invitations: holder ? b.playerInvitations.map(i => ({ id: i.id, label: i.label, status: i.status === "OPEN" && i.expiresAt.getTime() <= Date.now() ? "EXPIRED" : i.status, expiresAt: i.expiresAt.toISOString() })) : [], matches };
   });

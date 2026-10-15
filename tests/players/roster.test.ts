@@ -10,6 +10,17 @@ beforeEach(resetDb);
 afterEach(() => vi.restoreAllMocks());
 
 describe("Optional player rosters", () => {
+  it("returns Leave eligibility only before the actual Manila start and only for active participants", async () => {
+    const b = await seedConfirmedBooking();
+    expect(await rosterView(b.customerId,b.bookingId)).toHaveProperty("canLeave",false);
+    await joinRoster(b.customerId,b.bookingId);
+    expect(await rosterView(b.customerId,b.bookingId)).toHaveProperty("canLeave",true);
+    const now = Date.now();
+    await prisma.booking.update({where:{id:b.bookingId},data:{startsAt:new Date(now+8*3600000),endsAt:new Date(now+9*3600000)}});
+    vi.spyOn(Date,"now").mockReturnValue(now);
+    expect(await rosterView(b.customerId,b.bookingId)).toHaveProperty("canLeave",false);
+    await expect(leaveRoster(b.customerId,b.bookingId)).rejects.toThrow(/started|roster/i);
+  });
   it("rechecks a stale holder mutation after a concurrent ownership transfer releases the booking lock", async () => {
     const b = await seedConfirmedBooking();
     const buyer = await seedCustomer();
