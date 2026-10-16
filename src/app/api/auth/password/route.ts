@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
       : await client.supabase.auth.signInWithPassword({ email, password });
     // Hosted confirmation and duplicate-account responses must not grant access.
     if (body.action === "signup" && (!result.error && !result.data.session || result.error?.code === "user_already_exists")) {
-      return privateAuthResponse(NextResponse.json({ ok: true, confirmationRequired: true }));
+      return privateAuthResponse(client.applyCookies(NextResponse.json({ ok: true, confirmationRequired: true }), { onlyVerifierCookies: true }));
     }
     if (result.error) throwPasswordProviderError(result.error);
     if (!result.data.user || !result.data.session) throw new UnauthorizedError("Email or password is incorrect.");

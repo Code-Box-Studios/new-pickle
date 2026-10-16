@@ -279,10 +279,18 @@ an authenticator when first entering the workspace after this update.
 ### Supabase authentication
 
 Passwords, email magic links and six-digit Philippine phone OTPs are managed
-by Supabase. Configure the **Magic Link** and **Confirm signup** email templates
-from `supabase/templates/magic-link.html`; Pikol's callback verifies the token
-hash and retains the booking return path. Set Site URL and redirect allowlists
-in Supabase. Password recovery reuses the verified Magic Link template; no
+by Supabase. For production, set Supabase's **Authentication → URL Configuration → Site URL**
+to `https://pikol-ph.vercel.app` and add `https://pikol-ph.vercel.app/**` to **Redirect URLs**.
+Keep Vercel's production `APP_URL` on the same origin. Save these settings before
+requesting a new email; existing links do not change when the configuration changes.
+
+Use `supabase/templates/magic-link.html` for the **Magic Link** and **Confirm signup**
+email templates to verify token hashes directly on the server. Default Supabase
+email templates are also supported: PKCE callbacks exchange the code using its
+matching verifier cookie, while browser fragment callbacks remove credentials
+from the address bar and send them to the same-origin server for verification.
+Successful callbacks set HttpOnly session cookies and require MFA for privileged accounts.
+Password recovery reuses the verified Magic Link template; no
 additional recovery template or environment variable is required. Custom SMTP
 is needed for real email recipients; phone sign-in
 requires enabling the Phone provider and configuring a paid SMS service in

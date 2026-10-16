@@ -7,8 +7,9 @@ import { authCookieOptions, supabaseConfig } from "./config";
 export function createSupabaseRequestClient(request: NextRequest) {
   const pending = new Map<string, { name: string; value: string; options: CookieOptions }>();
   const { url, key } = supabaseConfig();
+  const cookieOptions = authCookieOptions();
   const supabase = createServerClient(url, key, {
-    cookieOptions: authCookieOptions(),
+    cookieOptions,
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll(values) { values.forEach(cookie => pending.set(cookie.name, cookie)); },
@@ -16,8 +17,13 @@ export function createSupabaseRequestClient(request: NextRequest) {
   });
   return {
     supabase,
-    applyCookies(response: NextResponse) {
-      pending.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+    applyCookies(response: NextResponse, { onlyVerifierCookies = false }: { onlyVerifierCookies?: boolean } = {}) {
+      pending.forEach(({ name, value, options }) => {
+        const key = name.replace(/\.\d+$/, "");
+        const verifier = key === `${cookieOptions.name}-code-verifier` || key === `${cookieOptions.name}-flows-code-verifier` ||
+          (key.startsWith(`${cookieOptions.name}-flow-`) && key.endsWith("-code-verifier"));
+        if (!onlyVerifierCookies || verifier) response.cookies.set(name, value, options);
+      });
       response.headers.set("Cache-Control", "private, no-store");
       response.headers.set("Pragma", "no-cache");
       response.headers.set("Expires", "0");

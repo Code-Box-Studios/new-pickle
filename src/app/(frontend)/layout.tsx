@@ -3,6 +3,7 @@ import "../globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 import { ShareToPhonePanel } from "@/components/dev/ShareToPhonePanel";
 import { InstallProvider } from "@/components/pwa/InstallProvider";
+import { SupabaseEmailCallback } from "@/components/auth/SupabaseEmailCallback";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
@@ -32,6 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <body className="font-sans text-ink antialiased">
+        <SupabaseEmailCallback />
         <InstallProvider>
           <ToastProvider>{children}</ToastProvider>
           <ShareToPhonePanel />
