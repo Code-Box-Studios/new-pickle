@@ -14,5 +14,5 @@ export default async function OwnerLoginPage({ searchParams }: { searchParams: P
   const next = ownerDestination(sp.next, session?.role);
   if (session && requiresOwnerMfa(session.role)) redirect(session.mfaVerified ? next : ownerVerificationPath(next));
   if (session) redirect("/list-your-venue");
-  return <AuthShell audience="owner"><OwnerLoginForm nextPath={next} preview={isPreviewMode()} authError={sp.error === "invalid" || sp.error === "missing" ? sp.error : undefined} /></AuthShell>;
+  return <AuthShell audience="owner"><OwnerLoginForm nextPath={next} preview={isPreviewMode()} authError={sp.error === "oauth" || sp.error === "invalid" || sp.error === "missing" ? sp.error : undefined} /></AuthShell>;
 }

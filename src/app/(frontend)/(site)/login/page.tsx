@@ -24,7 +24,7 @@ export default async function LoginPage({
 
   return (
     <AuthShell>
-      <LoginForm preview={isPreviewMode()} nextPath={safeNextPath(sp.next)} authError={sp.error === "missing" || sp.error === "invalid" ? sp.error : undefined} />
+      <LoginForm preview={isPreviewMode()} nextPath={safeNextPath(sp.next)} authError={sp.error === "oauth" || sp.error === "missing" || sp.error === "invalid" ? sp.error : undefined} />
     </AuthShell>
   );
 }

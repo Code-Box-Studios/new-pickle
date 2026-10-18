@@ -278,11 +278,27 @@ an authenticator when first entering the workspace after this update.
 
 ### Supabase authentication
 
-Passwords, email magic links and six-digit Philippine phone OTPs are managed
+Google sign-in, passwords, email magic links and six-digit Philippine phone OTPs are managed
 by Supabase. For production, set Supabase's **Authentication → URL Configuration → Site URL**
 to `https://pikol-ph.vercel.app` and add `https://pikol-ph.vercel.app/**` to **Redirect URLs**.
 Keep Vercel's production `APP_URL` on the same origin. Save these settings before
 requesting a new email; existing links do not change when the configuration changes.
+
+**Continue with Google** is available on player sign-in, venue sign-in and signup.
+It uses Supabase's Google provider and a server-created PKCE flow. The callback at
+`/auth/verify` checks the code and browser verifier before setting HttpOnly session
+cookies. Booking return paths are preserved, and venue owners still complete
+authenticator verification. Google users receive the same account permissions as
+other sign-in methods; choosing venue access does not grant an owner role.
+
+For a new Supabase project, enable **Authentication → Sign In / Providers → Google**
+and enter the Google Cloud web application's client ID and secret there. In Google
+Cloud, add the production origin `https://pikol-ph.vercel.app` and the authorized
+redirect URI `https://bulxmjdxoophdskdpyhg.supabase.co/auth/v1/callback` (use your
+project's Supabase callback when deploying another project). Keep the Google
+consent screen published for public access; a testing consent screen allows only
+its configured test users. No Google client secret belongs in frontend environment
+variables. The existing Supabase redirect allowlist above covers the app callback.
 
 Use `supabase/templates/magic-link.html` for the **Magic Link** and **Confirm signup**
 email templates to verify token hashes directly on the server. Default Supabase

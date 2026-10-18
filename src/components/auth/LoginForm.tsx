@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PhoneLoginForm } from "./PhoneLoginForm";
 import { PasswordLoginForm } from "./PasswordLoginForm";
 import { Brand } from "@/components/ui/brand";
+import { GoogleSignInButton } from "./GoogleSignInButton";
 
 export type AuthMode = "login" | "signup";
 
@@ -21,7 +22,7 @@ export function LoginForm({
 }: {
   nextPath?: string;
   mode?: AuthMode;
-  authError?: "missing" | "invalid";
+  authError?: "missing" | "invalid" | "oauth";
   preview?: boolean;
   audience?: "player" | "owner";
 }) {
@@ -49,7 +50,7 @@ export function LoginForm({
       </div>
       {authError && !preview && (
         <div role="alert" className="mb-5 rounded-lg border border-line bg-mist px-4 py-3 text-sm leading-relaxed text-ink-soft">
-          That sign-in link is invalid or expired. Request a new link below to continue.
+          {authError === "oauth" ? "Google sign-in couldn’t be completed. Try again or choose another sign-in method." : "That sign-in link is invalid or expired. Request a new link below to continue."}
         </div>
       )}
       {preview ? (
@@ -63,6 +64,8 @@ export function LoginForm({
           </Button>
         </div>
       ) : (
+      <>
+      <GoogleSignInButton nextPath={nextPath} audience={audience} />
       <Tabs defaultValue="email" className="gap-6">
         <TabsList className="w-full rounded-full border border-line/70 bg-mist p-1 group-data-[orientation=horizontal]/tabs:h-auto" aria-label={signup ? "Account creation method" : "Sign-in method"}>
           <TabsTrigger value="email" className="h-11 rounded-full px-3 text-ink-soft data-[state=active]:border-line data-[state=active]:text-brand-700"><Mail className="size-4" aria-hidden />Email</TabsTrigger>
@@ -71,6 +74,7 @@ export function LoginForm({
         <TabsContent value="email" className="auth-method-panel"><EmailLoginForm nextPath={nextPath} mode={mode} /></TabsContent>
         <TabsContent value="phone" className="auth-method-panel"><PhoneLoginForm nextPath={nextPath} mode={mode} /></TabsContent>
       </Tabs>
+      </>
       )}
       {!preview && <p className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
         <ShieldCheck className="size-3.5 shrink-0 text-brand-700" aria-hidden /> {owner ? "Two-step verification protects your workspace" : "Secure sign-in. More time to play."}

@@ -26,7 +26,7 @@ export default async function SignUpPage({
   const owner = nextPath?.startsWith("/owner") || nextPath === "/list-your-venue" || nextPath === "/admin";
   return (
     <AuthShell audience={owner ? "owner" : "player"}>
-      <LoginForm audience={owner ? "owner" : "player"} preview={isPreviewMode()} mode="signup" nextPath={safeNextPath(sp.next)} authError={sp.error === "missing" || sp.error === "invalid" ? sp.error : undefined} />
+      <LoginForm audience={owner ? "owner" : "player"} preview={isPreviewMode()} mode="signup" nextPath={safeNextPath(sp.next)} authError={sp.error === "oauth" || sp.error === "missing" || sp.error === "invalid" ? sp.error : undefined} />
     </AuthShell>
   );
 }

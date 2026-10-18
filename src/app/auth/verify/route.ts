@@ -17,8 +17,19 @@ export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
   const flowId = req.nextUrl.searchParams.get("sb_flow_id");
   const type = req.nextUrl.searchParams.get("type");
-  const failure = (error: string) => NextResponse.redirect(new URL(`/login?error=${error}`, base), { headers: { "Cache-Control": "private, no-store", "Referrer-Policy": "no-referrer" } });
+  const google = req.nextUrl.searchParams.get("provider") === "google";
+  const failure = (error: string) => {
+    const login = new URL("/login", base);
+    login.searchParams.set("error", google && error === "invalid" ? "oauth" : error);
+    const next = safeNextPath(req.nextUrl.searchParams.get("next"));
+    if (next) login.searchParams.set("next", next);
+    // OAuth failures can include a fragment. Suppress redirect fragment
+    // inheritance so the email callback does not misclassify Google's error.
+    if (google) login.hash = "#";
+    return privateAuthResponse(NextResponse.redirect(login));
+  };
   if (isPreviewMode()) return failure("unavailable");
+  if (google && (req.nextUrl.searchParams.has("error") || !code)) return failure("invalid");
   if (!tokenHash && !code) {
     // Default implicit email links carry credentials in a fragment only the browser can read.
     const login = new URL("/login", base);
